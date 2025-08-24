@@ -9,14 +9,21 @@
   <link rel="stylesheet" href="detail.css" />
 </head>
 <body>
+  <!-- Header -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Motoria home">
-        <svg class="logo" viewBox="0 0 64 64"><rect x="4" y="20" width="56" height="24" rx="6"/><circle cx="20" cy="48" r="6"/><circle cx="48" cy="48" r="6"/></svg>
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+          <circle cx="20" cy="48" r="6"></circle>
+          <circle cx="48" cy="48" r="6"></circle>
+        </svg>
         <span class="brand-name">Motoria</span>
       </a>
       <nav class="nav">
-        <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
         <ul id="navMenu" class="nav-menu">
           <li><a href="results.html">Buy</a></li>
           <li><a href="#">Sell</a></li>
@@ -30,58 +37,102 @@
     </div>
   </header>
 
+  <!-- Breadcrumbs -->
+  <nav class="container crumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a> › <a href="results.html">Search</a> › <span id="crumbTitle">Car</span>
+  </nav>
+
   <main class="container detail-layout">
-    <div class="gallery">
+    <!-- Gallery -->
+    <section class="gallery">
       <div class="hero-img">
         <img id="heroImg" src="assets/cars/sportage.jpg" alt="Car photo" />
       </div>
       <div class="thumbs" id="thumbs"></div>
-    </div>
 
-    <aside class="summary glass">
-      <h1 id="title">Kia Sportage 1.6 T‑GDi</h1>
+      <!-- Similar cars -->
+      <section class="section">
+        <div class="section-head">
+          <h2>Similar cars</h2>
+          <div class="actions">
+            <button class="carousel-btn" id="simPrev" aria-label="Previous">&#10094;</button>
+            <button class="carousel-btn" id="simNext" aria-label="Next">&#10095;</button>
+          </div>
+        </div>
+        <div class="carousel" id="similar" tabindex="0" aria-label="Similar listings"></div>
+      </section>
+    </section>
+
+    <!-- Sticky summary -->
+    <aside class="summary glass" id="summary">
+      <div class="summary-top">
+        <h1 id="title">Kia Sportage 1.6 T‑GDi</h1>
+        <div class="btn-row">
+          <button class="icon-btn" id="saveBtn" title="Save">♡</button>
+          <button class="icon-btn" id="shareBtn" title="Share">⤴︎</button>
+          <button class="icon-btn" id="printBtn" title="Print">🖨</button>
+        </div>
+      </div>
+
+      <div class="badges-row">
+        <span class="badge badge-verify">Verified</span>
+        <span class="badge" id="locBadge">London</span>
+        <span class="badge" id="yearBadge">2021</span>
+      </div>
+
       <div class="price" id="price">£19,900</div>
       <div class="specs" id="specs">2021 • 29,000 km • Petrol • Manual • London</div>
 
+      <div class="seller glass-min">
+        <div class="seller-top">
+          <div class="seller-name" id="dealerName">City Cars</div>
+          <div class="stars" id="dealerStars" aria-label="Dealer rating">★★★★★</div>
+        </div>
+        <div class="seller-meta muted">Dealer • ID‑verified • Responsive</div>
+      </div>
+
       <div class="cta-col">
         <a class="btn btn-primary" href="#contact">Contact seller</a>
-        <button class="btn btn-ghost" id="saveBtn">Save</button>
+        <a class="btn btn-ghost" href="#finance">Finance options</a>
       </div>
 
-      <div class="seller">
-        <div class="seller-name">City Cars <span class="badge">Verified</span></div>
-        <div class="seller-meta">Dealer • ★★★★☆ (4.6)</div>
-      </div>
+      <ul class="chip-list" id="featureChips"></ul>
     </aside>
 
+    <!-- Details + contact + finance -->
     <section class="glass details">
       <h2>Vehicle overview</h2>
       <div class="grid2">
-        <div>
-          <ul class="kv">
-            <li><span>Make</span><strong>Kia</strong></li>
-            <li><span>Model</span><strong>Sportage</strong></li>
-            <li><span>Year</span><strong>2021</strong></li>
-            <li><span>Mileage</span><strong>29,000 km</strong></li>
-          </ul>
-        </div>
-        <div>
-          <ul class="kv">
-            <li><span>Fuel</span><strong>Petrol</strong></li>
-            <li><span>Gearbox</span><strong>Manual</strong></li>
-            <li><span>Colour</span><strong>White</strong></li>
-            <li><span>Owners</span><strong>1</strong></li>
-          </ul>
-        </div>
+        <ul class="kv">
+          <li><span>Make</span><strong id="makeVal">Kia</strong></li>
+          <li><span>Model</span><strong id="modelVal">Sportage</strong></li>
+          <li><span>Year</span><strong id="yearVal">2021</strong></li>
+          <li><span>Mileage</span><strong id="kmVal">29,000 km</strong></li>
+        </ul>
+        <ul class="kv">
+          <li><span>Fuel</span><strong id="fuelVal">Petrol</strong></li>
+          <li><span>Gearbox</span><strong id="boxVal">Manual</strong></li>
+          <li><span>Colour</span><strong id="colourVal">White</strong></li>
+          <li><span>Owners</span><strong id="ownersVal">1</strong></li>
+        </ul>
       </div>
 
       <h3>Description</h3>
       <p id="desc">Well‑maintained Sportage with full service history, Apple CarPlay, rear camera and lane assist.</p>
 
-      <h3>Features</h3>
-      <ul class="pill-list">
+      <h3>Key features</h3>
+      <ul class="pill-list" id="featureList">
         <li>Apple CarPlay</li><li>Android Auto</li><li>Rear Camera</li><li>Heated Seats</li><li>Lane Assist</li>
       </ul>
+
+      <h3 id="finance">Finance estimator</h3>
+      <form class="finance" id="finForm">
+        <label>Deposit (£)<input type="number" name="deposit" value="3000" min="0"></label>
+        <label>APR (%)<input type="number" step="0.1" name="apr" value="8.9" min="0"></label>
+        <label>Term (months)<input type="number" name="months" value="48" min="12"></label>
+        <button class="btn btn-ghost" type="submit">Calculate</button>
+        <div class="muted small" id="finOut"></div>
+      </form>
     </section>
 
     <section class="glass contact" id="contact">
