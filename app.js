@@ -2,15 +2,15 @@
 (function () {
   'use strict';
 
-  // ===== Simple Auth (primary) =====
+  // ===== Simple Auth =====
   const LS_USERS = 'motoria_users';
   const LS_SESSION = 'motoria_session';
 
-  function getUsers()    { try { return JSON.parse(localStorage.getItem(LS_USERS)   || '[]');   } catch { return []; } }
-  function setUsers(u)   { localStorage.setItem(LS_USERS, JSON.stringify(u)); }
-  function getSession()  { try { return JSON.parse(localStorage.getItem(LS_SESSION) || 'null'); } catch { return null; } }
-  function setSession(s) { localStorage.setItem(LS_SESSION, JSON.stringify(s)); }
-  function clearSession(){ localStorage.removeItem(LS_SESSION); }
+  const getUsers    = () => { try { return JSON.parse(localStorage.getItem(LS_USERS)   || '[]');   } catch { return []; } };
+  const setUsers    = (u) => localStorage.setItem(LS_USERS, JSON.stringify(u));
+  const getSession  = () => { try { return JSON.parse(localStorage.getItem(LS_SESSION) || 'null'); } catch { return null; } };
+  const setSession  = (s) => localStorage.setItem(LS_SESSION, JSON.stringify(s));
+  const clearSession= () => localStorage.removeItem(LS_SESSION);
 
   // Seed demo accounts if first run
   if (!localStorage.getItem(LS_USERS)) {
@@ -20,31 +20,36 @@
     ]);
   }
 
-  // Expose globally
+  // Expose
   window.MotoriaAuth = { getUsers, setUsers, getSession, setSession, clearSession };
 
-  // ===== Utilities =====
+  // ===== Helpers =====
   function resolveSession() {
     const s = getSession();
     if (!s) return null;
     if (s.role) return s;
     const u = getUsers().find(x => (x.email||'').toLowerCase() === (s.email||'').toLowerCase());
     if (u) return { ...s, role: u.role || 'user', name: s.name || u.name };
-    if ((s.email||'').toLowerCase() === 'admin@motoria.test') return { ...s, role:'admin' };
-    return { ...s, role:'user' };
+    if ((s.email||'').toLowerCase() === 'admin@motoria.test') return { ...s, role: 'admin' };
+    return { ...s, role: 'user' };
   }
 
   function ensureAuthSlot() {
     const navMenu = document.getElementById('navMenu');
     if (!navMenu) return null;
-    // Add divider if not present (keeps layout consistent across pages)
+
+    // Remove any static "Sign in" or "List your car" that might be hard-coded in HTML
+    navMenu.querySelectorAll('a[href$="auth.html"]').forEach(a => a.closest('li')?.remove());
+
+    // Ensure divider exists exactly once
     if (!navMenu.querySelector('.divider')) {
       const liDiv = document.createElement('li');
       liDiv.className = 'divider';
       liDiv.setAttribute('aria-hidden','true');
       navMenu.appendChild(liDiv);
     }
-    // Ensure slot
+
+    // Ensure #authSlot exists
     let slot = document.getElementById('authSlot');
     if (!slot) {
       slot = document.createElement('li');
@@ -55,11 +60,10 @@
   }
 
   function hydrateHeader() {
-    // Header basics
-    const header = document.getElementById('siteHeader');
-    const yearEl = document.getElementById('year');
+    const header    = document.getElementById('siteHeader');
+    const yearEl    = document.getElementById('year');
     const navToggle = document.getElementById('navToggle');
-    const navMenu  = document.getElementById('navMenu');
+    const navMenu   = document.getElementById('navMenu');
 
     if (header) header.classList.toggle('elevated', scrollY > 6);
     if (yearEl)  yearEl.textContent = new Date().getFullYear();
@@ -72,25 +76,25 @@
     const slot = ensureAuthSlot();
     if (!slot || !navMenu) return;
 
-    // Clear any previously injected items
+    // Clear previously injected items
     [...navMenu.querySelectorAll('[data-auth]')].forEach(n => n.remove());
     slot.innerHTML = '';
 
-    const session = resolveSession();
-
-    if (session) {
+    // Decide what to render
+    const s = resolveSession();
+    if (s) {
       // Persist recovered role if needed
       const s0 = getSession();
-      if (s0 && !s0.role && session.role) setSession(session);
+      if (s0 && !s0.role && s.role) setSession(s);
 
       // Admin CMS (admins only)
-      if (session.role === 'admin') {
+      if (s.role === 'admin') {
         slot.insertAdjacentHTML('beforebegin',
           `<li data-auth="1"><a class="btn btn-ghost" href="cms.html">Admin CMS</a></li>`
         );
       }
 
-      // Account + Dealer + Sign out
+      // Account + Dealer + Sign out (no Sign in anywhere)
       slot.insertAdjacentHTML('afterend', `
         <li data-auth="1"><a class="btn btn-ghost" href="dashboard-user.html" id="accountBtn">My account</a></li>
         <li data-auth="1"><a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a></li>
@@ -102,7 +106,7 @@
         location.href = 'index.html';
       });
     } else {
-      // Logged out
+      // Logged out: show Sign in + List your car
       slot.insertAdjacentHTML('afterend', `
         <li data-auth="1"><a class="btn btn-ghost" href="auth.html" id="signInBtn">Sign in</a></li>
         <li data-auth="1"><a class="btn btn-primary" href="auth.html">List your car</a></li>
@@ -110,44 +114,29 @@
     }
   }
 
-  // ===== Make it robust across all pages =====
-  // 1) Hydrate when DOM is ready (or immediately if already loaded)
+  // Robust hydration across all pages
   function ready(fn){
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn, { once:true });
     } else { fn(); }
   }
-
-  // 2) Retry if header/nav renders late (static hosts sometimes stream HTML)
   function waitAndHydrate(retries = 20) {
     const navMenu = document.getElementById('navMenu');
     if (navMenu) { hydrateHeader(); return; }
     if (retries <= 0) return;
-    setTimeout(() => waitAndHydrate(retries - 1), 100); // try for ~2s
+    setTimeout(() => waitAndHydrate(retries - 1), 100);
   }
 
-  // 3) Re-hydrate on scroll (for elevation), storage (login/logout), and navigation events
+  // Elevation on scroll + re-hydrate on storage/nav changes
   addEventListener('scroll', () => {
     const header = document.getElementById('siteHeader');
     if (header) header.classList.toggle('elevated', scrollY > 6);
   });
   addEventListener('storage', (e) => {
     if (e.key === LS_SESSION || e.key === LS_USERS) waitAndHydrate(1);
-    if (e.key === 'motoria_saved_cars') updateSavedCount();
   });
   addEventListener('pageshow', () => waitAndHydrate(1));
   addEventListener('popstate', () => waitAndHydrate(1));
 
-  // Kick off
   ready(() => waitAndHydrate());
-
-  // Optional saved cars badge
-  function updateSavedCount(){
-    const el = document.querySelector('.saved-count');
-    if (!el) return;
-    let count = 0;
-    try { count = JSON.parse(localStorage.getItem('motoria_saved_cars')||'[]').length; } catch {}
-    el.textContent = String(count);
-  }
-  updateSavedCount();
 })();
