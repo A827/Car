@@ -55,3 +55,36 @@
 
   window.MotoriaData = { KEYS, GBP, KM, getCars, getCarById, saveCar, saveSearchFromParams };
 })();
+// data.js — add taxonomy helpers
+(function(){
+  'use strict';
+  const KEY_LIVE = 'motoria_taxonomy_v1';
+  function load(k,d){ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d)) }catch(_){ return d } }
+
+  const DEFAULT_TAXO = {
+    makes: [
+      { name:'Kia', models:['Sportage','Ceed','Rio','Stonic'] },
+      { name:'Skoda', models:['Octavia','Fabia','Superb','Karoq'] },
+      { name:'Hyundai', models:['Ioniq','i10','i20','Tucson'] },
+      { name:'Volkswagen', models:['Golf','Polo','Passat','T-Roc'] },
+      { name:'BMW', models:['1 Series','3 Series','X1','X3'] },
+      { name:'Audi', models:['A3','A4','Q2','Q3'] },
+      { name:'Ford', models:['Fiesta','Focus','Puma','Kuga'] },
+      { name:'Toyota', models:['Corolla','Yaris','C-HR','RAV4'] }
+    ]
+  };
+
+  function getTaxonomy(){
+    return load(KEY_LIVE, DEFAULT_TAXO);
+  }
+  function modelsForMake(makeName){
+    const taxo = getTaxonomy();
+    const m = taxo.makes.find(x => x.name.toLowerCase() === String(makeName||'').toLowerCase());
+    return m ? m.models.slice() : [];
+  }
+
+  // Attach to existing MotoriaData if present
+  window.MotoriaData = Object.assign({}, window.MotoriaData||{}, {
+    getTaxonomy, modelsForMake
+  });
+})();
