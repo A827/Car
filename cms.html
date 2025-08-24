@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Admin CMS (Makes & Models)</title>
+  <title>Motoria • Admin CMS</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="cms.css" />
@@ -30,8 +30,7 @@
           <li><a href="#">Finance</a></li>
           <li><a href="#">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <li><a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a></li>
-          <li><a class="btn btn-primary" href="dashboard-user.html">My account</a></li>
+          <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
@@ -48,6 +47,7 @@
         </div>
       </div>
       <button class="tablink active" data-view="taxonomy">Makes & Models</button>
+      <button class="tablink" data-view="dealers">Dealers</button>
       <button class="tablink" data-view="import">Import / Export</button>
       <button class="tablink" data-view="help">Help</button>
     </aside>
@@ -97,6 +97,30 @@
         </div>
       </section>
 
+      <!-- Dealers -->
+      <section class="panel" id="panel-dealers">
+        <div class="panel-head">
+          <h2>Dealers</h2>
+          <div class="row">
+            <input id="dealerSearch" class="filter" placeholder="Search dealers by name, email, company…" />
+            <button id="exportDealersCsv" class="btn btn-ghost">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="tbl head">
+            <div>Name</div>
+            <div>Company</div>
+            <div>Email</div>
+            <div>Phone</div>
+            <div>Status</div>
+            <div>Listings</div>
+            <div>Actions</div>
+          </div>
+          <div id="dealerRows" class="tbl body"></div>
+        </div>
+      </section>
+
       <!-- Import / Export -->
       <section class="panel" id="panel-import">
         <div class="panel-head">
@@ -120,7 +144,8 @@
         <div class="panel-head"><h2>Help</h2></div>
         <div class="glass-min">
           <p><strong>Publish</strong> saves your makes & models to the site-wide store so dropdowns on search and listing forms update instantly.</p>
-          <p>Only <em>Admins</em> can access this page. Use account: <code>admin@motoria.test</code> / <code>motoria123</code> in the demo.</p>
+          <p>Only <em>Admins</em> can access this page. Demo admin: <code>admin@motoria.test</code> / <code>motoria123</code>.</p>
+          <p><strong>Dealers</strong> shows users with role <code>dealer</code> (or entries you added). You can verify/unverify them and jump to their public listings.</p>
         </div>
       </section>
     </section>
