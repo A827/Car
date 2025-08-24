@@ -1,99 +1,111 @@
-/* ===== Basic behaviors ===== */
-const header = document.getElementById('siteHeader');
-if (header) {
-  window.addEventListener('scroll', () => {
-    header.classList.toggle('elevated', window.scrollY > 6);
+// app.js — global header/auth glue usable on every page
+(function(){
+  'use strict';
+
+  // ===== Simple Auth (primary) =====
+  const LS_USERS = 'motoria_users';
+  const LS_SESSION = 'motoria_session';
+
+  function getUsers(){ try{return JSON.parse(localStorage.getItem(LS_USERS)||'[]')}catch(_){return []} }
+  function setUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+  function getSession(){ try{return JSON.parse(localStorage.getItem(LS_SESSION)||'null')}catch(_){return null} }
+  function setSession(s){ localStorage.setItem(LS_SESSION, JSON.stringify(s)); }
+  function clearSession(){ localStorage.removeItem(LS_SESSION); }
+
+  // Seed demo accounts if first run
+  if (!localStorage.getItem(LS_USERS)) {
+    setUsers([
+      { name:'Admin',     email:'admin@motoria.test', pass:'motoria123', role:'admin' },
+      { name:'Demo User', email:'user@motoria.test',  pass:'demo123',    role:'user'  },
+    ]);
+  }
+
+  // Expose a single source so all pages can use it
+  window.MotoriaAuth = { getUsers, setUsers, getSession, setSession, clearSession };
+
+  // ===== Header UI state =====
+  const header = document.getElementById('siteHeader');
+  const yearEl = document.getElementById('year');
+  const navToggle = document.getElementById('navToggle');
+  const navMenu   = document.getElementById('navMenu');
+
+  // Elevation on scroll
+  if (header) addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // Mobile menu
+  navToggle?.addEventListener('click', ()=>{
+    const exp = navToggle.getAttribute('aria-expanded')==='true';
+    navToggle.setAttribute('aria-expanded', String(!exp));
+    navMenu?.classList.toggle('open');
   });
-}
 
-/* Mobile nav toggle */
-const navToggle = document.getElementById('navToggle');
-const navMenu = document.getElementById('navMenu');
-navToggle?.addEventListener('click', () => {
-  const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-  navToggle.setAttribute('aria-expanded', String(!expanded));
-  navMenu?.classList.toggle('open');
-});
+  // Rewrite header buttons depending on auth state
+  function hydrateHeader(){
+    const session = getSession();
+    const menu = document.getElementById('navMenu');
+    if (!menu) return;
 
-/* Year in footer */
-const yearEl = document.getElementById('year');
-if (yearEl) yearEl.textContent = new Date().getFullYear();
+    // Remove any previous “account” block so we can re-render
+    // (keeps static menu items like Buy/Sell/Finance/Dealers)
+    [...menu.querySelectorAll('[data-auth]')].forEach(n=>n.remove());
 
-/* ===== Featured data (replace with API later) ===== */
-const featured = [
-  { id: 1, title: 'Volkswagen Golf 1.5 TSI', price: 15500, year: 2019, km: 55000, fuel: 'Petrol',  img: 'assets/cars/golf.jpg' },
-  { id: 2, title: 'BMW 320d M Sport',        price: 24900, year: 2018, km: 42000, fuel: 'Diesel',  img: 'assets/cars/bmw.jpg' },
-  { id: 3, title: 'Ford Fiesta Titanium',     price: 13200, year: 2017, km: 60000, fuel: 'Petrol',  img: 'assets/cars/fiesta.jpg' },
-  { id: 4, title: 'Audi Q3 35 TFSI',          price: 28700, year: 2020, km: 25000, fuel: 'Petrol',  img: 'assets/cars/q3.jpg' },
-  { id: 5, title: 'Toyota Corolla Icon',      price: 16900, year: 2020, km: 31000, fuel: 'Hybrid',  img: 'assets/cars/corolla.jpg' }
-];
+    if (session) {
+      const liDivider = document.createElement('li');
+      liDivider.className = 'divider';
+      liDivider.setAttribute('aria-hidden','true');
+      liDivider.setAttribute('data-auth','1');
 
-/* ===== Render featured carousel ===== */
-const carouselEl = document.getElementById('carousel');
+      const liAccount = document.createElement('li'); liAccount.setAttribute('data-auth','1');
+      liAccount.innerHTML = `<a class="btn btn-ghost" href="dashboard-user.html" id="accountBtn">My account</a>`;
 
-function formatPrice(num){
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(num);
-}
-function km(n){ return `${n.toLocaleString('en-GB')} km`; }
+      const liDealer = document.createElement('li'); liDealer.setAttribute('data-auth','1');
+      liDealer.innerHTML = `<a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a>`;
 
-function renderCards() {
-  if (!carouselEl) return;
-  carouselEl.innerHTML = featured.map(c => `
-    <article class="card" tabindex="0" role="group" aria-label="${c.title}">
-      <a href="detail.html?id=${c.id}" style="display:block">
-        <img class="card-img" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
-      </a>
-      <div class="card-body">
-        <div class="price">${formatPrice(c.price)}</div>
-        <div class="meta">${c.title}</div>
-        <div class="meta">${c.year} • ${km(c.km)} • ${c.fuel}</div>
-        <div class="badges">
-          <span class="badge">Verified</span>
-          <span class="badge">Instant message</span>
-        </div>
-      </div>
-    </article>
-  `).join('');
-}
-renderCards();
+      const liOut = document.createElement('li'); liOut.setAttribute('data-auth','1');
+      liOut.innerHTML = `<button class="btn btn-primary" id="signOutBtn" type="button">Sign out</button>`;
 
-/* ===== Carousel controls (smooth scroll) ===== */
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
+      menu.appendChild(liDivider);
+      menu.appendChild(liAccount);
+      menu.appendChild(liDealer);
+      menu.appendChild(liOut);
 
-function cardWidth(){
-  const first = carouselEl?.firstElementChild;
-  if (!first) return 320;
-  const rect = first.getBoundingClientRect();
-  // 16px gap in your CSS grid
-  return rect.width + 16;
-}
+      document.getElementById('signOutBtn')?.addEventListener('click', ()=>{
+        clearSession();
+        // return to homepage after sign out
+        location.href = 'index.html';
+      });
+    } else {
+      const liDivider = document.createElement('li');
+      liDivider.className = 'divider';
+      liDivider.setAttribute('aria-hidden','true');
+      liDivider.setAttribute('data-auth','1');
 
-prevBtn?.addEventListener('click', () => {
-  if (!carouselEl) return;
-  carouselEl.scrollBy({ left: -cardWidth(), behavior: 'smooth' });
-});
-nextBtn?.addEventListener('click', () => {
-  if (!carouselEl) return;
-  carouselEl.scrollBy({ left: cardWidth(), behavior: 'smooth' });
-});
+      const liIn = document.createElement('li'); liIn.setAttribute('data-auth','1');
+      liIn.innerHTML = `<a class="btn btn-ghost" href="auth.html" id="signInBtn">Sign in</a>`;
 
-/* Keyboard support */
-carouselEl?.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') nextBtn?.click();
-  if (e.key === 'ArrowLeft')  prevBtn?.click();
-});
+      const liList = document.createElement('li'); liList.setAttribute('data-auth','1');
+      liList.innerHTML = `<a class="btn btn-primary" href="auth.html">List your car</a>`;
 
-/* ===== Search handling =====
-   NOTE: your homepage form id is `homeSearch` */
-const form = document.getElementById('homeSearch');
-form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const data = new FormData(form);
-  const params = new URLSearchParams();
-  for (const [k,v] of data.entries()) if (v) params.append(k, v);
+      menu.appendChild(liDivider);
+      menu.appendChild(liIn);
+      menu.appendChild(liList);
+    }
+  }
+  hydrateHeader();
 
-  // Navigate to results page with query params
-  const url = `results.html?${params.toString()}`;
-  window.location.href = url;
-});
+  // Optional little badge to show saved cars count (if .saved-count exists)
+  function updateSavedCount(){
+    const el = document.querySelector('.saved-count');
+    if (!el) return;
+    let count = 0;
+    try {
+      const saved = JSON.parse(localStorage.getItem('motoria_saved_cars')||'[]');
+      count = saved.length;
+    } catch(_){}
+    el.textContent = String(count);
+  }
+  updateSavedCount();
+  window.addEventListener('storage', (e)=>{ if (e.key==='motoria_saved_cars') updateSavedCount(); });
+
+})();
