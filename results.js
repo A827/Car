@@ -26,21 +26,22 @@ const prevPage = qs('#prevPage');
 const nextPage = qs('#nextPage');
 const chipSummary = qs('#chipSummary');
 
+const viewListBtn = qs('#viewList');
+const viewGridBtn = qs('#viewGrid');
+
 const PAGE_SIZE = 6;
-let state = { page:1, sort:'relevance' };
+let state = { page:1, sort:'relevance', view:'list' };
 
 function GBP(n){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)}
 function KM(n){return `${n.toLocaleString('en-GB')} km`}
-function stars(r){
-  const full = Math.round(r);
-  return '★'.repeat(full)+'☆'.repeat(5-full);
-}
+function stars(r){ const full=Math.round(r); return '★'.repeat(full)+'☆'.repeat(5-full) }
 
 function readParams(){
   const p = new URLSearchParams(location.search);
   state.sort = p.get('sort') || 'relevance';
+  state.view = p.get('view') || 'list';
 
-  // quick search fields
+  // quick search
   qs('#quickSearch [name="q"]').value   = p.get('q') || '';
   qs('#quickSearch [name="loc"]').value = p.get('loc') || '';
   qs('#quickSearch [name="sort"]').value = state.sort;
@@ -66,6 +67,15 @@ function readParams(){
   chipSummary.innerHTML = chips.map(([k,v])=>`
     <span class="chip">${v} <button aria-label="Remove ${v}" data-remove="${k}" data-val="${v}">✕</button></span>
   `).join('');
+
+  // view toggle UI
+  const isGrid = state.view === 'grid';
+  viewGridBtn.classList.toggle('active', isGrid);
+  viewListBtn.classList.toggle('active', !isGrid);
+  viewGridBtn.setAttribute('aria-pressed', String(isGrid));
+  viewListBtn.setAttribute('aria-pressed', String(!isGrid));
+  cardsEl.classList.toggle('cards', isGrid);
+  cardsEl.classList.toggle('listlike', !isGrid);
 }
 readParams();
 
@@ -119,7 +129,7 @@ function render(){
           <h3 class="title"><a href="detail.html?id=${c.id}" style="color:inherit;text-decoration:none">${c.title}</a></h3>
           <div class="meta-row"><span>${c.year}</span> • <span>${KM(c.km)}</span> • <span>${c.fuel}</span> • <span>${c.gearbox}</span></div>
           <div class="badges">
-            <span class="dealer">${c.dealer} • <span class="stars">${stars(c.rating)}</span></span>
+            <span class="dealer">${c.dealer} • <span class="stars">${'★'.repeat(Math.round(c.rating))}</span></span>
             <span class="badge">${c.loc}</span>
             <span class="badge">Verified</span>
           </div>
@@ -202,6 +212,16 @@ chipSummary.addEventListener('click', e=>{
 // pager
 qs('#prevPage').addEventListener('click',()=>{ state.page--; render(); });
 qs('#nextPage').addEventListener('click',()=>{ state.page++; render(); });
+
+// view toggle
+function setView(view){
+  const p = new URLSearchParams(location.search);
+  p.set('view', view);
+  history.replaceState({},'',`?${p.toString()}`);
+  readParams(); render();
+}
+viewListBtn.addEventListener('click', ()=> setView('list'));
+viewGridBtn.addEventListener('click', ()=> setView('grid'));
 
 // save search (local demo)
 qs('#saveSearchBtn').addEventListener('click', ()=>{

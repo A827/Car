@@ -19,7 +19,7 @@
       <nav class="nav" aria-label="Primary">
         <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu"><span></span><span></span><span></span></button>
         <ul id="navMenu" class="nav-menu">
-          <li><a href="results.html">Buy</a></li><li><a href="#">Sell</a></li><li><a href="#">Finance</a></li><li><a href="#">Dealers</a></li>
+          <li><a href="results.html" aria-current="page">Buy</a></li><li><a href="#">Sell</a></li><li><a href="#">Finance</a></li><li><a href="#">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li><li><a class="btn btn-ghost" href="#">Sign in</a></li><li><a class="btn btn-primary" href="#">List your car</a></li>
         </ul>
       </nav>
@@ -43,9 +43,13 @@
       </form>
 
       <div class="tools-actions">
-        <div id="chipSummary" class="chips"></div>
+        <div id="chipSummary" class="chips" aria-live="polite"></div>
         <div class="tools-meta">
           <span id="resultCount" class="muted"></span>
+          <div class="view-toggle" role="group" aria-label="View">
+            <button id="viewList"  class="vbtn active" aria-pressed="true"  title="List view">≣</button>
+            <button id="viewGrid"  class="vbtn"        aria-pressed="false" title="Grid view">▦</button>
+          </div>
           <button id="saveSearchBtn" class="btn btn-ghost">Save search</button>
         </div>
       </div>
