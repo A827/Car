@@ -9,15 +9,35 @@
   <link rel="stylesheet" href="auth.css" />
 </head>
 <body>
+  <!-- Header -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Motoria home">
-        <svg class="logo" viewBox="0 0 64 64"><rect x="4" y="20" width="56" height="24" rx="6"/><circle cx="20" cy="48" r="6"/><circle cx="48" cy="48" r="6"/></svg>
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+          <circle cx="20" cy="48" r="6"></circle>
+          <circle cx="48" cy="48" r="6"></circle>
+        </svg>
         <span class="brand-name">Motoria</span>
       </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <ul id="navMenu" class="nav-menu">
+          <li><a href="results.html">Buy</a></li>
+          <li><a href="#">Sell</a></li>
+          <li><a href="#">Finance</a></li>
+          <li><a href="#">Dealers</a></li>
+          <li class="divider" aria-hidden="true"></li>
+          <li><a class="btn btn-ghost" href="auth.html">Sign in</a></li>
+          <li><a class="btn btn-primary" href="#">List your car</a></li>
+        </ul>
+      </nav>
     </div>
   </header>
 
+  <!-- Auth card -->
   <main class="container auth-wrap">
     <section class="auth-card glass">
       <div class="tabs">
@@ -25,23 +45,53 @@
         <button class="tab" data-view="register">Create account</button>
       </div>
 
-      <form id="signForm" class="form active">
-        <label>Email<input type="email" name="email" required /></label>
-        <label>Password<input type="password" name="pass" required /></label>
+      <!-- Sign in -->
+      <form id="signForm" class="form active" autocomplete="on">
+        <label>Email
+          <input type="email" name="email" required placeholder="you@motoria.test" />
+        </label>
+        <label>Password
+          <input type="password" name="pass" required placeholder="••••••••" />
+        </label>
         <button class="btn btn-primary" type="submit">Sign in</button>
+        <p class="small muted">Demo accounts: <code>admin@motoria.test</code> / <code>motoria123</code> &nbsp;|&nbsp; <code>user@motoria.test</code> / <code>demo123</code></p>
       </form>
 
-      <form id="regForm" class="form">
-        <label>Name<input name="name" required /></label>
-        <label>Email<input type="email" name="email" required /></label>
-        <label>Password<input type="password" name="pass" required /></label>
+      <!-- Register -->
+      <form id="regForm" class="form" autocomplete="on">
+        <label>Name
+          <input name="name" required placeholder="Your name" />
+        </label>
+        <label>Email
+          <input type="email" name="email" required placeholder="you@motoria.test" />
+        </label>
+        <label>Password
+          <input type="password" name="pass" required placeholder="Create a password" />
+        </label>
         <button class="btn btn-primary" type="submit">Create account</button>
+        <p class="small muted">We’ll keep this demo data in your browser only.</p>
       </form>
-
-      <div class="muted small">By continuing you agree to our terms & privacy.</div>
     </section>
   </main>
 
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand-footer">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+            <circle cx="20" cy="48" r="6"></circle>
+            <circle cx="48" cy="48" r="6"></circle>
+          </svg>
+          <span>Motoria</span>
+        </div>
+        <p class="muted">© <span id="year"></span> Motoria Ltd.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Load order matters: app.js first, then auth.js -->
+  <script src="app.js"></script>
   <script src="auth.js"></script>
 </body>
 </html>
