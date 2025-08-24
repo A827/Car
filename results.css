@@ -19,7 +19,7 @@
 .vbtn.active{background:#f1f5ff}
 
 /* layout */
-.results-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;padding:22px 0 44px}
+.results-layout{display:grid;grid-template-columns: 300px 1fr;gap:20px;padding:22px 0 44px}
 .filters{position:sticky;top:72px;align-self:start}
 #filtersForm{display:grid;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;box-shadow:var(--shadow-soft)}
 .filter-group label{font-weight:700;font-size:14px;display:block;margin-bottom:4px}
@@ -38,13 +38,15 @@
 .grid .price-big{font-size:22px;font-weight:800;text-align:right}
 .grid .actions{display:flex;gap:8px;align-self:end;justify-content:flex-end}
 .card .stars{color:#f59e0b}
+.badge{font-size:12px;background:var(--brand-weak);color:var(--brand-ink);padding:4px 8px;border-radius:999px}
 
 /* grid view */
-.grid.cards .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-soft)}
+.grid.cards .card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-soft);display:block}
 .grid.cards{grid-template-columns:repeat(3,1fr)}
 .grid.cards .thumb{aspect-ratio:4/3;min-height:auto}
-.grid.cards .info{grid-template-columns:1fr;gap:6px}
+.grid.cards .info{display:grid;grid-template-columns:1fr;gap:6px}
 .grid.cards .price-big{text-align:left}
+.grid.cards .actions{justify-content:flex-start}
 
 /* pager */
 .pager{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:18px}
