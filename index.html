@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Motoria • Buy & Sell Cars</title>
   <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="favicon.ico" />
 </head>
 <body>
   <!-- Header -->
@@ -37,11 +37,14 @@
     </div>
   </header>
 
-  <!-- Hero with pill search (ATUK vibe) -->
+  <!-- Hero with pill search -->
   <section class="hero hero-atuk">
-    <div class="hero-bg" role="img" aria-label="Cars on a dealership forecourt"></div>
+    <div class="hero-bg" role="img" aria-label="Modern dealership forecourt"></div>
     <div class="hero-overlay"></div>
+
     <div class="container hero-content">
+      <h1 class="hero-title">Find your next car</h1>
+
       <div class="search-tabs" role="tablist" aria-label="Search category">
         <button class="search-tab active" data-type="used" aria-selected="true">Used</button>
         <button class="search-tab" data-type="nearly">Nearly new</button>
@@ -82,13 +85,13 @@
         <button class="btn btn-primary pill-btn" type="submit">Search</button>
       </form>
 
-      <div class="chip-row" aria-label="Popular quick filters">
+      <nav class="chip-row" aria-label="Popular quick filters">
         <a class="chip" href="results.html?q=Golf&sort=year_desc">VW Golf</a>
         <a class="chip" href="results.html?fuel=Electric">Electric</a>
         <a class="chip" href="results.html?max=10000">Under £10k</a>
         <a class="chip" href="results.html?gearbox=Automatic">Automatic</a>
         <a class="chip" href="results.html?fuel=Hybrid">Hybrid</a>
-      </div>
+      </nav>
 
       <ul class="trust-badges" role="list">
         <li><span class="tick"></span>Trusted dealers</li>
@@ -111,7 +114,7 @@
     </div>
   </section>
 
-  <!-- Featured strip (unchanged logic, looks cleaner) -->
+  <!-- Featured listings -->
   <section class="container section">
     <div class="section-head">
       <h2>Featured listings</h2>
@@ -168,12 +171,10 @@
   </footer>
 
   <script>
-    // header elevation
     const header = document.getElementById('siteHeader');
     addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // mobile nav
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
     navToggle?.addEventListener('click', ()=>{
@@ -182,7 +183,6 @@
       navMenu.classList.toggle('open');
     });
 
-    // search tabs (used/new)
     let searchType = 'used';
     document.querySelectorAll('.search-tab').forEach(b=>{
       b.addEventListener('click', ()=>{
@@ -192,7 +192,6 @@
       });
     });
 
-    // homepage search → results.html with params
     const form = document.getElementById('homeSearch');
     form.addEventListener('submit', (e)=>{
       e.preventDefault();
