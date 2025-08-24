@@ -3,18 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Find Your Perfect Car</title>
-  <meta name="description" content="Search, buy and sell cars with verified dealers. Finance options, alerts and a modern experience." />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>Motoria • Buy & Sell Cars</title>
+  <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="favicon.ico" />
 </head>
 <body>
-  <!-- ================= HEADER ================= -->
+  <!-- Header -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <a class="brand" href="/" aria-label="Motoria home">
-        <!-- Simple logo mark -->
+      <a class="brand" href="index.html" aria-label="Motoria home">
         <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="4" y="20" width="56" height="24" rx="6"></rect>
           <circle cx="20" cy="48" r="6"></circle>
@@ -22,13 +20,12 @@
         </svg>
         <span class="brand-name">Motoria</span>
       </a>
-
       <nav class="nav" aria-label="Primary">
         <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
           <span></span><span></span><span></span>
         </button>
         <ul id="navMenu" class="nav-menu">
-          <li><a href="#">Buy</a></li>
+          <li><a href="results.html">Buy</a></li>
           <li><a href="#">Sell</a></li>
           <li><a href="#">Finance</a></li>
           <li><a href="#">Dealers</a></li>
@@ -40,64 +37,81 @@
     </div>
   </header>
 
-  <!-- ================= HERO ================= -->
-  <section class="hero">
-    <!-- Use your own photo/video: place a 1920x1080 image at assets/hero.jpg -->
-    <div class="hero-bg" role="img" aria-label="Sport sedan driving at dusk"></div>
+  <!-- Hero with pill search (ATUK vibe) -->
+  <section class="hero hero-atuk">
+    <div class="hero-bg" role="img" aria-label="Cars on a dealership forecourt"></div>
     <div class="hero-overlay"></div>
-
     <div class="container hero-content">
-      <h1 class="hero-title">Find your perfect car</h1>
+      <div class="search-tabs" role="tablist" aria-label="Search category">
+        <button class="search-tab active" data-type="used" aria-selected="true">Used</button>
+        <button class="search-tab" data-type="nearly">Nearly new</button>
+        <button class="search-tab" data-type="new">New</button>
+      </div>
 
-      <form id="searchForm" class="search-bar" role="search" aria-label="Car search">
-        <label class="field">
-          <span class="label">Make / Model</span>
-          <input type="text" name="q" placeholder="e.g. BMW 3 Series" list="makes" autocomplete="off" />
+      <form id="homeSearch" class="pill-search" role="search" aria-label="Car search">
+        <div class="pill">
+          <label>Make</label>
+          <input name="make" placeholder="Any make" list="makes" />
           <datalist id="makes">
-            <option>Volkswagen Golf</option>
-            <option>BMW 3 Series</option>
-            <option>Audi A3</option>
-            <option>Ford Fiesta</option>
-            <option>Toyota Corolla</option>
+            <option>Volkswagen</option><option>BMW</option><option>Audi</option>
+            <option>Ford</option><option>Toyota</option><option>Kia</option>
           </datalist>
-        </label>
-        <label class="field">
-          <span class="label">Location</span>
-          <input type="text" name="loc" placeholder="City or postcode" />
-        </label>
-        <label class="field">
-          <span class="label">Max Price</span>
+        </div>
+        <div class="pill">
+          <label>Model</label>
+          <input name="model" placeholder="Any model" />
+        </div>
+        <div class="pill">
+          <label>Postcode / City</label>
+          <input name="loc" placeholder="e.g. SW1A or London" />
+        </div>
+        <div class="pill pill-sm">
+          <label>Max price</label>
           <select name="max">
-            <option value="">Any</option>
-            <option value="5000">£5,000</option>
-            <option value="10000">£10,000</option>
-            <option value="15000">£15,000</option>
-            <option value="20000">£20,000</option>
-            <option value="30000">£30,000</option>
-            <option value="50000">£50,000</option>
+            <option value="">Any</option><option>5000</option><option>10000</option>
+            <option>15000</option><option>20000</option><option>30000</option><option>50000</option>
           </select>
-        </label>
-        <button class="btn btn-primary search-btn" type="submit" aria-label="Search cars">Search</button>
+        </div>
+        <div class="pill pill-sm">
+          <label>Year from</label>
+          <select name="year_min">
+            <option value="">Any</option><option>2015</option><option>2017</option>
+            <option>2019</option><option>2020</option><option>2022</option>
+          </select>
+        </div>
+        <button class="btn btn-primary pill-btn" type="submit">Search</button>
       </form>
 
-      <ul class="usp-list" role="list">
-        <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 4v6c0 5-4 9-7 10-3-1-7-5-7-10V6l7-4zM6 10l4 4 8-8"/></svg>
-          Verified sellers
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm-1 13l-4-4 1.4-1.4L11 12.2l5.6-5.6L18 8"/></svg>
-          Free vehicle checks
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 9h14M5 15h14"/></svg>
-          Easy finance options
-        </li>
+      <div class="chip-row" aria-label="Popular quick filters">
+        <a class="chip" href="results.html?q=Golf&sort=year_desc">VW Golf</a>
+        <a class="chip" href="results.html?fuel=Electric">Electric</a>
+        <a class="chip" href="results.html?max=10000">Under £10k</a>
+        <a class="chip" href="results.html?gearbox=Automatic">Automatic</a>
+        <a class="chip" href="results.html?fuel=Hybrid">Hybrid</a>
+      </div>
+
+      <ul class="trust-badges" role="list">
+        <li><span class="tick"></span>Trusted dealers</li>
+        <li><span class="tick"></span>Free vehicle checks</li>
+        <li><span class="tick"></span>Flexible finance</li>
       </ul>
     </div>
   </section>
 
-  <!-- =============== FEATURED CAROUSEL =============== -->
+  <!-- Brand strip -->
+  <section class="container section brand-strip">
+    <h2>Browse by brand</h2>
+    <div class="brand-grid">
+      <a href="results.html?make=Volkswagen" class="brand-tile">Volkswagen</a>
+      <a href="results.html?make=BMW" class="brand-tile">BMW</a>
+      <a href="results.html?make=Audi" class="brand-tile">Audi</a>
+      <a href="results.html?make=Ford" class="brand-tile">Ford</a>
+      <a href="results.html?make=Toyota" class="brand-tile">Toyota</a>
+      <a href="results.html?make=Kia" class="brand-tile">Kia</a>
+    </div>
+  </section>
+
+  <!-- Featured strip (unchanged logic, looks cleaner) -->
   <section class="container section">
     <div class="section-head">
       <h2>Featured listings</h2>
@@ -106,24 +120,21 @@
         <button class="carousel-btn" id="nextBtn" aria-label="Next listings">&#10095;</button>
       </div>
     </div>
-
-    <div class="carousel" id="carousel" tabindex="0" aria-label="Featured listings">
-      <!-- Cards are injected by app.js from data below -->
-    </div>
+    <div class="carousel" id="carousel" tabindex="0" aria-label="Featured listings"></div>
   </section>
 
-  <!-- =============== SELL CARD / CTA =============== -->
+  <!-- CTA -->
   <section class="cta container">
     <div class="cta-card">
       <div>
-        <h3>Sell your car in 24 hours</h3>
-        <p>Create your listing, get verified, reach thousands of buyers.</p>
+        <h3>Sell your car fast</h3>
+        <p>Reach serious buyers and verified dealers with one listing.</p>
       </div>
       <a class="btn btn-primary" href="#">List your car</a>
     </div>
   </section>
 
-  <!-- ================= FOOTER ================= -->
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
@@ -142,8 +153,6 @@
           <li><a href="#">About</a></li>
           <li><a href="#">Safety & Trust</a></li>
           <li><a href="#">For Dealers</a></li>
-          <li><a href="#">Finance</a></li>
-          <li><a href="#">Contact</a></li>
         </ul>
       </nav>
       <form class="newsletter" aria-label="Newsletter">
@@ -158,6 +167,40 @@
     </div>
   </footer>
 
+  <script>
+    // header elevation
+    const header = document.getElementById('siteHeader');
+    addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // mobile nav
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    navToggle?.addEventListener('click', ()=>{
+      const exp = navToggle.getAttribute('aria-expanded')==='true';
+      navToggle.setAttribute('aria-expanded', String(!exp));
+      navMenu.classList.toggle('open');
+    });
+
+    // search tabs (used/new)
+    let searchType = 'used';
+    document.querySelectorAll('.search-tab').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('.search-tab').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        searchType = b.dataset.type;
+      });
+    });
+
+    // homepage search → results.html with params
+    const form = document.getElementById('homeSearch');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const p = new URLSearchParams(new FormData(form));
+      if (searchType) p.set('type', searchType);
+      location.href = `results.html?${p.toString()}`;
+    });
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

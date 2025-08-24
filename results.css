@@ -1,43 +1,41 @@
-/* Sticky tools bar */
-.tools-wrap{
-  position:sticky; top:0; z-index:30;
-  background:#ffffffee; backdrop-filter:saturate(180%) blur(10px);
-  border-bottom:1px solid #eef2f7;
-}
-.tools{display:flex; align-items:center; gap:16px; padding:10px 0; justify-content:space-between}
-.tools-search{display:flex; gap:8px; width:min(800px, 100%)}
-.tools-search input, .tools-search select{
-  height:40px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; background:#fff; width:100%;
-}
+.tools-wrap{position:sticky;top:0;z-index:30;background:#ffffffee;backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid #eef2f7}
+.tools{display:flex;align-items:center;gap:16px;padding:10px 0;justify-content:space-between}
+.tools-search{display:flex;gap:8px;width:min(820px,100%)}
+.tools-search input,.tools-search select{height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px;background:#fff;width:100%}
+.tools-actions{display:flex;align-items:center;gap:16px}
+.tools-actions .chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips .chip{height:28px;padding:0 10px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;display:inline-flex;align-items:center;gap:6px}
+.chips .chip button{border:0;background:none;cursor:pointer}
 
-.results-layout{
-  display:grid; grid-template-columns: 280px 1fr; gap:20px; padding:22px 0 44px;
-}
+/* layout */
+.results-layout{display:grid;grid-template-columns: 300px 1fr;gap:20px;padding:22px 0 44px}
+.filters{position:sticky;top:72px;align-self:start}
+#filtersForm{display:grid;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;box-shadow:var(--shadow-soft)}
+.filter-group label{font-weight:700;font-size:14px;display:block;margin-bottom:4px}
+.filter-group .row{display:flex;gap:8px}
+.filter-group input[type="number"],.filter-group input[type="text"]{width:100%;height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px}
+.checkcol{display:grid;gap:8px}
 
-/* Filters */
-.filters{position:sticky; top:72px; align-self:start}
-#filtersForm{display:grid; gap:14px; background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:16px; box-shadow:var(--shadow-soft)}
-.filter-group label{font-weight:700; font-size:14px; display:block; margin-bottom:4px}
-.filter-group .row{display:flex; gap:8px}
-.filter-group input[type="number"], .filter-group input[type="text"]{
-  width:100%; height:40px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px;
-}
-.checkcol{display:grid; gap:8px}
+/* cards — list-like (photo left, details right) */
+.grid{display:grid;gap:12px}
+.grid.listlike .card{display:grid;grid-template-columns:260px 1fr;gap:12px;align-items:stretch;background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden}
+.grid .thumb{width:100%;height:100%;min-height:180px;object-fit:cover;background:#eef2ff}
+.grid .info{padding:12px;display:grid;grid-template-columns:1fr auto;gap:8px}
+.grid .title{font-weight:800;margin:0}
+.grid .meta-row,.grid .badges{display:flex;gap:8px;flex-wrap:wrap}
+.grid .dealer{font-size:12px;color:#334155;background:#f1f5ff;border:1px solid #e5e7eb;padding:4px 8px;border-radius:999px}
+.grid .price-big{font-size:22px;font-weight:800}
+.grid .actions{display:flex;gap:8px;align-self:end}
+.card .stars{color:#f59e0b}
 
-/* Results grid */
-.grid{display:grid; gap:16px; grid-template-columns: repeat(3, 1fr)}
-.grid .card-img{aspect-ratio: 4/3}
-.pager{display:flex; align-items:center; gap:10px; justify-content:center; margin-top:18px}
+/* pager */
+.pager{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:18px}
 
-@media (max-width: 1080px){
-  .grid{grid-template-columns: repeat(2, 1fr)}
-}
-@media (max-width: 860px){
+/* responsive */
+@media (max-width:1020px){
   .results-layout{grid-template-columns:1fr}
   .filters{position:static}
-  .grid{grid-template-columns: 1fr 1fr}
 }
-@media (max-width: 580px){
-  .tools-search{flex-wrap:wrap}
-  .grid{grid-template-columns: 1fr}
+@media (max-width:720px){
+  .grid.listlike .card{grid-template-columns:1fr}
 }
