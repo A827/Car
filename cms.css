@@ -31,8 +31,28 @@
 
 .filebtn{position:relative;overflow:hidden}
 
+/* Dealers table */
+.tbl{display:grid}
+.tbl.head{grid-template-columns:1.2fr 1.2fr 1.4fr 1fr .9fr .7fr 1fr;font-weight:700;color:#0e1726;border-bottom:1px solid #e5e7eb;padding:8px}
+.tbl.body{display:grid}
+.tbl .row{display:grid;grid-template-columns:1.2fr 1.2fr 1.4fr 1fr .9fr .7fr 1fr;align-items:center;border-bottom:1px solid #f1f5f9;padding:10px 8px;gap:8px}
+.tbl .row:last-child{border-bottom:0}
+.dealer-name{font-weight:700}
+.status-pill{font-size:12px;border-radius:999px;padding:3px 8px;border:1px solid #e5e7eb}
+.status-pill.verified{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+.status-pill.unverified{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+
+.tbl .actions{display:flex;gap:6px;flex-wrap:wrap}
+.tbl .actions .btn{height:36px;padding:0 10px;border-radius:10px}
+
 /* Responsive */
 @media (max-width:1100px){
   .grid{grid-template-columns:1fr}
   .taxo-wrap{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .tbl.head{display:none}
+  .tbl .row{grid-template-columns:1fr;align-items:start}
+  .tbl .row > div{padding:2px 0}
+  .tbl .actions{margin-top:6px}
 }
