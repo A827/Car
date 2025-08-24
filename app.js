@@ -24,10 +24,10 @@
   window.MotoriaAuth = { getUsers, setUsers, getSession, setSession, clearSession };
 
   // ===== Header UI state =====
-  const header   = document.getElementById('siteHeader');
-  const yearEl   = document.getElementById('year');
-  const navToggle= document.getElementById('navToggle');
-  const navMenu  = document.getElementById('navMenu');
+  const header    = document.getElementById('siteHeader');
+  const yearEl    = document.getElementById('year');
+  const navToggle = document.getElementById('navToggle');
+  const navMenu   = document.getElementById('navMenu');
 
   // Elevation on scroll
   if (header) addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
@@ -40,27 +40,44 @@
     navMenu?.classList.toggle('open');
   });
 
+  // Derive a trusted role for the current session
+  function resolveSession(){
+    const s = getSession();
+    if (!s) return null;
+    if (s.role) return s; // already has role
+    // try to recover role from Users DB by email
+    const u = getUsers().find(x => (x.email||'').toLowerCase() === (s.email||'').toLowerCase());
+    if (u) return { ...s, role: u.role || 'user', name: s.name || u.name };
+    // fallback: treat admin email as admin (in case old data exists)
+    if ((s.email||'').toLowerCase() === 'admin@motoria.test') return { ...s, role:'admin' };
+    return { ...s, role:'user' };
+  }
+
   // Render auth buttons into #authSlot (no duplicates)
   function hydrateHeader(){
-    const session = getSession();
     const slot = document.getElementById('authSlot');
-    if (!slot) return;
-
-    // Clear prior render and any siblings we created earlier
-    // (Anything with data-auth is ours; core nav stays intact)
     const menu = document.getElementById('navMenu');
+    if (!slot || !menu) return;
+
+    // Clear prior render
     [...menu.querySelectorAll('[data-auth]')].forEach(n=>n.remove());
-    slot.innerHTML = ''; // keep slot element for layout
+    slot.innerHTML = '';
+
+    const session = resolveSession();
 
     if (session) {
-      // Admin CMS (only for admins) — add BEFORE slot
+      // Update session if we recovered a role
+      const existing = getSession();
+      if (existing && !existing.role && session.role) setSession(session);
+
+      // Admin CMS (only for admins)
       if (session.role === 'admin') {
         slot.insertAdjacentHTML('beforebegin',
           `<li data-auth="1"><a class="btn btn-ghost" href="cms.html">Admin CMS</a></li>`
         );
       }
 
-      // Account + Dealer + Sign out — add AFTER slot
+      // Account + Dealer + Sign out
       slot.insertAdjacentHTML('afterend', `
         <li data-auth="1"><a class="btn btn-ghost" href="dashboard-user.html" id="accountBtn">My account</a></li>
         <li data-auth="1"><a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a></li>
@@ -79,7 +96,14 @@
       `);
     }
   }
+
   hydrateHeader();
+
+  // Re-hydrate when session/users change (other tab or after login)
+  window.addEventListener('storage', (e)=>{
+    if (e.key === LS_SESSION || e.key === LS_USERS) hydrateHeader();
+    if (e.key === 'motoria_saved_cars') updateSavedCount();
+  });
 
   // Optional saved cars badge (if .saved-count exists)
   function updateSavedCount(){
@@ -93,6 +117,4 @@
     el.textContent = String(count);
   }
   updateSavedCount();
-  window.addEventListener('storage', (e)=>{ if (e.key==='motoria_saved_cars') updateSavedCount(); });
-
 })();
