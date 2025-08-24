@@ -1,0 +1,38 @@
+.cms{display:grid;grid-template-columns:280px 1fr;gap:20px;padding:24px 0 44px}
+.cms-side{display:grid;gap:10px;height:max-content;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:var(--shadow-soft);padding:16px}
+.cms-head{display:flex;gap:10px;align-items:center;margin-bottom:4px}
+.cms-head .avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#eff6ff;border:1px solid #e5e7eb;font-size:22px}
+.tablink{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;font-weight:700}
+.tablink.active{background:#f1f5ff}
+.cms-main{display:grid;gap:16px}
+
+.panel{display:none}
+.panel.active{display:block}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.panel-head .row{display:flex;gap:8px;align-items:center}
+
+.filter{height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px;background:#fff}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{padding:14px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:var(--shadow-soft)}
+.form-col{display:grid;gap:10px}
+.form-col input{height:42px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px}
+.row{display:flex;gap:8px;align-items:center}
+
+.taxo-wrap{display:grid;grid-template-columns:360px 1fr;gap:12px;margin-top:12px}
+.make-list,.model-list{border:1px solid #e5e7eb;border-radius:12px;background:#fff;min-height:360px;padding:8px;display:grid;gap:6px}
+.make-item{display:flex;align-items:center;justify-content:space-between;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px}
+.make-item.active{background:#f1f5ff;border-color:#dbeafe}
+.model-item{display:flex;align-items:center;justify-content:space-between;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px}
+
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer}
+.btn-icon:hover{background:#f8fafc}
+.badge-min{font-size:12px;background:#eef2ff;color:#0a2e8a;border-radius:999px;padding:2px 8px;border:1px solid #dbeafe}
+
+.filebtn{position:relative;overflow:hidden}
+
+/* Responsive */
+@media (max-width:1100px){
+  .grid{grid-template-columns:1fr}
+  .taxo-wrap{grid-template-columns:1fr}
+}
