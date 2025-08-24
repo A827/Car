@@ -129,7 +129,7 @@ function render(){
           <h3 class="title"><a href="detail.html?id=${c.id}" style="color:inherit;text-decoration:none">${c.title}</a></h3>
           <div class="meta-row"><span>${c.year}</span> • <span>${KM(c.km)}</span> • <span>${c.fuel}</span> • <span>${c.gearbox}</span></div>
           <div class="badges">
-            <span class="dealer">${c.dealer} • <span class="stars">${'★'.repeat(Math.round(c.rating))}</span></span>
+            <span class="dealer">${c.dealer} • <span class="stars">${stars(c.rating)}</span></span>
             <span class="badge">${c.loc}</span>
             <span class="badge">Verified</span>
           </div>
