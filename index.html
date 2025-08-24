@@ -33,8 +33,8 @@
           <li><a href="#">Finance</a></li>
           <li><a href="#">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <li><a class="btn btn-ghost" href="auth.html">Sign in</a></li>
-          <li><a class="btn btn-primary" href="#">List your car</a></li>
+          <!-- Auth buttons are injected by app.js -->
+          <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
@@ -61,14 +61,12 @@
             <span>Make</span>
             <select id="makeSelect" name="make">
               <option value="">Any</option>
-              <!-- populated by taxonomy -->
             </select>
           </label>
           <label class="field">
             <span>Model</span>
             <select id="modelSelect" name="model" disabled>
               <option value="">Any</option>
-              <!-- populated by taxonomy -->
             </select>
           </label>
           <label class="field">
@@ -110,7 +108,7 @@
     </div>
   </section>
 
-  <!-- Brand strip (monochrome) -->
+  <!-- Brand strip -->
   <section class="container section brand-pro">
     <div class="section-head">
       <h2>Browse by brand</h2>
@@ -207,12 +205,10 @@
       const makeSel = document.getElementById('makeSelect');
       const modelSel = document.getElementById('modelSelect');
 
-      // Read current URL params to preselect (supports deep-links)
       const params = new URLSearchParams(location.search);
       const selectedMake  = params.get('make')  || '';
       const selectedModel = params.get('model') || '';
 
-      // Try CMS taxonomy; fallback to static list if missing
       if (MD.getTaxonomy && MD.modelsForMake) {
         const taxo = MD.getTaxonomy();
         makeSel.innerHTML = `<option value="">Any</option>` + taxo.makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
@@ -228,7 +224,6 @@
         refreshModels();
         makeSel.addEventListener('change', refreshModels);
       } else {
-        // Fallback: minimal static options
         const STATIC_MAKES = ['Volkswagen','BMW','Audi','Ford','Toyota','Kia'];
         makeSel.innerHTML = `<option value="">Any</option>` + STATIC_MAKES.map(m=>`<option>${m}</option>`).join('');
       }
@@ -242,13 +237,13 @@
       location.href = `results.html?${p.toString()}`;
     });
 
-    // ===== Featured carousel demo (simple static list) =====
+    // ===== Featured carousel demo =====
     const featured = [
-      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol', img:'assets/cars/sportage.jpg' },
-      { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel', img:'assets/cars/octavia.jpg'  },
-      { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric',img:'assets/cars/leaf.jpg'     },
-      { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',  img:'assets/cars/a180.jpg'     },
-      { id:10, title:'Hyundai Ioniq Hybrid',  price:15800, year:2018, km:62000, fuel:'Hybrid',  img:'assets/cars/ioniq.jpg'    }
+      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol',  img:'assets/cars/sportage.jpg' },
+      { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel',  img:'assets/cars/octavia.jpg'  },
+      { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric', img:'assets/cars/leaf.jpg'     },
+      { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',   img:'assets/cars/a180.jpg'     },
+      { id:10, title:'Hyundai Ioniq Hybrid',  price:15800, year:2018, km:62000, fuel:'Hybrid',   img:'assets/cars/ioniq.jpg'    }
     ];
     const GBP = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
     const KM  = n => `${(+n||0).toLocaleString('en-GB')} km`;
@@ -285,12 +280,12 @@
       if (e.key === 'ArrowLeft')  prevBtn.click();
     });
 
-    // Optional: hydrate brand strip from taxonomy (keeps static as fallback)
+    // Brand strip from taxonomy (fallback to static already in DOM)
     (function hydrateBrandStrip(){
       const MD = window.MotoriaData || {};
       const wrap = document.getElementById('brandStrip');
       if (!wrap || !MD.getTaxonomy) return;
-      const makes = MD.getTaxonomy().makes.slice(0,6); // first 6
+      const makes = MD.getTaxonomy().makes.slice(0,6);
       if (!makes.length) return;
       wrap.innerHTML = makes.map(m => `<a href="results.html?make=${encodeURIComponent(m.name)}" class="brand-pro-tile">${m.name}</a>`).join('');
     })();
