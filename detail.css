@@ -1,0 +1,93 @@
+/* --- Gallery --- */
+.detail-hero{padding:16px 0 6px; background:#f8fafc}
+.gallery{
+  position:relative; height:56svh; min-height:360px; border-radius:16px; overflow:hidden;
+  border:1px solid #e5e7eb; background:#fff; box-shadow:var(--shadow-soft);
+  display:grid; place-items:center;
+}
+.gallery img{width:100%; height:100%; object-fit:cover}
+.gbtn{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:44px; height:44px; border-radius:50%; border:1px solid #e5e7eb;
+  background:#ffffffd9; backdrop-filter: blur(6px); cursor:pointer; font-size:22px;
+}
+.gbtn.left{left:12px}
+.gbtn.right{right:12px}
+
+.thumbs{display:flex; gap:10px; margin-top:10px; overflow:auto; padding-bottom:4px}
+.thumbs button{
+  border:2px solid transparent; border-radius:10px; padding:0; background:transparent; cursor:pointer;
+}
+.thumbs img{
+  width:140px; height:88px; object-fit:cover; display:block; border-radius:8px; border:1px solid #e5e7eb;
+}
+.thumbs button[aria-selected="true"]{border-color:var(--brand)}
+
+/* --- Layout --- */
+.detail-grid{
+  display:grid; grid-template-columns: 1.5fr .9fr; gap:22px; padding:20px 0 60px;
+}
+.title{margin:10px 0 6px; font-size:28px}
+.price-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.price-big{font-size:28px; font-weight:800; color:#0f172a}
+.actions{display:flex; gap:10px; flex-wrap:wrap}
+
+.specs{
+  display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px; margin:12px 0 18px; padding:0; list-style:none;
+}
+.specs li{
+  display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px;
+}
+.specs svg{width:18px; height:18px; stroke:#0b1220; fill:none; stroke-width:2}
+
+.tabs{display:flex; gap:10px; margin-top:8px}
+.tab{
+  height:40px; padding:0 14px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; cursor:pointer;
+}
+.tab.active{background:var(--brand); color:#fff; border-color:transparent}
+.tabpanel{background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:16px; margin-top:10px}
+.hidden{display:none !important}
+
+.feature-list{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; margin:0; padding:0; list-style:none}
+.feature-list li{padding:8px 10px; border:1px dashed #e5e7eb; border-radius:10px; background:#fcfdff}
+
+/* Seller */
+.seller-card{
+  display:flex; gap:12px; align-items:center; background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:12px;
+}
+.avatar{
+  width:56px; height:56px; border-radius:50%; display:grid; place-items:center; font-weight:800; color:#fff; background:linear-gradient(135deg,#6aa3ff,#3559ff);
+}
+.seller-actions{display:flex; gap:8px; margin-top:6px}
+.contact-form{display:grid; gap:10px; margin-top:10px}
+.contact-form input, .contact-form textarea{
+  width:100%; border:1px solid #e5e7eb; border-radius:10px; padding:10px; font:inherit; background:#fff;
+}
+
+/* Finance */
+.finance{display:grid; gap:12px}
+.finance .row{display:flex; gap:12px}
+.finance label{display:grid; gap:6px}
+.finance input{
+  height:42px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; background:#fff;
+}
+.calc-out{display:flex; gap:12px; align-items:center}
+
+/* Side */
+.side .side-card{
+  position:sticky; top:84px; background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:16px; box-shadow:var(--shadow-soft);
+}
+.bullets{margin:10px 0; padding-left:18px}
+.bullets li{margin:6px 0}
+
+/* Responsive */
+@media (max-width: 980px){
+  .detail-grid{grid-template-columns:1fr}
+  .side .side-card{position:static}
+  .specs{grid-template-columns: repeat(2, 1fr)}
+  .gallery{height:48svh}
+}
+@media (max-width: 560px){
+  .feature-list{grid-template-columns: 1fr}
+  .specs{grid-template-columns: 1fr}
+}

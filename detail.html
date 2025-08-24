@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Motoria • Car Detail</title>
+  <meta name="description" content="View full details, photos, specs, finance, and contact the seller." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="detail.css" />
+  <link rel="icon" href="favicon.ico" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Motoria home">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+          <circle cx="20" cy="48" r="6"></circle>
+          <circle cx="48" cy="48" r="6"></circle>
+        </svg>
+        <span class="brand-name">Motoria</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <ul id="navMenu" class="nav-menu">
+          <li><a href="results.html">Buy</a></li>
+          <li><a href="#">Sell</a></li>
+          <li><a href="#">Finance</a></li>
+          <li><a href="#">Dealers</a></li>
+          <li class="divider" aria-hidden="true"></li>
+          <li><a class="btn btn-ghost" href="#">Sign in</a></li>
+          <li><a class="btn btn-primary" href="#">List your car</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Gallery -->
+  <section class="detail-hero">
+    <div class="container">
+      <div class="gallery" id="gallery" aria-label="Car photo gallery">
+        <button class="gbtn left" id="gPrev" aria-label="Previous photo">‹</button>
+        <img id="gMain" alt="Car photo" />
+        <button class="gbtn right" id="gNext" aria-label="Next photo">›</button>
+      </div>
+      <div class="thumbs" id="thumbs" role="tablist" aria-label="Thumbnails"></div>
+    </div>
+  </section>
+
+  <main class="container detail-grid">
+    <!-- Summary -->
+    <section class="summary">
+      <h1 id="title" class="title">Car Title</h1>
+      <div class="price-row">
+        <div id="price" class="price-big">£—</div>
+        <div class="actions">
+          <button class="btn btn-primary" id="contactBtn">Contact seller</button>
+          <button class="btn btn-ghost" id="reserveBtn">Reserve now</button>
+        </div>
+      </div>
+
+      <ul class="specs" role="list">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10M7 12h10M7 17h6"/></svg><span id="year">—</span> Year</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1116 0H4z"/></svg><span id="km">—</span> Mileage</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M6 5h12M6 19h12"/></svg><span id="gearbox">—</span> Gearbox</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg><span id="fuel">—</span> Fuel</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M6 12a6 6 0 1112 0"/></svg><span id="power">—</span> Power</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4 12h16"/></svg><span id="location">—</span> Location</li>
+      </ul>
+
+      <!-- Tabs -->
+      <div class="tabs" role="tablist" aria-label="Detail sections">
+        <button class="tab active" data-tab="desc" aria-selected="true">Description</button>
+        <button class="tab" data-tab="features">Features</button>
+        <button class="tab" data-tab="seller">Seller</button>
+        <button class="tab" data-tab="finance">Finance</button>
+      </div>
+
+      <section id="tab-desc" class="tabpanel" role="tabpanel">
+        <p id="desc">Loading description…</p>
+      </section>
+
+      <section id="tab-features" class="tabpanel hidden" role="tabpanel">
+        <ul id="featuresList" class="feature-list"></ul>
+      </section>
+
+      <section id="tab-seller" class="tabpanel hidden" role="tabpanel">
+        <div class="seller-card">
+          <div class="avatar" aria-hidden="true">DL</div>
+          <div class="seller-info">
+            <h3 id="dealerName">Dealer</h3>
+            <p id="dealerMeta" class="muted">Verified dealer • 4.8 ★</p>
+            <div class="seller-actions">
+              <a class="btn btn-primary" href="#contact">Message</a>
+              <a class="btn btn-ghost" href="tel:+44000000000">Call</a>
+            </div>
+          </div>
+        </div>
+        <form id="contact" class="contact-form" aria-label="Contact seller">
+          <label>
+            <span>Your name</span>
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            <span>Message</span>
+            <textarea name="message" rows="4" placeholder="I’m interested in this car. Is it still available?"></textarea>
+          </label>
+          <button class="btn btn-primary" type="submit">Send message</button>
+        </form>
+      </section>
+
+      <section id="tab-finance" class="tabpanel hidden" role="tabpanel">
+        <form id="financeForm" class="finance" aria-label="Finance calculator">
+          <div class="row">
+            <label><span>Price (£)</span><input type="number" name="price" min="0" required /></label>
+            <label><span>Deposit (£)</span><input type="number" name="deposit" min="0" value="1000" /></label>
+          </div>
+          <div class="row">
+            <label><span>Term (months)</span><input type="number" name="months" min="12" max="120" value="48" /></label>
+            <label><span>APR (%)</span><input type="number" name="apr" step="0.1" min="0" value="7.9" /></label>
+          </div>
+          <button class="btn btn-ghost" type="submit">Calculate</button>
+          <div class="calc-out">
+            <div><strong>Monthly:</strong> <span id="finMonthly">—</span></div>
+            <div class="muted">Estimate only. Subject to status.</div>
+          </div>
+        </form>
+      </section>
+    </section>
+
+    <!-- Sticky side card -->
+    <aside class="side">
+      <div class="side-card">
+        <div class="price-big" id="sidePrice">£—</div>
+        <ul class="bullets">
+          <li>Verified seller</li>
+          <li>Free vehicle history check</li>
+          <li>14‑day money‑back (dealer only)</li>
+        </ul>
+        <button class="btn btn-primary" id="sideContact">Contact seller</button>
+        <button class="btn btn-ghost" id="sideReserve">Reserve now</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand-footer">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+            <circle cx="20" cy="48" r="6"></circle>
+            <circle cx="48" cy="48" r="6"></circle>
+          </svg>
+          <span>Motoria</span>
+        </div>
+        <p class="muted">© <span id="year"></span> Motoria Ltd.</p>
+      </div>
+      <nav aria-label="Footer">
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Safety & Trust</a></li>
+          <li><a href="#">For Dealers</a></li>
+        </ul>
+      </nav>
+      <form class="newsletter" aria-label="Newsletter">
+        <label>
+          <span>Get market updates</span>
+          <div class="newsletter-row">
+            <input type="email" placeholder="Email address" aria-label="Email address" />
+            <button class="btn btn-ghost" type="button">Subscribe</button>
+          </div>
+        </label>
+      </form>
+    </div>
+  </footer>
+
+  <script src="detail.js"></script>
+</body>
+</html>
