@@ -2,9 +2,29 @@
 (function(){
   'use strict';
 
+  // ---- Auth fallback (works even if app.js didn't load)
+  function ensureAuth(){
+    if (window.MotoriaAuth) return window.MotoriaAuth;
+    const LS_USERS = 'motoria_users';
+    const LS_SESSION = 'motoria_session';
+    function getUsers(){ try{return JSON.parse(localStorage.getItem(LS_USERS)||'[]')}catch(_){return []} }
+    function setUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+    function getSession(){ try{return JSON.parse(localStorage.getItem(LS_SESSION)||'null')}catch(_){return null} }
+    function setSession(s){ localStorage.setItem(LS_SESSION, JSON.stringify(s)); }
+    function clearSession(){ localStorage.removeItem(LS_SESSION); }
+    if(!localStorage.getItem(LS_USERS)){
+      setUsers([
+        { name:'Admin', email:'admin@motoria.test', pass:'motoria123', role:'admin' },
+        { name:'Demo User', email:'user@motoria.test', pass:'demo123', role:'user' }
+      ]);
+    }
+    console.warn('[dealer.js] app.js not found; using fallback auth');
+    return { getUsers, setUsers, getSession, setSession, clearSession };
+  }
+  const Auth = ensureAuth();
+
   // ---- Auth guard (requires login; optionally restrict by role)
-  const Auth = window.MotoriaAuth;
-  const session = Auth?.getSession?.();
+  const session = Auth.getSession();
   if (!session) { location.href = 'auth.html'; return; }
   // If you want to restrict to admin only, uncomment:
   // if (session.role !== 'admin') { alert('Dealer access only'); location.href='dashboard-user.html'; return; }
