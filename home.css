@@ -103,3 +103,6 @@
 
 /* Featured cards spacing refinement (uses your existing card styles) */
 #carousel .card-body .meta{ margin-top:2px }
+
+/* --- Fix: abstract blobs shouldn't capture clicks --- */
+.pro-hero-bg, .pro-hero-bg .blob{ pointer-events: none; }

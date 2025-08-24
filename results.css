@@ -1,5 +1,5 @@
 /* Sticky tools bar */
-.tools-wrap{position:sticky;top:0;z-index:30;background:#ffffffee;backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid #eef2f7}
+.tools-wrap{position:sticky;top:0;z-index:50;background:#ffffffee;backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid #eef2f7}
 .tools{display:flex;align-items:center;gap:16px;padding:10px 0;justify-content:space-between}
 .tools-search{display:flex;gap:8px;width:min(820px,100%)}
 .tools-search input,.tools-search select{height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px;background:#fff;width:100%}
