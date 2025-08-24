@@ -6,7 +6,10 @@
   <title>Motoria • Buy & Sell Cars</title>
   <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <!-- Global styles (keep your existing styles.css) -->
   <link rel="stylesheet" href="styles.css" />
+  <!-- New modern homepage layer -->
+  <link rel="stylesheet" href="home.css" />
 </head>
 <body>
   <!-- Header -->
@@ -37,87 +40,93 @@
     </div>
   </header>
 
-  <!-- Hero with pill search -->
-  <section class="hero hero-atuk">
-    <div class="hero-bg" role="img" aria-label="Modern dealership forecourt"></div>
-    <div class="hero-overlay"></div>
+  <!-- Modern Hero -->
+  <section class="pro-hero">
+    <div class="pro-hero-bg" aria-hidden="true">
+      <!-- abstract background shapes -->
+      <svg class="blob a" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"><g transform="translate(300,300)"><path d="M147.7 -170.7C181.3 -130 188.7 -65 188.3 -0.2C187.9 64.7 179.8 129.5 146.2 168.7C112.7 208 53.7 221.7 -6.4 230.6C-66.6 239.4 -133.2 243.4 -168.4 208.9C-203.7 174.4 -207.6 101.4 -209.4 34.6C-211.2 -32.2 -211 -92.8 -181.6 -131.7C-152.1 -170.6 -93.4 -187.7 -34.5 -180.4C24.4 -173.2 48.9 -141.5 147.7 -170.7Z" fill="url(#g1)"/></g><defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#e9efff"/><stop offset="1" stop-color="#dbe4ff"/></linearGradient></defs></svg>
+      <svg class="blob b" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"><g transform="translate(300,300)"><path d="M140.3 -163.5C175.6 -139.6 191.2 -87.2 197.4 -32.1C203.6 23 200.4 81 172.3 121.9C144.2 162.8 91.2 186.6 38.8 194.7C-13.5 202.8 -65.5 195.3 -109 170.5C-152.5 145.8 -187.6 103.7 -199.2 56.5C-210.9 9.3 -199  -43.1 -172.8 -86.8C-146.5 -130.5 -105.9 -165.4 -58.1 -184.5C-10.2 -203.5 44.9 -206.7 94.1 -190.7C143.3 -174.7 186.6 -139.5 140.3 -163.5Z" fill="url(#g2)"/></g><defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#f5faff"/><stop offset="1" stop-color="#eef6ff"/></linearGradient></defs></svg>
+    </div>
 
-    <div class="container hero-content">
-      <h1 class="hero-title">Find your next car</h1>
-
-      <div class="search-tabs" role="tablist" aria-label="Search category">
-        <button class="search-tab active" data-type="used" aria-selected="true">Used</button>
-        <button class="search-tab" data-type="nearly">Nearly new</button>
-        <button class="search-tab" data-type="new">New</button>
+    <div class="container pro-hero-inner">
+      <div class="pro-hero-text">
+        <h1>Find the right car — fast.</h1>
+        <p class="lead">Search verified listings from trusted dealers and private sellers. Transparent history, flexible finance.</p>
       </div>
 
-      <form id="homeSearch" class="pill-search" role="search" aria-label="Car search">
-        <div class="pill">
-          <label>Make</label>
-          <input name="make" placeholder="Any make" list="makes" />
-          <datalist id="makes">
-            <option>Volkswagen</option><option>BMW</option><option>Audi</option>
-            <option>Ford</option><option>Toyota</option><option>Kia</option>
-          </datalist>
+      <!-- Glass search card -->
+      <form id="homeSearch" class="glass-search" role="search" aria-label="Car search">
+        <div class="row">
+          <label class="field">
+            <span>Make</span>
+            <input name="make" placeholder="Any" list="makes" />
+            <datalist id="makes">
+              <option>Volkswagen</option><option>BMW</option><option>Audi</option>
+              <option>Ford</option><option>Toyota</option><option>Kia</option>
+            </datalist>
+          </label>
+          <label class="field">
+            <span>Model</span>
+            <input name="model" placeholder="Any" />
+          </label>
+          <label class="field">
+            <span>Postcode / City</span>
+            <input name="loc" placeholder="e.g. SW1A or London" />
+          </label>
         </div>
-        <div class="pill">
-          <label>Model</label>
-          <input name="model" placeholder="Any model" />
+        <div class="row">
+          <label class="field sm">
+            <span>Max price</span>
+            <select name="max">
+              <option value="">Any</option><option>5000</option><option>10000</option>
+              <option>15000</option><option>20000</option><option>30000</option><option>50000</option>
+            </select>
+          </label>
+          <label class="field sm">
+            <span>Year from</span>
+            <select name="year_min">
+              <option value="">Any</option><option>2015</option><option>2017</option>
+              <option>2019</option><option>2020</option><option>2022</option>
+            </select>
+          </label>
+          <button class="btn btn-primary go" type="submit">Search</button>
         </div>
-        <div class="pill">
-          <label>Postcode / City</label>
-          <input name="loc" placeholder="e.g. SW1A or London" />
+        <div class="quick-links" aria-label="Quick picks">
+          <a href="results.html?fuel=Electric" class="pill">Electric</a>
+          <a href="results.html?max=10000" class="pill">Under £10k</a>
+          <a href="results.html?gearbox=Automatic" class="pill">Automatic</a>
+          <a href="results.html?q=Sportage" class="pill">Kia Sportage</a>
         </div>
-        <div class="pill pill-sm">
-          <label>Max price</label>
-          <select name="max">
-            <option value="">Any</option><option>5000</option><option>10000</option>
-            <option>15000</option><option>20000</option><option>30000</option><option>50000</option>
-          </select>
-        </div>
-        <div class="pill pill-sm">
-          <label>Year from</label>
-          <select name="year_min">
-            <option value="">Any</option><option>2015</option><option>2017</option>
-            <option>2019</option><option>2020</option><option>2022</option>
-          </select>
-        </div>
-        <button class="btn btn-primary pill-btn" type="submit">Search</button>
       </form>
 
-      <nav class="chip-row" aria-label="Popular quick filters">
-        <a class="chip" href="results.html?q=Golf&sort=year_desc">VW Golf</a>
-        <a class="chip" href="results.html?fuel=Electric">Electric</a>
-        <a class="chip" href="results.html?max=10000">Under £10k</a>
-        <a class="chip" href="results.html?gearbox=Automatic">Automatic</a>
-        <a class="chip" href="results.html?fuel=Hybrid">Hybrid</a>
-      </nav>
-
-      <ul class="trust-badges" role="list">
-        <li><span class="tick"></span>Trusted dealers</li>
-        <li><span class="tick"></span>Free vehicle checks</li>
-        <li><span class="tick"></span>Flexible finance</li>
-      </ul>
+      <!-- Trust row -->
+      <div class="trust-row">
+        <div class="trust-item"><span class="dot"></span> Verified sellers</div>
+        <div class="trust-item"><span class="dot"></span> Free history checks</div>
+        <div class="trust-item"><span class="dot"></span> Flexible finance</div>
+      </div>
     </div>
   </section>
 
-  <!-- Brand strip -->
-  <section class="container section brand-strip">
-    <h2>Browse by brand</h2>
-    <div class="brand-grid">
-      <a href="results.html?make=Volkswagen" class="brand-tile">Volkswagen</a>
-      <a href="results.html?make=BMW" class="brand-tile">BMW</a>
-      <a href="results.html?make=Audi" class="brand-tile">Audi</a>
-      <a href="results.html?make=Ford" class="brand-tile">Ford</a>
-      <a href="results.html?make=Toyota" class="brand-tile">Toyota</a>
-      <a href="results.html?make=Kia" class="brand-tile">Kia</a>
+  <!-- Brand strip (monochrome) -->
+  <section class="container section brand-pro">
+    <div class="section-head">
+      <h2>Browse by brand</h2>
+    </div>
+    <div class="brand-pro-grid">
+      <a href="results.html?make=Volkswagen" class="brand-pro-tile">Volkswagen</a>
+      <a href="results.html?make=BMW" class="brand-pro-tile">BMW</a>
+      <a href="results.html?make=Audi" class="brand-pro-tile">Audi</a>
+      <a href="results.html?make=Ford" class="brand-pro-tile">Ford</a>
+      <a href="results.html?make=Toyota" class="brand-pro-tile">Toyota</a>
+      <a href="results.html?make=Kia" class="brand-pro-tile">Kia</a>
     </div>
   </section>
 
   <!-- Featured listings -->
   <section class="container section">
     <div class="section-head">
-      <h2>Featured listings</h2>
+      <h2>Featured</h2>
       <div class="actions">
         <button class="carousel-btn" id="prevBtn" aria-label="Previous listings">&#10094;</button>
         <button class="carousel-btn" id="nextBtn" aria-label="Next listings">&#10095;</button>
@@ -128,12 +137,12 @@
 
   <!-- CTA -->
   <section class="cta container">
-    <div class="cta-card">
+    <div class="cta-card pro-cta">
       <div>
-        <h3>Sell your car fast</h3>
-        <p>Reach serious buyers and verified dealers with one listing.</p>
+        <h3>List your car</h3>
+        <p>Reach serious buyers with professional tools and safe messaging.</p>
       </div>
-      <a class="btn btn-primary" href="#">List your car</a>
+      <a class="btn btn-primary" href="#">Get started</a>
     </div>
   </section>
 
@@ -171,10 +180,12 @@
   </footer>
 
   <script>
+    // Header behavior
     const header = document.getElementById('siteHeader');
     addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // Mobile nav
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
     navToggle?.addEventListener('click', ()=>{
@@ -183,20 +194,11 @@
       navMenu.classList.toggle('open');
     });
 
-    let searchType = 'used';
-    document.querySelectorAll('.search-tab').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        document.querySelectorAll('.search-tab').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        searchType = b.dataset.type;
-      });
-    });
-
+    // Search handling -> results.html
     const form = document.getElementById('homeSearch');
     form.addEventListener('submit', (e)=>{
       e.preventDefault();
       const p = new URLSearchParams(new FormData(form));
-      if (searchType) p.set('type', searchType);
       location.href = `results.html?${p.toString()}`;
     });
   </script>
