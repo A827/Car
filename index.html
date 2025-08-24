@@ -6,9 +6,9 @@
   <title>Motoria • Buy & Sell Cars</title>
   <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <!-- Global styles (keep your existing styles.css) -->
+  <!-- Global styles -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- New modern homepage layer -->
+  <!-- Modern homepage layer -->
   <link rel="stylesheet" href="home.css" />
 </head>
 <body>
@@ -59,15 +59,17 @@
         <div class="row">
           <label class="field">
             <span>Make</span>
-            <input name="make" placeholder="Any" list="makes" />
-            <datalist id="makes">
-              <option>Volkswagen</option><option>BMW</option><option>Audi</option>
-              <option>Ford</option><option>Toyota</option><option>Kia</option>
-            </datalist>
+            <select id="makeSelect" name="make">
+              <option value="">Any</option>
+              <!-- populated by taxonomy -->
+            </select>
           </label>
           <label class="field">
             <span>Model</span>
-            <input name="model" placeholder="Any" />
+            <select id="modelSelect" name="model" disabled>
+              <option value="">Any</option>
+              <!-- populated by taxonomy -->
+            </select>
           </label>
           <label class="field">
             <span>Postcode / City</span>
@@ -113,7 +115,7 @@
     <div class="section-head">
       <h2>Browse by brand</h2>
     </div>
-    <div class="brand-pro-grid">
+    <div class="brand-pro-grid" id="brandStrip">
       <a href="results.html?make=Volkswagen" class="brand-pro-tile">Volkswagen</a>
       <a href="results.html?make=BMW" class="brand-pro-tile">BMW</a>
       <a href="results.html?make=Audi" class="brand-pro-tile">Audi</a>
@@ -179,6 +181,11 @@
     </div>
   </footer>
 
+  <!-- Core scripts -->
+  <script src="app.js"></script>
+  <script src="data.js"></script>
+
+  <!-- Page script -->
   <script>
     // Header behavior
     const header = document.getElementById('siteHeader');
@@ -194,6 +201,39 @@
       navMenu.classList.toggle('open');
     });
 
+    // Populate taxonomy-driven Make/Model selects
+    (function hydrateTaxonomy(){
+      const MD = window.MotoriaData || {};
+      const makeSel = document.getElementById('makeSelect');
+      const modelSel = document.getElementById('modelSelect');
+
+      // Read current URL params to preselect (supports deep-links)
+      const params = new URLSearchParams(location.search);
+      const selectedMake  = params.get('make')  || '';
+      const selectedModel = params.get('model') || '';
+
+      // Try CMS taxonomy; fallback to static list if missing
+      if (MD.getTaxonomy && MD.modelsForMake) {
+        const taxo = MD.getTaxonomy();
+        makeSel.innerHTML = `<option value="">Any</option>` + taxo.makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+        if (selectedMake) makeSel.value = selectedMake;
+
+        function refreshModels(){
+          const make = makeSel.value;
+          const models = make ? MD.modelsForMake(make) : [];
+          modelSel.disabled = !make;
+          modelSel.innerHTML = `<option value="">Any</option>` + models.map(x=>`<option value="${x}">${x}</option>`).join('');
+          if (selectedModel && models.includes(selectedModel)) modelSel.value = selectedModel;
+        }
+        refreshModels();
+        makeSel.addEventListener('change', refreshModels);
+      } else {
+        // Fallback: minimal static options
+        const STATIC_MAKES = ['Volkswagen','BMW','Audi','Ford','Toyota','Kia'];
+        makeSel.innerHTML = `<option value="">Any</option>` + STATIC_MAKES.map(m=>`<option>${m}</option>`).join('');
+      }
+    })();
+
     // Search handling -> results.html
     const form = document.getElementById('homeSearch');
     form.addEventListener('submit', (e)=>{
@@ -201,7 +241,59 @@
       const p = new URLSearchParams(new FormData(form));
       location.href = `results.html?${p.toString()}`;
     });
+
+    // ===== Featured carousel demo (simple static list) =====
+    const featured = [
+      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol', img:'assets/cars/sportage.jpg' },
+      { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel', img:'assets/cars/octavia.jpg'  },
+      { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric',img:'assets/cars/leaf.jpg'     },
+      { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',  img:'assets/cars/a180.jpg'     },
+      { id:10, title:'Hyundai Ioniq Hybrid',  price:15800, year:2018, km:62000, fuel:'Hybrid',  img:'assets/cars/ioniq.jpg'    }
+    ];
+    const GBP = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
+    const KM  = n => `${(+n||0).toLocaleString('en-GB')} km`;
+
+    const carouselEl = document.getElementById('carousel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function renderFeatured(){
+      carouselEl.innerHTML = featured.map(c => `
+        <article class="card" tabindex="0" role="group" aria-label="${c.title}">
+          <a href="detail.html?id=${c.id}" aria-label="${c.title}">
+            <img class="card-img" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
+          </a>
+          <div class="card-body">
+            <div class="price">${GBP(c.price)}</div>
+            <div class="meta">${c.title}</div>
+            <div class="meta">${c.year} • ${KM(c.km)} • ${c.fuel}</div>
+            <div class="badges">
+              <span class="badge">Verified</span>
+              <span class="badge">Instant message</span>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+    renderFeatured();
+
+    const CARD_WIDTH = () => carouselEl.firstElementChild?.getBoundingClientRect().width + 16 || 320;
+    prevBtn.addEventListener('click', () => carouselEl.scrollBy({ left: -CARD_WIDTH(), behavior: 'smooth' }));
+    nextBtn.addEventListener('click', () => carouselEl.scrollBy({ left:  CARD_WIDTH(), behavior: 'smooth' }));
+    carouselEl.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') nextBtn.click();
+      if (e.key === 'ArrowLeft')  prevBtn.click();
+    });
+
+    // Optional: hydrate brand strip from taxonomy (keeps static as fallback)
+    (function hydrateBrandStrip(){
+      const MD = window.MotoriaData || {};
+      const wrap = document.getElementById('brandStrip');
+      if (!wrap || !MD.getTaxonomy) return;
+      const makes = MD.getTaxonomy().makes.slice(0,6); // first 6
+      if (!makes.length) return;
+      wrap.innerHTML = makes.map(m => `<a href="results.html?make=${encodeURIComponent(m.name)}" class="brand-pro-tile">${m.name}</a>`).join('');
+    })();
   </script>
-  <script src="app.js"></script>
 </body>
 </html>
