@@ -1,31 +1,28 @@
-// cms.js — Admin CMS for Makes & Models (localStorage demo)
+// cms.js — Admin CMS for Makes & Models + Dealers (localStorage demo)
 (function(){
   'use strict';
 
   /* ========== Auth Guard (admin only) ========== */
   function ensureAuth(){
-    if (window.MotoriaAuth) return window.MotoriaAuth;
+    const A = window.MotoriaAuth;
+    if (A) return A;
+    // fallback (shouldn't happen if app.js is loaded)
     const LS_USERS='motoria_users', LS_SESSION='motoria_session';
     const getUsers=()=>{try{return JSON.parse(localStorage.getItem(LS_USERS)||'[]')}catch(_){return[]}};
-    const setUsers=u=>localStorage.setItem(LS_USERS, JSON.stringify(u));
     const getSession=()=>{try{return JSON.parse(localStorage.getItem(LS_SESSION)||'null')}catch(_){return null}};
-    if(!localStorage.getItem(LS_USERS)){
-      setUsers([
-        {name:'Admin',email:'admin@motoria.test',pass:'motoria123',role:'admin'},
-        {name:'Demo User',email:'user@motoria.test',pass:'demo123',role:'user'}
-      ]);
-    }
-    console.warn('[cms] using fallback auth');
     return { getUsers, getSession };
   }
   const Auth = ensureAuth();
-  const session = Auth.getSession();
+  const session = Auth.getSession?.();
+  const users = Auth.getUsers?.() || [];
+  const me = session ? (users.find(u=>u.email?.toLowerCase()===session.email?.toLowerCase())||session) : null;
+
   if (!session){ location.href='auth.html'; return; }
-  if (session.role!=='admin'){ alert('Admins only'); location.href='dashboard-user.html'; return; }
+  if ((me?.role||session.role) !== 'admin'){ alert('Admins only'); location.href='dashboard-user.html'; return; }
 
   // Header basics
   const header=document.getElementById('siteHeader');
-  addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+  addEventListener('scroll',()=>header?.classList.toggle('elevated', scrollY>6));
   const year=document.getElementById('year'); if (year) year.textContent = new Date().getFullYear();
   const navToggle=document.getElementById('navToggle');
   const navMenu=document.getElementById('navMenu');
@@ -35,13 +32,17 @@
     navMenu?.classList.toggle('open');
   });
 
-  // Show admin user
-  document.getElementById('adminName').textContent = session.name || 'Admin';
-  document.getElementById('adminEmail').textContent = session.email || '';
+  // Show admin identity
+  document.getElementById('adminName').textContent = me?.name || 'Admin';
+  document.getElementById('adminEmail').textContent = me?.email || 'admin@motoria.test';
 
   /* ========== Storage Keys & Utils ========== */
-  const KEY_DRAFT = 'motoria_taxonomy_draft_v1';  // editable working copy
-  const KEY_LIVE  = 'motoria_taxonomy_v1';        // published version (site uses this)
+  const KEY_DRAFT = 'motoria_taxonomy_draft_v1';
+  const KEY_LIVE  = 'motoria_taxonomy_v1';
+
+  // Dealers store (admin-managed list; also merges known "dealer" users)
+  const KEY_DEALERS = 'motoria_dealers_v1';
+
   const DEFAULT_TAXO = {
     makes: [
       { name:'Kia', models:['Sportage','Ceed','Rio','Stonic'] },
@@ -59,17 +60,26 @@
   const save = (k,v)=>localStorage.setItem(k, JSON.stringify(v));
   const clone = (o)=>JSON.parse(JSON.stringify(o));
 
-  // On first run, ensure LIVE exists
+  // On first run, ensure LIVE & DRAFT
   if (!localStorage.getItem(KEY_LIVE)) save(KEY_LIVE, DEFAULT_TAXO);
-  // Start with DRAFT = LIVE (unless a draft already exists)
   if (!localStorage.getItem(KEY_DRAFT)) save(KEY_DRAFT, load(KEY_LIVE, DEFAULT_TAXO));
 
-  /* ========== State & Elements ========== */
+  // Seed dealers demo if empty: will merge with users that have role 'dealer'
+  if (!localStorage.getItem(KEY_DEALERS)) {
+    const demo = [
+      { id: 101, name:'City Cars',   company:'City Cars Ltd',   email:'dealer1@motoria.test', phone:'+44 20 1234 5678', verified:true,  createdAt: Date.now()-86400000, listings:3 },
+      { id: 102, name:'North Auto',  company:'North Autohaus',  email:'dealer2@motoria.test', phone:'+44 161 000 000',  verified:false, createdAt: Date.now()-3600*1000*6, listings:1 },
+    ];
+    save(KEY_DEALERS, demo);
+  }
+
+  /* ========== Tabs ========== */
   const qs=(s,el=document)=>el.querySelector(s);
   const qsa=(s,el=document)=>[...el.querySelectorAll(s)];
 
   const panels = {
     taxonomy: qs('#panel-taxonomy'),
+    dealers:  qs('#panel-dealers'),
     import:   qs('#panel-import'),
     help:     qs('#panel-help'),
   };
@@ -80,9 +90,11 @@
       const view = btn.dataset.view;
       Object.values(panels).forEach(p=>p.classList.remove('active'));
       panels[view].classList.add('active');
+      if (view==='dealers') renderDealers();
     });
   });
 
+  /* ========== TAXONOMY (same as before) ========== */
   const searchMake = qs('#searchMake');
   const makeForm = qs('#makeForm');
   const cancelMakeEdit = qs('#cancelMakeEdit');
@@ -96,11 +108,10 @@
   const exportJson = qs('#exportJson');
 
   let data = load(KEY_DRAFT, DEFAULT_TAXO);
-  let activeIndex = -1; // which make is selected
+  let activeIndex = -1;
 
-  /* ========== Rendering ========== */
   function renderMakes(){
-    const q = (searchMake.value||'').toLowerCase().trim();
+    const q = (searchMake?.value||'').toLowerCase().trim();
     const items = data.makes
       .map((m,i)=>({ ...m, index:i }))
       .filter(m => !q || m.name.toLowerCase().includes(q));
@@ -120,13 +131,11 @@
       </div>
     `).join('');
 
-    // Update selected label & model UI state
     const cur = data.makes[activeIndex];
     currentMakeEl.textContent = cur ? cur.name : '—';
     addModelBtn.disabled = !cur;
     renderModels();
   }
-
   function renderModels(){
     const cur = data.makes[activeIndex];
     if (!cur){ modelList.innerHTML = `<div class="muted" style="padding:8px">Select a make to manage its models.</div>`; return; }
@@ -145,174 +154,185 @@
       `).join('')}
     `;
   }
-
   renderMakes();
 
-  /* ========== Interactions ========== */
-  searchMake.addEventListener('input', renderMakes);
-
-  // Select make
-  makeList.addEventListener('click', (e)=>{
-    const item = e.target.closest('.make-item'); 
-    if (!item) return;
-    const idx = +item.dataset.index;
-
-    // If action button is clicked, don’t just select
-    const btn = e.target.closest('button[data-act]');
-    if (btn) return; // handled in separate listener
-
-    activeIndex = idx;
-    renderMakes();
+  searchMake?.addEventListener('input', renderMakes);
+  makeList?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.make-item'); if (!item) return;
+    const btn = e.target.closest('button[data-act]'); if (btn) return;
+    activeIndex = +item.dataset.index; renderMakes();
   });
-
-  // Make actions
-  makeList.addEventListener('click', (e)=>{
+  makeList?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button[data-act]'); if(!btn) return;
-    const row = btn.closest('.make-item'); const idx = +row.dataset.index;
+    const idx = +btn.closest('.make-item').dataset.index;
     const act = btn.dataset.act;
-
-    if (act==='edit'){
-      // fill form
-      makeForm.index.value = String(idx);
-      makeForm.name.value = data.makes[idx].name;
-      cancelMakeEdit.hidden = false;
-      makeForm.name.focus();
-      return;
-    }
-    if (act==='del'){
-      if (!confirm('Delete this make and all its models?')) return;
-      data.makes.splice(idx,1);
-      if (activeIndex===idx) activeIndex=-1;
-      save(KEY_DRAFT, data); renderMakes(); return;
-    }
-    if (act==='up' || act==='down'){
-      const dir = act==='up' ? -1 : 1;
-      const j = idx + dir;
-      if (j<0 || j>=data.makes.length) return;
-      const tmp = data.makes[idx];
-      data.makes[idx] = data.makes[j];
-      data.makes[j] = tmp;
-      if (activeIndex===idx) activeIndex=j;
-      else if (activeIndex===j) activeIndex=idx;
-      save(KEY_DRAFT, data); renderMakes(); return;
-    }
+    if (act==='edit'){ makeForm.index.value=String(idx); makeForm.name.value=data.makes[idx].name; cancelMakeEdit.hidden=false; makeForm.name.focus(); return; }
+    if (act==='del'){ if(!confirm('Delete this make and its models?')) return; data.makes.splice(idx,1); if(activeIndex===idx) activeIndex=-1; save(KEY_DRAFT,data); renderMakes(); return; }
+    if (act==='up'||act==='down'){ const j=idx+(act==='up'?-1:1); if(j<0||j>=data.makes.length) return; [data.makes[idx],data.makes[j]]=[data.makes[j],data.makes[idx]]; if(activeIndex===idx)activeIndex=j; else if(activeIndex===j)activeIndex=idx; save(KEY_DRAFT,data); renderMakes(); }
   });
-
-  // Add / update make
-  makeForm.addEventListener('submit', (e)=>{
+  makeForm?.addEventListener('submit', e=>{
     e.preventDefault();
     const fd = new FormData(makeForm);
     const name = String(fd.get('name')||'').trim();
     const hasIndex = fd.get('index');
     if (!name) return;
-
-    // prevent duplicates (case-insensitive)
     const exists = data.makes.some((m,i)=> m.name.toLowerCase()===name.toLowerCase() && String(i)!==String(hasIndex||''));
     if (exists){ alert('That make already exists.'); return; }
-
-    if (hasIndex){
-      data.makes[+hasIndex].name = name;
-      activeIndex = +hasIndex;
-    } else {
-      data.makes.push({ name, models: [] });
-      activeIndex = data.makes.length - 1;
-    }
-    save(KEY_DRAFT, data);
-    makeForm.reset(); makeForm.index.value=''; cancelMakeEdit.hidden = true;
-    renderMakes();
+    if (hasIndex){ data.makes[+hasIndex].name=name; activeIndex=+hasIndex; }
+    else { data.makes.push({name,models:[]}); activeIndex=data.makes.length-1; }
+    save(KEY_DRAFT,data); makeForm.reset(); makeForm.index.value=''; cancelMakeEdit.hidden=true; renderMakes();
   });
-
-  cancelMakeEdit.addEventListener('click', ()=>{
-    makeForm.reset(); makeForm.index.value=''; cancelMakeEdit.hidden=true;
-  });
-
-  // Add model
-  modelForm.addEventListener('submit', (e)=>{
+  cancelMakeEdit?.addEventListener('click', ()=>{ makeForm.reset(); makeForm.index.value=''; cancelMakeEdit.hidden=true; });
+  modelForm?.addEventListener('submit', e=>{
     e.preventDefault();
-    const cur = data.makes[activeIndex]; if (!cur) return;
+    const cur = data.makes[activeIndex]; if(!cur) return;
     const fd = new FormData(modelForm);
-    const model = String(fd.get('model')||'').trim();
-    if (!model) return;
-    const exists = cur.models.some(m=>m.toLowerCase()===model.toLowerCase());
-    if (exists){ alert('That model already exists for this make.'); return; }
-    cur.models.push(model);
-    save(KEY_DRAFT, data);
-    modelForm.reset();
-    renderModels(); renderMakes();
+    const model = String(fd.get('model')||'').trim(); if(!model) return;
+    if (cur.models.some(m=>m.toLowerCase()===model.toLowerCase())){ alert('That model already exists.'); return; }
+    cur.models.push(model); save(KEY_DRAFT,data); modelForm.reset(); renderModels(); renderMakes();
+  });
+  modelList?.addEventListener('click', e=>{
+    const btn=e.target.closest('button[data-act]'); if(!btn) return;
+    const act=btn.dataset.act; const idx=+btn.closest('.model-item').dataset.index;
+    const cur=data.makes[activeIndex]; if(!cur) return;
+    if (act==='mdel'){ if(!confirm('Delete this model?')) return; cur.models.splice(idx,1); save(KEY_DRAFT,data); renderModels(); renderMakes(); return; }
+    if (act==='medit'){ const nn=prompt('Rename model:',cur.models[idx]); if(!nn) return; if(cur.models.some((m,i)=>m.toLowerCase()===nn.toLowerCase()&&i!==idx)){ alert('That model name already exists.'); return; } cur.models[idx]=nn.trim(); save(KEY_DRAFT,data); renderModels(); return; }
+    if (act==='mup'||act==='mdown'){ const j=idx+(act==='mup'?-1:1); if(j<0||j>=cur.models.length) return; [cur.models[idx],cur.models[j]]=[cur.models[j],cur.models[idx]]; save(KEY_DRAFT,data); renderModels(); }
+  });
+  publishBtn?.addEventListener('click', ()=>{
+    const seen=new Set();
+    for(const m of data.makes){ if(!m.name||!Array.isArray(m.models)){ alert('Invalid data.'); return; } const key=m.name.trim().toLowerCase(); if(seen.has(key)){ alert(`Duplicate make: ${m.name}`); return; } seen.add(key); }
+    save(KEY_LIVE,data); alert('Published. Front-end dropdowns will use the new taxonomy.');
+  });
+  exportJson?.addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(load(KEY_DRAFT,DEFAULT_TAXO),null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='motoria-taxonomy.json'; a.click(); URL.revokeObjectURL(url);
+  });
+  importJson?.addEventListener('change', async (e)=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    try{
+      const text=await file.text(); const json=JSON.parse(text);
+      if(!json||!Array.isArray(json.makes)) throw new Error('Invalid file');
+      save(KEY_DRAFT,json); data=load(KEY_DRAFT,DEFAULT_TAXO); activeIndex=-1; renderMakes(); alert('Imported to draft. Click Publish to go live.');
+    }catch(err){ alert('Import failed: '+err.message); }
+    finally{ e.target.value=''; }
   });
 
-  // Model actions
-  modelList.addEventListener('click', (e)=>{
+  /* ========== DEALERS PANEL ========== */
+  const dealerSearch = qs('#dealerSearch');
+  const dealerRows   = qs('#dealerRows');
+  const exportDealersCsv = qs('#exportDealersCsv');
+
+  function getDealerStore(){
+    // Merge admin-managed store with users who have role 'dealer'
+    const store = load(KEY_DEALERS, []);
+    const fromUsers = (Auth.getUsers?.()||[])
+      .filter(u => (u.role||'').toLowerCase()==='dealer')
+      .map(u => ({
+        id: u.id || (`U${(u.email||'').toLowerCase()}`),
+        name: u.name || 'Dealer',
+        company: u.company || (u.dealerCompany || ''),
+        email: u.email || '',
+        phone: u.phone || '',
+        verified: !!u.verified,
+        createdAt: u.createdAt || Date.now(),
+        listings: u.listings || 0
+      }));
+
+    // upsert users into store by email
+    const byEmail = new Map(store.map(d=>[String(d.email||'').toLowerCase(), d]));
+    fromUsers.forEach(d=>{
+      const key = String(d.email||'').toLowerCase();
+      if (!key) return;
+      if (!byEmail.has(key)) {
+        store.push(d);
+        byEmail.set(key, d);
+      } else {
+        const tgt = byEmail.get(key);
+        Object.assign(tgt, { name:d.name||tgt.name, company:d.company||tgt.company, phone:d.phone||tgt.phone });
+        if (typeof tgt.verified==='undefined') tgt.verified = !!d.verified;
+      }
+    });
+
+    // persist merged store
+    save(KEY_DEALERS, store);
+    return store;
+  }
+
+  function setDealerStore(list){ save(KEY_DEALERS, list); }
+
+  function renderDealers(){
+    const q = (dealerSearch?.value||'').toLowerCase().trim();
+    const list = getDealerStore()
+      .filter(d=>{
+        const hay = [d.name,d.company,d.email,d.phone].join(' ').toLowerCase();
+        return !q || hay.includes(q);
+      })
+      .sort((a,b)=> (b.verified - a.verified) || String(a.name).localeCompare(String(b.name)));
+
+    if (!list.length){
+      dealerRows.innerHTML = `<div class="row"><div class="muted">No dealers found</div></div>`;
+      return;
+    }
+
+    dealerRows.innerHTML = list.map(d=>`
+      <div class="row" data-email="${(d.email||'').toLowerCase()}">
+        <div><div class="dealer-name">${d.name||'—'}</div></div>
+        <div>${d.company||'—'}</div>
+        <div>${d.email||'—'}</div>
+        <div>${d.phone||'—'}</div>
+        <div><span class="status-pill ${d.verified?'verified':'unverified'}">${d.verified?'Verified':'Unverified'}</span></div>
+        <div>${d.listings||0}</div>
+        <div class="actions">
+          <button class="btn btn-ghost" data-act="toggle">${d.verified?'Unverify':'Verify'}</button>
+          <a class="btn btn-ghost" href="results.html?dealer=${encodeURIComponent(d.company||d.name||'')}" target="_blank" rel="noopener">View listings</a>
+          <a class="btn btn-ghost" href="mailto:${d.email||''}">Email</a>
+          <button class="btn btn-primary" data-act="remove">Remove</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  renderDealers();
+
+  dealerSearch?.addEventListener('input', renderDealers);
+
+  dealerRows?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button[data-act]'); if(!btn) return;
     const act = btn.dataset.act;
-    const row = btn.closest('.model-item'); const idx = +row.dataset.index;
-    const cur = data.makes[activeIndex]; if (!cur) return;
+    const row = btn.closest('.row'); const email = row?.dataset.email;
+    if (!email) return;
+    const list = getDealerStore();
+    const d = list.find(x => String(x.email||'').toLowerCase()===email);
+    if (!d) return;
 
-    if (act==='mdel'){
-      if (!confirm('Delete this model?')) return;
-      cur.models.splice(idx,1);
-      save(KEY_DRAFT, data); renderModels(); renderMakes(); return;
+    if (act==='toggle'){
+      d.verified = !d.verified;
+      setDealerStore(list);
+      renderDealers();
+      return;
     }
-    if (act==='medit'){
-      const newName = prompt('Rename model:', cur.models[idx]);
-      if (!newName) return;
-      if (cur.models.some((m,i)=>m.toLowerCase()===newName.toLowerCase() && i!==idx)){
-        alert('That model name already exists.'); return;
-      }
-      cur.models[idx] = newName.trim();
-      save(KEY_DRAFT, data); renderModels(); return;
-    }
-    if (act==='mup' || act==='mdown'){
-      const dir = act==='mup' ? -1 : 1;
-      const j = idx + dir;
-      if (j<0 || j>=cur.models.length) return;
-      const tmp = cur.models[idx];
-      cur.models[idx] = cur.models[j];
-      cur.models[j] = tmp;
-      save(KEY_DRAFT, data); renderModels(); return;
+    if (act==='remove'){
+      if (!confirm('Remove this dealer from the CMS list? (This does not delete the user account)')) return;
+      const next = list.filter(x => String(x.email||'').toLowerCase()!==email);
+      setDealerStore(next);
+      renderDealers();
+      return;
     }
   });
 
-  // Publish (copy DRAFT -> LIVE)
-  publishBtn.addEventListener('click', ()=>{
-    // simple validation: no empty names, unique makes, models arrays are arrays
-    const seen = new Set();
-    for (const m of data.makes){
-      if (!m.name || !Array.isArray(m.models)){ alert('Invalid data shape.'); return; }
-      const key = m.name.trim().toLowerCase();
-      if (seen.has(key)){ alert(`Duplicate make: ${m.name}`); return; }
-      seen.add(key);
-    }
-    save(KEY_LIVE, data);
-    alert('Published. Front-end dropdowns will use the new taxonomy.');
-  });
-
-  // Export
-  exportJson.addEventListener('click', ()=>{
-    const blob = new Blob([JSON.stringify(load(KEY_DRAFT, DEFAULT_TAXO), null, 2)], {type:'application/json'});
+  // Export CSV
+  function dealersToCSV(items){
+    const cols = ['name','company','email','phone','verified','listings','createdAt'];
+    const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
+    return [cols.join(',')].concat(items.map(d=>cols.map(k=>esc(d[k])).join(','))).join('\n');
+  }
+  exportDealersCsv?.addEventListener('click', ()=>{
+    const csv = dealersToCSV(getDealerStore());
+    const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'motoria-taxonomy.json'; a.click();
+    a.href = url; a.download = 'dealers.csv'; a.click();
     URL.revokeObjectURL(url);
-  });
-
-  // Import
-  importJson.addEventListener('change', async (e)=>{
-    const file = e.target.files?.[0]; if(!file) return;
-    try{
-      const text = await file.text();
-      const json = JSON.parse(text);
-      if (!json || !Array.isArray(json.makes)) throw new Error('Invalid file');
-      save(KEY_DRAFT, json);
-      data = load(KEY_DRAFT, DEFAULT_TAXO);
-      activeIndex = -1;
-      renderMakes();
-      alert('Imported to draft. Review and click Publish to go live.');
-    } catch(err){
-      alert('Import failed: ' + err.message);
-    } finally {
-      e.target.value='';
-    }
   });
 
 })();
