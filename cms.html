@@ -114,7 +114,8 @@
             <div>Email</div>
             <div>Phone</div>
             <div>Status</div>
-            <div>Listings</div>
+            <div>Promoted</div>
+            <div>Leads</div>
             <div>Actions</div>
           </div>
           <div id="dealerRows" class="tbl body"></div>
@@ -145,7 +146,7 @@
         <div class="glass-min">
           <p><strong>Publish</strong> saves your makes & models to the site-wide store so dropdowns on search and listing forms update instantly.</p>
           <p>Only <em>Admins</em> can access this page. Demo admin: <code>admin@motoria.test</code> / <code>motoria123</code>.</p>
-          <p><strong>Dealers</strong> shows users with role <code>dealer</code> (or entries you added). You can verify/unverify them and jump to their public listings.</p>
+          <p><strong>Dealers</strong> lets you verify/unverify dealers, mark as promoted, keep notes & KYC file names, and track leads.</p>
         </div>
       </section>
     </section>
@@ -166,6 +167,55 @@
       </div>
     </div>
   </footer>
+
+  <!-- Dealer Edit Modal -->
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <div class="modal-head">
+        <h3 id="editTitle">Edit dealer</h3>
+        <button class="btn-icon" id="modalClose" aria-label="Close">✕</button>
+      </div>
+      <form id="dealerForm" class="form-col">
+        <input type="hidden" name="email" />
+        <label>Dealer name
+          <input name="name" placeholder="Dealer name" required />
+        </label>
+        <label>Company
+          <input name="company" placeholder="Company" />
+        </label>
+        <label>Email
+          <input name="email_view" placeholder="Email" disabled />
+        </label>
+        <label>Phone
+          <input name="phone" placeholder="Phone" />
+        </label>
+        <label class="row">
+          <input type="checkbox" name="promoted" />
+          <span>Promote dealer (featured)</span>
+        </label>
+        <label>Admin notes
+          <textarea name="notes" rows="4" placeholder="Internal notes visible only to admins"></textarea>
+        </label>
+
+        <div class="kyc">
+          <div class="block-head"><h4>KYC / Documents</h4></div>
+          <div class="row">
+            <label class="btn btn-ghost filebtn">
+              Add files
+              <input id="kycInput" type="file" multiple hidden />
+            </label>
+            <span class="muted small">Filenames are stored (demo). No file upload backend.</span>
+          </div>
+          <ul id="kycList" class="kyc-list"></ul>
+        </div>
+
+        <div class="row" style="justify-content:flex-end;margin-top:6px">
+          <button class="btn btn-ghost" type="button" id="modalCancel">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="app.js"></script>
   <script src="cms.js"></script>

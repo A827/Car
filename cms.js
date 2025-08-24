@@ -6,7 +6,6 @@
   function ensureAuth(){
     const A = window.MotoriaAuth;
     if (A) return A;
-    // fallback (shouldn't happen if app.js is loaded)
     const LS_USERS='motoria_users', LS_SESSION='motoria_session';
     const getUsers=()=>{try{return JSON.parse(localStorage.getItem(LS_USERS)||'[]')}catch(_){return[]}};
     const getSession=()=>{try{return JSON.parse(localStorage.getItem(LS_SESSION)||'null')}catch(_){return null}};
@@ -40,8 +39,8 @@
   const KEY_DRAFT = 'motoria_taxonomy_draft_v1';
   const KEY_LIVE  = 'motoria_taxonomy_v1';
 
-  // Dealers store (admin-managed list; also merges known "dealer" users)
-  const KEY_DEALERS = 'motoria_dealers_v1';
+  // Dealers store (admin-managed list; merges known "dealer" users)
+  const KEY_DEALERS = 'motoria_dealers_v2'; // v2 for new fields
 
   const DEFAULT_TAXO = {
     makes: [
@@ -64,11 +63,11 @@
   if (!localStorage.getItem(KEY_LIVE)) save(KEY_LIVE, DEFAULT_TAXO);
   if (!localStorage.getItem(KEY_DRAFT)) save(KEY_DRAFT, load(KEY_LIVE, DEFAULT_TAXO));
 
-  // Seed dealers demo if empty: will merge with users that have role 'dealer'
+  // Seed dealers demo if empty
   if (!localStorage.getItem(KEY_DEALERS)) {
     const demo = [
-      { id: 101, name:'City Cars',   company:'City Cars Ltd',   email:'dealer1@motoria.test', phone:'+44 20 1234 5678', verified:true,  createdAt: Date.now()-86400000, listings:3 },
-      { id: 102, name:'North Auto',  company:'North Autohaus',  email:'dealer2@motoria.test', phone:'+44 161 000 000',  verified:false, createdAt: Date.now()-3600*1000*6, listings:1 },
+      { id:101, name:'City Cars',  company:'City Cars Ltd',  email:'dealer1@motoria.test', phone:'+44 20 1234 5678', verified:true,  promoted:true,  createdAt: Date.now()-86400000, listings:3, leads:12, notes:'KYC complete.', kycDocs:[{name:'insurance.pdf',ts:Date.now()-86000}] },
+      { id:102, name:'North Auto', company:'North Autohaus', email:'dealer2@motoria.test', phone:'+44 161 000 000',  verified:false, promoted:false, createdAt: Date.now()-3600*1000*6, listings:1, leads:3,  notes:'Waiting proof of address.', kycDocs:[] },
     ];
     save(KEY_DEALERS, demo);
   }
@@ -94,7 +93,7 @@
     });
   });
 
-  /* ========== TAXONOMY (same as before) ========== */
+  /* ========== TAXONOMY (unchanged from previous) ========== */
   const searchMake = qs('#searchMake');
   const makeForm = qs('#makeForm');
   const cancelMakeEdit = qs('#cancelMakeEdit');
@@ -218,14 +217,22 @@
     finally{ e.target.value=''; }
   });
 
-  /* ========== DEALERS PANEL ========== */
+  /* ========== DEALERS PANEL (extended) ========== */
   const dealerSearch = qs('#dealerSearch');
   const dealerRows   = qs('#dealerRows');
   const exportDealersCsv = qs('#exportDealersCsv');
 
+  // Modal refs
+  const editModal = qs('#editModal');
+  const modalClose= qs('#modalClose');
+  const modalCancel= qs('#modalCancel');
+  const dealerForm= qs('#dealerForm');
+  const kycInput  = qs('#kycInput');
+  const kycList   = qs('#kycList');
+
   function getDealerStore(){
-    // Merge admin-managed store with users who have role 'dealer'
     const store = load(KEY_DEALERS, []);
+    // Merge users with role 'dealer'
     const fromUsers = (Auth.getUsers?.()||[])
       .filter(u => (u.role||'').toLowerCase()==='dealer')
       .map(u => ({
@@ -235,8 +242,12 @@
         email: u.email || '',
         phone: u.phone || '',
         verified: !!u.verified,
+        promoted: !!u.promoted,
         createdAt: u.createdAt || Date.now(),
-        listings: u.listings || 0
+        listings: +u.listings || 0,
+        leads: +u.leads || 0,
+        notes: u.notes || '',
+        kycDocs: Array.isArray(u.kycDocs)? u.kycDocs : []
       }));
 
     // upsert users into store by email
@@ -249,17 +260,27 @@
         byEmail.set(key, d);
       } else {
         const tgt = byEmail.get(key);
-        Object.assign(tgt, { name:d.name||tgt.name, company:d.company||tgt.company, phone:d.phone||tgt.phone });
+        Object.assign(tgt, {
+          name: d.name||tgt.name,
+          company: d.company||tgt.company,
+          phone: d.phone||tgt.phone
+        });
         if (typeof tgt.verified==='undefined') tgt.verified = !!d.verified;
+        if (typeof tgt.promoted==='undefined') tgt.promoted = !!d.promoted;
+        tgt.listings = Math.max(+tgt.listings||0, +d.listings||0);
+        tgt.leads    = Math.max(+tgt.leads||0, +d.leads||0);
+        if (!Array.isArray(tgt.kycDocs)) tgt.kycDocs=[];
       }
     });
 
-    // persist merged store
     save(KEY_DEALERS, store);
     return store;
   }
-
   function setDealerStore(list){ save(KEY_DEALERS, list); }
+
+  function pill(bool, yes='Yes', no='No', clsYes='promoted', clsNo=''){ 
+    return `<span class="status-pill ${bool?clsYes:clsNo}">${bool?yes:no}</span>`;
+  }
 
   function renderDealers(){
     const q = (dealerSearch?.value||'').toLowerCase().trim();
@@ -268,7 +289,7 @@
         const hay = [d.name,d.company,d.email,d.phone].join(' ').toLowerCase();
         return !q || hay.includes(q);
       })
-      .sort((a,b)=> (b.verified - a.verified) || String(a.name).localeCompare(String(b.name)));
+      .sort((a,b)=> (b.verified - a.verified) || (b.promoted - a.promoted) || String(a.name).localeCompare(String(b.name)));
 
     if (!list.length){
       dealerRows.innerHTML = `<div class="row"><div class="muted">No dealers found</div></div>`;
@@ -282,9 +303,13 @@
         <div>${d.email||'—'}</div>
         <div>${d.phone||'—'}</div>
         <div><span class="status-pill ${d.verified?'verified':'unverified'}">${d.verified?'Verified':'Unverified'}</span></div>
-        <div>${d.listings||0}</div>
+        <div>${pill(!!d.promoted,'Promoted','—','promoted')}</div>
+        <div>${+d.leads||0}</div>
         <div class="actions">
           <button class="btn btn-ghost" data-act="toggle">${d.verified?'Unverify':'Verify'}</button>
+          <button class="btn btn-ghost" data-act="promote">${d.promoted?'Unpromote':'Promote'}</button>
+          <button class="btn btn-ghost" data-act="recount">Recount leads</button>
+          <button class="btn btn-ghost" data-act="edit">Edit</button>
           <a class="btn btn-ghost" href="results.html?dealer=${encodeURIComponent(d.company||d.name||'')}" target="_blank" rel="noopener">View listings</a>
           <a class="btn btn-ghost" href="mailto:${d.email||''}">Email</a>
           <button class="btn btn-primary" data-act="remove">Remove</button>
@@ -295,6 +320,29 @@
   renderDealers();
 
   dealerSearch?.addEventListener('input', renderDealers);
+
+  // Recount leads by scanning a known listings store (best-effort)
+  function recountLeadsFor(email){
+    const keyCandidates = ['motoria_listings_all','motoria_listings','motoria_inventory','motoria_listings_demo'];
+    let total = 0, found = false;
+    for (const k of keyCandidates){
+      try{
+        const arr = JSON.parse(localStorage.getItem(k)||'[]');
+        if (Array.isArray(arr) && arr.length){
+          const sum = arr
+            .filter(i => ((i.sellerEmail||i.dealerEmail||'').toLowerCase() === email))
+            .reduce((s,i)=> s + (+i.leads||0), 0);
+          total = Math.max(total, sum);
+          found = true;
+        }
+      }catch{}
+    }
+    return { found, total };
+  }
+
+  // Modal helpers
+  function openModal(){ editModal.classList.add('open'); editModal.setAttribute('aria-hidden','false'); }
+  function closeModal(){ editModal.classList.remove('open'); editModal.setAttribute('aria-hidden','true'); dealerForm.reset(); kycList.innerHTML=''; }
 
   dealerRows?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button[data-act]'); if(!btn) return;
@@ -307,24 +355,111 @@
 
     if (act==='toggle'){
       d.verified = !d.verified;
-      setDealerStore(list);
-      renderDealers();
+      setDealerStore(list); renderDealers(); return;
+    }
+    if (act==='promote'){
+      d.promoted = !d.promoted;
+      setDealerStore(list); renderDealers(); return;
+    }
+    if (act==='recount'){
+      const {found,total} = recountLeadsFor(email);
+      if (found){ d.leads = total; setDealerStore(list); renderDealers(); alert(`Leads updated to ${total}.`); }
+      else { alert('No compatible listings store found. Ensure listings have dealerEmail / sellerEmail.'); }
+      return;
+    }
+    if (act==='edit'){
+      // Fill modal
+      dealerForm.email.value = d.email||'';
+      dealerForm['email_view'].value = d.email||'';
+      dealerForm.name.value = d.name||'';
+      dealerForm.company.value = d.company||'';
+      dealerForm.phone.value = d.phone||'';
+      dealerForm.promoted.checked = !!d.promoted;
+      dealerForm.notes.value = d.notes||'';
+      // KYC list
+      kycList.innerHTML = (d.kycDocs||[]).map((f,i)=>`
+        <li data-i="${i}">
+          <span>${f.name}</span>
+          <button class="btn-icon" data-act="kyc-del" title="Remove">✕</button>
+        </li>
+      `).join('');
+      openModal();
       return;
     }
     if (act==='remove'){
       if (!confirm('Remove this dealer from the CMS list? (This does not delete the user account)')) return;
       const next = list.filter(x => String(x.email||'').toLowerCase()!==email);
-      setDealerStore(next);
-      renderDealers();
-      return;
+      setDealerStore(next); renderDealers(); return;
     }
+  });
+
+  // Modal events
+  modalClose?.addEventListener('click', closeModal);
+  modalCancel?.addEventListener('click', closeModal);
+  editModal?.addEventListener('click', (e)=>{ if (e.target === editModal) closeModal(); });
+  kycList?.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-act="kyc-del"]'); if(!btn) return;
+    const idx = +btn.closest('li').dataset.i;
+    const email = dealerForm.email.value.toLowerCase();
+    const list = getDealerStore();
+    const d = list.find(x => String(x.email||'').toLowerCase()===email); if(!d) return;
+    (d.kycDocs||[]).splice(idx,1);
+    setDealerStore(list);
+    // re-render within modal
+    kycList.innerHTML = (d.kycDocs||[]).map((f,i)=>`
+      <li data-i="${i}">
+        <span>${f.name}</span>
+        <button class="btn-icon" data-act="kyc-del" title="Remove">✕</button>
+      </li>
+    `).join('');
+  });
+
+  kycInput?.addEventListener('change', ()=>{
+    const email = dealerForm.email.value.toLowerCase();
+    const list = getDealerStore();
+    const d = list.find(x => String(x.email||'').toLowerCase()===email); if(!d) return;
+    if (!Array.isArray(d.kycDocs)) d.kycDocs=[];
+    const files = [...(kycInput.files||[])];
+    files.forEach(f=> d.kycDocs.push({ name:f.name, ts: Date.now() }));
+    setDealerStore(list);
+    kycInput.value='';
+    kycList.innerHTML = d.kycDocs.map((f,i)=>`
+      <li data-i="${i}">
+        <span>${f.name}</span>
+        <button class="btn-icon" data-act="kyc-del" title="Remove">✕</button>
+      </li>
+    `).join('');
+  });
+
+  dealerForm?.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const fd = new FormData(dealerForm);
+    const email = String(fd.get('email')||'').toLowerCase();
+    const list = getDealerStore();
+    const d = list.find(x => String(x.email||'').toLowerCase()===email); if(!d) return;
+
+    d.name = String(fd.get('name')||'').trim();
+    d.company = String(fd.get('company')||'').trim();
+    d.phone = String(fd.get('phone')||'').trim();
+    d.promoted = !!fd.get('promoted');
+    d.notes = String(fd.get('notes')||'').trim();
+
+    setDealerStore(list);
+    renderDealers();
+    closeModal();
   });
 
   // Export CSV
   function dealersToCSV(items){
-    const cols = ['name','company','email','phone','verified','listings','createdAt'];
+    const cols = ['name','company','email','phone','verified','promoted','listings','leads','createdAt','notes','kyc'];
     const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
-    return [cols.join(',')].concat(items.map(d=>cols.map(k=>esc(d[k])).join(','))).join('\n');
+    return [cols.join(',')].concat(items.map(d=>{
+      const kyc = (d.kycDocs||[]).map(x=>x.name).join('; ');
+      return cols.map(k=>{
+        if (k==='kyc') return esc(kyc);
+        return esc(d[k]);
+      }).join(',');
+    })).join('\n');
   }
   exportDealersCsv?.addEventListener('click', ()=>{
     const csv = dealersToCSV(getDealerStore());

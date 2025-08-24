@@ -16,7 +16,8 @@
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .card{padding:14px;border:1px solid #e5e7eb;border-radius:16px;background:#fff;box-shadow:var(--shadow-soft)}
 .form-col{display:grid;gap:10px}
-.form-col input{height:42px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px}
+.form-col input, .form-col textarea{border:1px solid #e5e7eb;border-radius:10px;padding:10px}
+.form-col input{height:42px}
 .row{display:flex;gap:8px;align-items:center}
 
 .taxo-wrap{display:grid;grid-template-columns:360px 1fr;gap:12px;margin-top:12px}
@@ -33,19 +34,28 @@
 
 /* Dealers table */
 .tbl{display:grid}
-.tbl.head{grid-template-columns:1.2fr 1.2fr 1.4fr 1fr .9fr .7fr 1fr;font-weight:700;color:#0e1726;border-bottom:1px solid #e5e7eb;padding:8px}
+.tbl.head{grid-template-columns:1.1fr 1.1fr 1.4fr 1fr .9fr .9fr .7fr 1.3fr;font-weight:700;color:#0e1726;border-bottom:1px solid #e5e7eb;padding:8px}
 .tbl.body{display:grid}
-.tbl .row{display:grid;grid-template-columns:1.2fr 1.2fr 1.4fr 1fr .9fr .7fr 1fr;align-items:center;border-bottom:1px solid #f1f5f9;padding:10px 8px;gap:8px}
+.tbl .row{display:grid;grid-template-columns:1.1fr 1.1fr 1.4fr 1fr .9fr .9fr .7fr 1.3fr;align-items:center;border-bottom:1px solid #f1f5f9;padding:10px 8px;gap:8px}
 .tbl .row:last-child{border-bottom:0}
 .dealer-name{font-weight:700}
 .status-pill{font-size:12px;border-radius:999px;padding:3px 8px;border:1px solid #e5e7eb}
 .status-pill.verified{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
 .status-pill.unverified{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.status-pill.promoted{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
 
 .tbl .actions{display:flex;gap:6px;flex-wrap:wrap}
 .tbl .actions .btn{height:36px;padding:0 10px;border-radius:10px}
 
-/* Responsive */
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.46);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+.modal.open{display:flex}
+.modal-content{width:min(740px,96vw);background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:var(--shadow);padding:14px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.kyc{margin-top:8px}
+.kyc-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.kyc-list li{display:flex;align-items:center;justify-content:space-between;border:1px solid #eef2f7;border-radius:10px;padding:6px 10px}
+
 @media (max-width:1100px){
   .grid{grid-template-columns:1fr}
   .taxo-wrap{grid-template-columns:1fr}
