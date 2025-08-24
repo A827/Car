@@ -1,0 +1,20 @@
+.dash{display:grid;grid-template-columns:240px 1fr;gap:20px;padding:24px 0 44px}
+.dash-nav{display:grid;gap:8px;height:max-content}
+.dash-nav a{display:block;padding:10px 12px;border-radius:10px;color:#0b1220;text-decoration:none;border:1px solid #e5e7eb;background:#fff}
+.dash-nav a.active{background:#f1f5ff}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.kpi{padding:14px}
+.kpi .label{color:#64748b}
+.kpi .val{font-size:22px;font-weight:800}
+.block{margin-top:10px}
+.block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.table{display:grid}
+.table .row{display:grid;grid-template-columns:1.8fr .6fr .6fr .6fr;gap:10px;padding:10px;border-top:1px solid #eef2f7}
+.table .head{background:#f8fafc;border-top:0;border:1px solid #eef2f7;border-radius:10px}
+.saved-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+@media (max-width:980px){
+  .dash{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr}
+  .saved-grid{grid-template-columns:1fr}
+}
