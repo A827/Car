@@ -1,10 +1,8 @@
-// results.js — uses MotoriaData for a single source of truth
+// results.js — unified data + save-from-list
 (function(){
   'use strict';
+  const { GBP, KM, getCars, saveSearchFromParams, saveCar } = window.MotoriaData;
 
-  const { GBP, KM, getCars, saveSearchFromParams } = window.MotoriaData;
-
-  // Elements (use IDs already present in your results.html)
   const qs  = (s,el=document)=>el.querySelector(s);
   const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
 
@@ -14,37 +12,28 @@
   const prevPage     = qs('#prevPage');
   const nextPage     = qs('#nextPage');
   const chipSummary  = qs('#chipSummary');
-
   const viewListBtn  = qs('#viewList');
   const viewGridBtn  = qs('#viewGrid');
 
   const PAGE_SIZE = 6;
   let state = { page:1, sort:'relevance', view:'list' };
 
-  // If your HTML defines a demo array, expose it so data.js can merge it
-  if (!window.DEMO_CARS) {
-    window.DEMO_CARS = []; // keep empty if your page already defines the dataset elsewhere
-  }
-
   function readParams(){
     const p = new URLSearchParams(location.search);
     state.sort = p.get('sort') || 'relevance';
     state.view = p.get('view') || 'list';
 
-    // quick search (if present)
-    qs('#quickSearch [name="q"]')   && (qs('#quickSearch [name="q"]').value   = p.get('q') || '');
-    qs('#quickSearch [name="loc"]') && (qs('#quickSearch [name="loc"]').value = p.get('loc') || '');
-    qs('#quickSearch [name="sort"]')&& (qs('#quickSearch [name="sort"]').value = state.sort);
+    qs('#quickSearch [name="q"]')?.setAttribute('value', p.get('q')||'');
+    qs('#quickSearch [name="loc"]')?.setAttribute('value', p.get('loc')||'');
+    qs('#quickSearch [name="sort"]') && (qs('#quickSearch [name="sort"]').value = state.sort);
 
-    // sidebar filters (if present)
-    qs('#filtersForm [name="max"]')       && (qs('#filtersForm [name="max"]').value = p.get('max') || '');
-    qs('#filtersForm [name="year_min"]')  && (qs('#filtersForm [name="year_min"]').value = p.get('year_min') || '');
-    qs('#filtersForm [name="year_max"]')  && (qs('#filtersForm [name="year_max"]').value = p.get('year_max') || '');
-    qs('#filtersForm [name="km_max"]')    && (qs('#filtersForm [name="km_max"]').value = p.get('km_max') || '');
+    qs('#filtersForm [name="max"]')      && (qs('#filtersForm [name="max"]').value = p.get('max') || '');
+    qs('#filtersForm [name="year_min"]') && (qs('#filtersForm [name="year_min"]').value = p.get('year_min') || '');
+    qs('#filtersForm [name="year_max"]') && (qs('#filtersForm [name="year_max"]').value = p.get('year_max') || '');
+    qs('#filtersForm [name="km_max"]')   && (qs('#filtersForm [name="km_max"]').value = p.get('km_max') || '');
     qsa('#filtersForm input[name="fuel"]').forEach(cb => cb.checked = p.getAll('fuel').includes(cb.value));
     qsa('#filtersForm input[name="gearbox"]').forEach(cb => cb.checked = p.getAll('gearbox').includes(cb.value));
 
-    // chips
     const chips = [];
     if (p.get('q')) chips.push(['q', p.get('q')]);
     if (p.get('loc')) chips.push(['loc', p.get('loc')]);
@@ -58,7 +47,6 @@
       <span class="chip">${v} <button aria-label="Remove ${v}" data-remove="${k}" data-val="${v}">✕</button></span>
     `).join(''));
 
-    // view toggle UI
     const isGrid = state.view === 'grid';
     viewGridBtn?.classList.toggle('active', isGrid);
     viewListBtn?.classList.toggle('active', !isGrid);
@@ -99,9 +87,9 @@
     switch (p.get('sort')) {
       case 'price_asc':  data.sort((a,b)=>a.price-b.price); break;
       case 'price_desc': data.sort((a,b)=>b.price-a.price); break;
-      case 'year_desc':  data.sort((a,b)=>b.year-a.year);   break;
+      case 'year_desc':  data.sort((a,b)=>b.year-a-year);   break;
       case 'km_asc':     data.sort((a,b)=>a.km-b.km);       break;
-      default: break; // relevance (current order)
+      default: break;
     }
     return data;
   }
@@ -132,7 +120,7 @@
             <div class="price-big">${GBP(c.price)}</div>
             <div class="actions">
               <a class="btn btn-primary" href="detail.html?id=${c.id}">View</a>
-              <a class="btn btn-ghost" href="detail.html?id=${c.id}#contact">Contact</a>
+              <button class="btn btn-ghost save-btn" data-id="${c.id}">Save</button>
             </div>
           </div>
         </div>
@@ -141,10 +129,24 @@
 
     resultCount && (resultCount.textContent = `${data.length} cars found`);
     pageInfo && (pageInfo.textContent = `Page ${state.page} of ${pages}`);
-    if (prevPage) prevPage.disabled = state.page <= 1;
-    if (nextPage) nextPage.disabled = state.page >= pages;
+    prevPage && (prevPage.disabled = state.page <= 1);
+    nextPage && (nextPage.disabled = state.page >= pages);
   }
   if (cardsEl) render();
+
+  // Save car (list)
+  cardsEl?.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.save-btn'); if(!btn) return;
+    const id = +btn.dataset.id;
+    const car = applyFilters().find(c=>+c.id===id);
+    if (car) {
+      saveCar(car);
+      btn.disabled = true;
+      btn.textContent = 'Saved';
+      // Update optional saved count badge in header
+      window.dispatchEvent(new StorageEvent('storage', { key:'motoria_saved_cars' }));
+    }
+  });
 
   // quick search submit
   const quick = qs('#quickSearch');
