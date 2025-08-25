@@ -165,3 +165,44 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
   .grid-messages{grid-template-columns:1fr}
   .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}
 }
+
+/* ====== Masthead & polish (add-on) ====== */
+.dash-mast{
+  background: linear-gradient(180deg,#f7faff, #f3f6ff);
+  border-bottom:1px solid #e9eef6;
+  padding: 18px 0;
+}
+.mast-grid{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  align-items:center;
+  gap:14px;
+}
+.mast-title{ margin:0 }
+.mast-kpis{ display:flex; gap:14px; align-items:center }
+.kpi{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; box-shadow:var(--shadow) }
+.kpi-num{ font-size:22px; font-weight:900 }
+.kpi-label{ font-size:12px; color:var(--muted) }
+
+.aside-help{ margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:12px; background:#fbfdff }
+.aside-help .help-title{ font-weight:800; margin-bottom:6px }
+
+.form-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px }
+.fieldset{ border:1px solid var(--line); border-radius:14px; padding:12px; }
+.fieldset legend{ font-weight:800; padding:0 6px }
+
+.preview-card{ position:sticky; top:86px; align-self:start }
+.preview-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px }
+
+/* Tighter table look */
+.table .row{ background:#fff }
+.table .row:hover{ background:#f9fbff }
+
+/* Tiny gaps utility */
+.row.gap8{ display:flex; gap:8px; align-items:center }
+
+/* Mobile mast stack */
+@media (max-width: 720px){
+  .mast-grid{ grid-template-columns: 1fr }
+  .mast-kpis{ justify-content:flex-start }
+}

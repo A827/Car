@@ -28,20 +28,20 @@
           <li><a href="results.html">Buy</a></li>
           <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <!-- Auth buttons come from app.js -->
+          <!-- Auth buttons are injected by app.js -->
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Page mast -->
+  <!-- Mast -->
   <section class="dash-mast">
-    <div class="container">
+    <div class="container mast-grid">
       <div class="mast-left">
-        <h1>Dealer dashboard</h1>
-        <p class="muted">Create listings, manage inventory, and respond to buyer messages.</p>
+        <h1 class="mast-title">Dealer dashboard</h1>
+        <p class="muted">Create listings, manage inventory, and respond to buyers.</p>
       </div>
-      <div class="mast-kpi">
+      <div class="mast-kpis">
         <div class="kpi">
           <div class="kpi-num" id="kpiActive">0</div>
           <div class="kpi-label">Active</div>
@@ -70,11 +70,11 @@
       </div>
 
       <nav class="dash-nav" role="tablist" aria-label="Dashboard sections">
-        <button class="tablink active" data-view="overview" role="tab" aria-selected="true">Overview</button>
-        <button class="tablink" data-view="inventory" role="tab" aria-selected="false">Inventory</button>
-        <button class="tablink" data-view="add" role="tab" aria-selected="false">Add listing</button>
-        <button class="tablink" data-view="messages" role="tab" aria-selected="false">Messages</button>
-        <button class="tablink" data-view="settings" role="tab" aria-selected="false">Settings</button>
+        <button class="tablink active" data-view="overview"  role="tab" aria-selected="true">Overview</button>
+        <button class="tablink"        data-view="inventory" role="tab" aria-selected="false">Inventory</button>
+        <button class="tablink"        data-view="add"       role="tab" aria-selected="false">Add listing</button>
+        <button class="tablink"        data-view="messages"  role="tab" aria-selected="false">Messages</button>
+        <button class="tablink"        data-view="settings"  role="tab" aria-selected="false">Settings</button>
       </nav>
 
       <div class="aside-help">
@@ -114,6 +114,7 @@
               <a class="btn btn-primary" data-switch="add" href="#">Add listing</a>
             </div>
           </div>
+
           <div class="toolbar">
             <input id="invSearch" placeholder="Search by title or location…" />
             <select id="invStatus">
@@ -124,6 +125,7 @@
             </select>
             <div class="spacer"></div>
           </div>
+
           <div id="tableInventory" class="table"></div>
         </div>
       </div>
@@ -185,10 +187,10 @@
               </label>
               <label>Photos (URL) *
                 <input name="img" id="imgUrl" placeholder="https://…" required />
-                <div class="muted small">Tip: add a direct image URL (jpg/png/webp). You can add a gallery later.</div>
+                <div class="muted small">Tip: paste a direct image URL. You can add a gallery later.</div>
               </label>
               <label>Description
-                <textarea name="desc" id="descInp" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
+                <textarea name="desc" id="descInp" rows="5" placeholder="Condition, history, spec…"></textarea>
               </label>
             </fieldset>
 
@@ -219,7 +221,7 @@
             </div>
           </form>
 
-          <!-- Preview (sticky) -->
+          <!-- Preview -->
           <aside class="card preview-card">
             <div class="preview-head">
               <h2>Preview</h2>
