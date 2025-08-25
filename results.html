@@ -3,16 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Search Results</title>
+  <title>Motoria • Search results</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="results.css" />
 </head>
 <body>
   <!-- Header -->
   <header class="site-header" id="siteHeader">
     <div class="container header-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" href="index.html" aria-label="Motoria home">
         <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
           <rect x="4" y="20" width="56" height="24" rx="6"></rect>
           <circle cx="20" cy="48" r="6"></circle>
@@ -25,122 +24,394 @@
           <span></span><span></span><span></span>
         </button>
         <ul id="navMenu" class="nav-menu">
-          <li><a href="results.html" aria-current="page">Buy</a></li>
+          <li><a href="results.html">Buy</a></li>
           <li><a href="#">Sell</a></li>
           <li><a href="#">Finance</a></li>
           <li><a href="#">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <li><a class="btn btn-ghost" href="#">Sign in</a></li>
-          <li><a class="btn btn-primary" href="#">List your car</a></li>
+          <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Sticky tools -->
-  <div class="tools-wrap" id="toolsWrap">
-    <div class="container tools">
-      <form id="quickSearch" class="tools-search" role="search" aria-label="Refine search quick">
-        <input name="q" placeholder="Make / Model" />
-        <input name="loc" placeholder="Postcode / City" />
-        <select name="sort" aria-label="Sort results">
-          <option value="relevance">Sort: Relevance</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-          <option value="year_desc">Newest Year</option>
-          <option value="km_asc">Lowest Mileage</option>
-        </select>
-        <button class="btn btn-primary" type="submit">Update</button>
+  <!-- Top quick search -->
+  <section class="section" style="padding-bottom:12px">
+    <div class="container">
+      <form id="quickSearch" class="search-bar" role="search" aria-label="Quick search">
+        <label class="field">
+          <span class="label">Keyword</span>
+          <input name="q" placeholder="e.g. Golf, Hybrid…" />
+        </label>
+        <label class="field">
+          <span class="label">Location</span>
+          <input name="loc" placeholder="City / Postcode" />
+        </label>
+        <label class="field">
+          <span class="label">Sort by</span>
+          <select name="sort" id="sortSelect">
+            <option value="relevance">Recommended</option>
+            <option value="price_asc">Price ↑</option>
+            <option value="price_desc">Price ↓</option>
+            <option value="year_desc">Newest</option>
+            <option value="km_asc">Lowest mileage</option>
+          </select>
+        </label>
+        <button class="btn btn-primary search-btn" type="submit">Search</button>
       </form>
 
-      <div class="tools-actions">
-        <div id="chipSummary" class="chips" aria-live="polite"></div>
-        <div class="tools-meta">
-          <span id="resultCount" class="muted"></span>
-          <div class="view-toggle" role="group" aria-label="View">
-            <button id="viewList"  class="vbtn active" aria-pressed="true"  title="List view">≣</button>
-            <button id="viewGrid"  class="vbtn"        aria-pressed="false" title="Grid view">▦</button>
-          </div>
-          <button id="saveSearchBtn" class="btn btn-ghost">Save search</button>
-        </div>
-      </div>
+      <ul id="chipSummary" class="usp-list" style="margin-top:10px"></ul>
     </div>
-  </div>
+  </section>
 
-  <main class="container results-layout">
-    <!-- Filters -->
-    <aside class="filters" aria-label="Filters">
-      <form id="filtersForm">
-        <div class="filter-group">
-          <label>Price max</label>
-          <input type="number" name="max" min="0" placeholder="£">
-        </div>
+  <!-- Content -->
+  <main class="section" style="padding-top:12px">
+    <div class="container" style="display:grid;grid-template-columns:280px 1fr;gap:18px">
+      <!-- Sidebar filters -->
+      <aside>
+        <form id="filtersForm" class="card" style="padding:12px">
+          <h3 style="margin:0 0 10px">Filters</h3>
 
-        <div class="filter-group">
-          <label>Year</label>
+          <label class="field">
+            <span class="label">Max price (£)</span>
+            <input name="max" type="number" min="0" step="1000" placeholder="Any" />
+          </label>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <label class="field">
+              <span class="label">Year from</span>
+              <input name="year_min" type="number" min="1990" step="1" placeholder="Any" />
+            </label>
+            <label class="field">
+              <span class="label">Year to</span>
+              <input name="year_max" type="number" min="1990" step="1" placeholder="Any" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="label">Max mileage (km)</span>
+            <input name="km_max" type="number" min="0" step="1000" placeholder="Any" />
+          </label>
+
+          <div style="margin-top:8px">
+            <div class="label" style="margin-bottom:6px">Fuel</div>
+            <label><input type="checkbox" name="fuel" value="Petrol" /> Petrol</label><br/>
+            <label><input type="checkbox" name="fuel" value="Diesel" /> Diesel</label><br/>
+            <label><input type="checkbox" name="fuel" value="Hybrid" /> Hybrid</label><br/>
+            <label><input type="checkbox" name="fuel" value="Electric" /> Electric</label>
+          </div>
+
+          <div style="margin-top:8px">
+            <div class="label" style="margin-bottom:6px">Gearbox</div>
+            <label><input type="checkbox" name="gearbox" value="Manual" /> Manual</label><br/>
+            <label><input type="checkbox" name="gearbox" value="Automatic" /> Automatic</label>
+          </div>
+
+          <div class="row" style="margin-top:12px;justify-content:space-between">
+            <button class="btn btn-primary" type="submit">Apply</button>
+            <button class="btn btn-ghost" type="button" id="clearBtn">Clear</button>
+          </div>
+        </form>
+
+        <div class="card" style="padding:12px;margin-top:12px">
+          <h3 style="margin:0 0 8px">View</h3>
           <div class="row">
-            <input type="number" name="year_min" placeholder="From" min="1980" max="2026">
-            <input type="number" name="year_max" placeholder="To" min="1980" max="2026">
+            <button id="viewList" class="btn btn-ghost" aria-pressed="true">List</button>
+            <button id="viewGrid" class="btn btn-ghost" aria-pressed="false">Grid</button>
           </div>
         </div>
 
-        <div class="filter-group">
-          <label>Mileage (km)</label>
-          <div class="row"><input type="number" name="km_max" placeholder="Max"></div>
+        <div class="card" style="padding:12px;margin-top:12px">
+          <button id="saveSearchBtn" class="btn btn-ghost" type="button">Save this search</button>
         </div>
+      </aside>
 
-        <div class="filter-group">
-          <label>Fuel</label>
-          <div class="checkcol">
-            <label><input type="checkbox" name="fuel" value="Petrol"> Petrol</label>
-            <label><input type="checkbox" name="fuel" value="Diesel"> Diesel</label>
-            <label><input type="checkbox" name="fuel" value="Hybrid"> Hybrid</label>
-            <label><input type="checkbox" name="fuel" value="Electric"> Electric</label>
+      <!-- Results -->
+      <section>
+        <div class="section-head">
+          <h2 style="margin:0"><span id="resultCount">0</span></h2>
+          <div class="actions">
+            <button class="carousel-btn" id="prevPage" aria-label="Previous page">‹</button>
+            <div id="pageInfo" class="muted" style="display:grid;place-items:center;padding:0 6px">Page 1</div>
+            <button class="carousel-btn" id="nextPage" aria-label="Next page">›</button>
           </div>
         </div>
 
-        <div class="filter-group">
-          <label>Gearbox</label>
-          <div class="checkcol">
-            <label><input type="checkbox" name="gearbox" value="Manual"> Manual</label>
-            <label><input type="checkbox" name="gearbox" value="Automatic"> Automatic</label>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" type="submit">Apply filters</button>
-        <button class="btn btn-ghost" id="clearBtn" type="button">Clear</button>
-      </form>
-    </aside>
-
-    <!-- Results -->
-    <section class="results" aria-live="polite">
-      <div id="cards" class="grid listlike"></div>
-
-      <nav class="pager" aria-label="Pagination">
-        <button id="prevPage" class="btn btn-ghost" disabled>Prev</button>
-        <span id="pageInfo" class="muted">Page 1</span>
-        <button id="nextPage" class="btn btn-ghost" disabled>Next</button>
-      </nav>
-    </section>
+        <div id="cards" class="listlike" style="display:grid;gap:14px"></div>
+      </section>
+    </div>
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
         <div class="brand-footer">
-          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="20" width="56" height="24" rx="6"></rect><circle cx="20" cy="48" r="6"></circle><circle cx="48" cy="48" r="6"></circle></svg>
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+            <circle cx="20" cy="48" r="6"></circle>
+            <circle cx="48" cy="48" r="6"></circle>
+          </svg>
           <span>Motoria</span>
         </div>
         <p class="muted">© <span id="year"></span> Motoria Ltd.</p>
       </div>
-      <nav aria-label="Footer">
-        <ul class="footer-links">
-          <li><a href="#">About</a></li><li><a href="#">Safety & Trust</a></li><li><a href="#">For Dealers</a></li>
-        </ul>
-      </nav>
     </div>
   </footer>
 
-  <script src="results.js"></script>
+  <!-- Core scripts -->
+  <script src="app.js"></script>
+  <script src="data.js"></script>
+
+  <!-- Results controller -->
+  <script>
+  // Header / footer
+  const header = document.getElementById('siteHeader');
+  addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const navToggle = document.getElementById('navToggle');
+  const navMenu = document.getElementById('navMenu');
+  navToggle?.addEventListener('click', ()=>{
+    const exp = navToggle.getAttribute('aria-expanded')==='true';
+    navToggle.setAttribute('aria-expanded', String(!exp));
+    navMenu.classList.toggle('open');
+  });
+
+  // Shorthands
+  const qs  = (s,el=document)=>el.querySelector(s);
+  const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
+  const GBP = window.MotoriaData.GBP;
+  const KM  = window.MotoriaData.KM;
+  const annotateCars = window.MotoriaData.annotateCars;
+  const getCars = window.MotoriaData.getCars;
+
+  // DOM
+  const cardsEl      = qs('#cards');
+  const resultCount  = qs('#resultCount');
+  const pageInfo     = qs('#pageInfo');
+  const prevPage     = qs('#prevPage');
+  const nextPage     = qs('#nextPage');
+  const chipSummary  = qs('#chipSummary');
+  const viewListBtn  = qs('#viewList');
+  const viewGridBtn  = qs('#viewGrid');
+  const sortSelect   = qs('#sortSelect');
+
+  const PAGE_SIZE = 6;
+  let state = { page:1, sort:'relevance', view:'list' };
+
+  function stars(r){ const full=Math.round(r||0); return '★'.repeat(full)+'☆'.repeat(5-full) }
+
+  function readParams(){
+    const p = new URLSearchParams(location.search);
+    state.sort = p.get('sort') || 'relevance';
+    state.view = p.get('view') || 'list';
+
+    // quick search
+    qs('#quickSearch [name="q"]').value   = p.get('q')   || '';
+    qs('#quickSearch [name="loc"]').value = p.get('loc') || '';
+    sortSelect.value = state.sort;
+
+    // sidebar
+    qs('#filtersForm [name="max"]').value       = p.get('max') || '';
+    qs('#filtersForm [name="year_min"]').value  = p.get('year_min') || '';
+    qs('#filtersForm [name="year_max"]').value  = p.get('year_max') || '';
+    qs('#filtersForm [name="km_max"]').value    = p.get('km_max') || '';
+    qsa('#filtersForm input[name="fuel"]').forEach(cb => cb.checked = p.getAll('fuel').includes(cb.value));
+    qsa('#filtersForm input[name="gearbox"]').forEach(cb => cb.checked = p.getAll('gearbox').includes(cb.value));
+
+    // chips
+    const chips = [];
+    if (p.get('q')) chips.push(['q', p.get('q')]);
+    if (p.get('loc')) chips.push(['loc', p.get('loc')]);
+    if (p.get('max')) chips.push(['max', `≤ £${(+p.get('max')).toLocaleString('en-GB')}`]);
+    if (p.get('year_min')) chips.push(['year_min', `from ${p.get('year_min')}`]);
+    if (p.get('year_max')) chips.push(['year_max', `to ${p.get('year_max')}`]);
+    if (p.get('km_max')) chips.push(['km_max', `≤ ${(+p.get('km_max')).toLocaleString('en-GB')} km`]);
+    p.getAll('fuel').forEach(v=>chips.push(['fuel', v]));
+    p.getAll('gearbox').forEach(v=>chips.push(['gearbox', v]));
+    chipSummary.innerHTML = chips.map(([k,v])=>`
+      <span class="chip">${v} <button aria-label="Remove ${v}" data-remove="${k}" data-val="${v}">✕</button></span>
+    `).join('');
+
+    // view toggle UI
+    const isGrid = state.view === 'grid';
+    viewGridBtn.classList.toggle('active', isGrid);
+    viewListBtn.classList.toggle('active', !isGrid);
+    viewGridBtn.setAttribute('aria-pressed', String(isGrid));
+    viewListBtn.setAttribute('aria-pressed', String(!isGrid));
+    cardsEl.classList.toggle('cards', isGrid);
+    cardsEl.classList.toggle('listlike', !isGrid);
+  }
+  readParams();
+
+  function baseFiltered(){
+    const p = new URLSearchParams(location.search);
+    // Take cars from data.js and annotate with dealer flags
+    let data = annotateCars(getCars());
+
+    const q = (p.get('q')||'').toLowerCase();
+    const loc = (p.get('loc')||'').toLowerCase();
+    const max = +(p.get('max')||0);
+    const yearMin = +(p.get('year_min')||0);
+    const yearMax = +(p.get('year_max')||0);
+    const kmMax = +(p.get('km_max')||0);
+    const fuels = p.getAll('fuel');
+    const boxes = p.getAll('gearbox');
+
+    data = data.filter(c=>{
+      if (q && !String(c.title).toLowerCase().includes(q)) return false;
+      if (loc && !String(c.loc||'').toLowerCase().includes(loc)) return false;
+      if (max && +c.price > max) return false;
+      if (yearMin && +c.year < yearMin) return false;
+      if (yearMax && +c.year > yearMax) return false;
+      if (kmMax && +c.km > kmMax) return false;
+      if (fuels.length && !fuels.includes(String(c.fuel))) return false;
+      if (boxes.length && !boxes.includes(String(c.gearbox))) return false;
+      return true;
+    });
+
+    // Sorting
+    switch (p.get('sort')) {
+      case 'price_asc':  data.sort((a,b)=>a.price-b.price); break;
+      case 'price_desc': data.sort((a,b)=>b.price-a.price); break;
+      case 'year_desc':  data.sort((a,b)=>b.year-a.year);   break;
+      case 'km_asc':     data.sort((a,b)=>a.km-b.km);       break;
+      default:
+        // Recommended: Promoted → Verified → everything else (then by recency if ts present)
+        data.sort((a,b)=>{
+          const pv = (b.dealerPromoted - a.dealerPromoted) || (b.dealerVerified - a.dealerVerified);
+          if (pv) return pv;
+          return (b.ts||0) - (a.ts||0);
+        });
+        break;
+    }
+    return data;
+  }
+
+  function render(){
+    const data = baseFiltered();
+    const pages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
+    state.page = Math.min(state.page, pages);
+    const start = (state.page-1)*PAGE_SIZE;
+    const slice = data.slice(start, start+PAGE_SIZE);
+
+    cardsEl.innerHTML = slice.map(c=>`
+      <article class="card">
+        <img class="thumb" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
+        <div class="info">
+          <div>
+            <h3 class="title">
+              <a href="detail.html?id=${c.id}" style="color:inherit;text-decoration:none">${c.title}</a>
+            </h3>
+            <div class="meta-row"><span>${c.year||''}</span> • <span>${KM(+c.km||0)}</span> • <span>${c.fuel||''}</span> • <span>${c.gearbox||''}</span></div>
+            <div class="badges">
+              ${c.dealerPromoted ? `<span class="badge">Promoted</span>` : ``}
+              ${c.dealerVerified ? `<span class="badge">Verified</span>` : ``}
+              ${c.loc ? `<span class="badge">${c.loc}</span>` : ``}
+            </div>
+          </div>
+          <div class="right">
+            <div class="price-big">${GBP(+c.price||0)}</div>
+            <div class="actions">
+              <a class="btn btn-primary" href="detail.html?id=${c.id}">View</a>
+              <a class="btn btn-ghost" href="detail.html?id=${c.id}#contact">Contact</a>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    resultCount.textContent = `${data.length} cars found`;
+    pageInfo.textContent = `Page ${state.page} of ${pages}`;
+    prevPage.disabled = state.page <= 1;
+    nextPage.disabled = state.page >= pages;
+  }
+  render();
+
+  // Quick search submit
+  qs('#quickSearch').addEventListener('submit', e=>{
+    e.preventDefault();
+    const params = new URLSearchParams(location.search);
+    for (const [k,v] of new FormData(e.currentTarget).entries()){
+      v ? params.set(k,v) : params.delete(k);
+    }
+    params.delete('page');
+    history.replaceState({},'',`?${params.toString()}`);
+    state.page=1; readParams(); render();
+  });
+
+  // Sidebar filters
+  qs('#filtersForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const params = new URLSearchParams(location.search);
+    const values = new FormData(e.currentTarget);
+
+    ['max','year_min','year_max','km_max'].forEach(k=>{
+      const v = values.get(k); v ? params.set(k,v) : params.delete(k);
+    });
+    ['fuel','gearbox'].forEach(k=>{
+      params.delete(k);
+      (values.getAll(k)||[]).forEach(v=>params.append(k,v));
+    });
+
+    history.replaceState({},'',`?${params.toString()}`);
+    state.page=1; readParams(); render();
+  });
+
+  // Clear filters
+  qs('#clearBtn').addEventListener('click', ()=>{
+    const keep = new URLSearchParams(location.search);
+    ['max','year_min','year_max','km_max','fuel','gearbox'].forEach(k=>keep.delete(k));
+    history.replaceState({},'',`?${keep.toString()}`);
+    qs('#filtersForm').reset();
+    qsa('#filtersForm input[type="checkbox"]').forEach(cb=>cb.checked=false);
+    state.page=1; readParams(); render();
+  });
+
+  // Remove chip
+  chipSummary.addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-remove]');
+    if(!btn) return;
+    const k = btn.dataset.remove;
+    const v = btn.dataset.val;
+    const p = new URLSearchParams(location.search);
+    if (['fuel','gearbox'].includes(k)){
+      const values = p.getAll(k).filter(x=>x!==v);
+      p.delete(k); values.forEach(x=>p.append(k,x));
+    } else {
+      p.delete(k);
+    }
+    history.replaceState({},'',`?${p.toString()}`);
+    state.page=1; readParams(); render();
+  });
+
+  // Pager
+  prevPage.addEventListener('click',()=>{ state.page--; render(); });
+  nextPage.addEventListener('click',()=>{ state.page++; render(); });
+
+  // View toggle
+  function setView(view){
+    const p = new URLSearchParams(location.search);
+    p.set('view', view);
+    history.replaceState({},'',`?${p.toString()}`);
+    readParams(); render();
+  }
+  viewListBtn.addEventListener('click', ()=> setView('list'));
+  viewGridBtn.addEventListener('click', ()=> setView('grid'));
+
+  // Sort change
+  sortSelect.addEventListener('change', ()=>{
+    const p = new URLSearchParams(location.search);
+    p.set('sort', sortSelect.value);
+    history.replaceState({},'',`?${p.toString()}`);
+    readParams(); render();
+  });
+
+  // Save search (local demo)
+  qs('#saveSearchBtn').addEventListener('click', ()=>{
+    window.MotoriaData.saveSearchFromParams(location.search);
+    alert('Search saved! (local demo)');
+  });
+  </script>
 </body>
 </html>
