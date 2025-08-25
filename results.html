@@ -27,7 +27,7 @@
           <li><a href="results.html">Buy</a></li>
           <li><a href="#">Sell</a></li>
           <li><a href="#">Finance</a></li>
-          <li><a href="#">Dealers</a></li>
+          <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
           <li id="authSlot"></li>
         </ul>
@@ -142,7 +142,6 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
@@ -159,11 +158,9 @@
     </div>
   </footer>
 
-  <!-- Core scripts -->
   <script src="app.js"></script>
   <script src="data.js"></script>
 
-  <!-- Results controller -->
   <script>
   // Header / footer
   const header = document.getElementById('siteHeader');
@@ -229,6 +226,11 @@
     if (p.get('km_max')) chips.push(['km_max', `≤ ${(+p.get('km_max')).toLocaleString('en-GB')} km`]);
     p.getAll('fuel').forEach(v=>chips.push(['fuel', v]));
     p.getAll('gearbox').forEach(v=>chips.push(['gearbox', v]));
+
+    // NEW: show chips for dealer filters
+    if (p.get('dealer_email')) chips.push(['dealer_email', p.get('dealer_email')]);
+    if (p.get('dealer')) chips.push(['dealer', p.get('dealer')]);
+
     chipSummary.innerHTML = chips.map(([k,v])=>`
       <span class="chip">${v} <button aria-label="Remove ${v}" data-remove="${k}" data-val="${v}">✕</button></span>
     `).join('');
@@ -257,6 +259,10 @@
     const fuels = p.getAll('fuel');
     const boxes = p.getAll('gearbox');
 
+    // NEW: dealer filters
+    const filterDealerEmail = (p.get('dealer_email')||'').toLowerCase();
+    const filterDealerName  = (p.get('dealer')||'').toLowerCase();
+
     data = data.filter(c=>{
       if (q && !String(c.title).toLowerCase().includes(q)) return false;
       if (loc && !String(c.loc||'').toLowerCase().includes(loc)) return false;
@@ -266,6 +272,16 @@
       if (kmMax && +c.km > kmMax) return false;
       if (fuels.length && !fuels.includes(String(c.fuel))) return false;
       if (boxes.length && !boxes.includes(String(c.gearbox))) return false;
+
+      if (filterDealerEmail){
+        const ce = String(c.dealerEmail||c.sellerEmail||'').toLowerCase();
+        if (ce !== filterDealerEmail) return false;
+      }
+      if (filterDealerName){
+        const dn = String(c.dealer||c.company||'').toLowerCase();
+        if (!dn.includes(filterDealerName)) return false;
+      }
+
       return true;
     });
 
@@ -276,7 +292,6 @@
       case 'year_desc':  data.sort((a,b)=>b.year-a.year);   break;
       case 'km_asc':     data.sort((a,b)=>a.km-b.km);       break;
       default:
-        // Recommended: Promoted → Verified → recency
         data.sort((a,b)=>{
           const pv = (b.dealerPromoted - a.dealerPromoted) || (b.dealerVerified - a.dealerVerified);
           if (pv) return pv;
@@ -360,7 +375,7 @@
   // Clear filters
   qs('#clearBtn').addEventListener('click', ()=>{
     const keep = new URLSearchParams(location.search);
-    ['max','year_min','year_max','km_max','fuel','gearbox'].forEach(k=>keep.delete(k));
+    ['max','year_min','year_max','km_max','fuel','gearbox','dealer_email','dealer'].forEach(k=>keep.delete(k));
     history.replaceState({},'',`?${keep.toString()}`);
     qs('#filtersForm').reset();
     qsa('#filtersForm input[type="checkbox"]').forEach(cb=>cb.checked=false);
