@@ -182,21 +182,33 @@
   const addTitle = qs('#addTitle');
   const cancelEdit = qs('#cancelEdit');
 
-  // Taxonomy → Make/Model
+  // Taxonomy → Make/Model (with fallback)
   const MD = window.MotoriaData || {};
   const makeSel = qs('#makeSel');
   const modelSel = qs('#modelSel');
   function hydrateMakeModel(){
-    const makes = MD.getTaxonomy ? MD.getTaxonomy().makes : [];
-    makeSel.innerHTML = `<option value="">Select make</option>` + makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+    const fallback = {
+      Volkswagen:['Golf','Polo','Passat','T-Roc'],
+      BMW:['1 Series','3 Series','X1','X3'],
+      Audi:['A3','A4','Q2','Q3'],
+      Ford:['Fiesta','Focus','Puma','Kuga'],
+      Toyota:['Corolla','Yaris','C-HR','RAV4'],
+      Kia:['Sportage','Ceed','Rio','Stonic'],
+      Skoda:['Octavia','Fabia','Superb','Karoq'],
+      Hyundai:['Ioniq','i10','i20','Tucson']
+    };
+    const hasTaxo = !!(MD.getTaxonomy && MD.modelsForMake);
+    const makes = hasTaxo ? MD.getTaxonomy().makes.map(m=>m.name) : Object.keys(fallback);
+    makeSel.innerHTML = `<option value="">Select make</option>` + makes.map(m=>`<option value="${m}">${m}</option>`).join('');
     modelSel.innerHTML = `<option value="">Model</option>`;
     modelSel.disabled = true;
 
     makeSel.addEventListener('change', ()=>{
       const make = makeSel.value;
-      const models = make ? (MD.modelsForMake ? MD.modelsForMake(make) : []) : [];
+      const models = !make ? [] : (hasTaxo ? MD.modelsForMake(make) : (fallback[make]||[]));
       modelSel.disabled = !make || !models.length;
-      modelSel.innerHTML = `<option value="">${models.length?'Select model':'Model'}</option>` + models.map(x=>`<option value="${x}">${x}</option>`).join('');
+      modelSel.innerHTML = `<option value="">${models.length?'Select model':'Model'}</option>` +
+        models.map(x=>`<option value="${x}">${x}</option>`).join('');
       updatePreview();
     });
     modelSel.addEventListener('change', updatePreview);
@@ -212,14 +224,14 @@
   function updatePreview(){
     const make = makeSel.value || '';
     const model= modelSel.value || '';
-    const title = (qs('#titleInp').value || `${make} ${model}`).trim() || 'Title appears here';
+    const title = (qs('#titleInp').value || `${make} ${model}`.trim()).trim() || 'Title appears here';
     const year  = qs('#yearInp').value;
     const km    = qs('#kmInp').value;
     const fuel  = qs('#fuelSel').value;
     const box   = qs('#boxSel').value;
 
     prevTitle.textContent = title;
-    prevMeta.textContent = `${year || 'Year'} • ${km?KM(km):'Mileage'} • ${fuel || 'Fuel'} • ${box || 'Gearbox'}`;
+    prevMeta.textContent = `${year || 'Year'} • ${km?KM(km):'Mileage'} • ${fuel || 'Fuel'} • ${box || 'Manual'}`;
 
     const price = +qs('#priceInp').value || 0;
     prevPrice.textContent = GBP(price);
@@ -234,16 +246,18 @@
   function fillForm(i){
     addTitle.textContent = 'Edit listing';
     cancelEdit.hidden = false;
-    makeSel.value = '';
-    modelSel.innerHTML = `<option value="">Model</option>`; modelSel.disabled=true;
-    // best effort to set make/model from title if not present
-    if (i.make && i.model){
-      makeSel.value=i.make;
-      const models = MD.modelsForMake ? MD.modelsForMake(i.make) : [];
+
+    // try set make/model if stored; otherwise leave for user
+    makeSel.value = i.make || '';
+    if (i.make){
+      const models = (MD.modelsForMake ? MD.modelsForMake(i.make) : []);
       modelSel.innerHTML = `<option value="">Select model</option>` + models.map(x=>`<option value="${x}">${x}</option>`).join('');
       modelSel.disabled = !models.length;
       modelSel.value = i.model || '';
+    } else {
+      modelSel.innerHTML = `<option value="">Model</option>`; modelSel.disabled=true;
     }
+
     qs('#yearInp').value  = i.year||'';
     qs('#priceInp').value = i.price||'';
     qs('#kmInp').value    = i.km||'';
@@ -264,7 +278,6 @@
     cancelEdit.hidden = true;
     form.reset();
     qs('#idHidden').value='';
-    // reset model
     modelSel.innerHTML = `<option value="">Model</option>`;
     modelSel.disabled = true;
     updatePreview();
