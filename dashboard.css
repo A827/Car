@@ -1,51 +1,131 @@
-/* Dealer dashboard visuals */
-:root{ --line:#e5e7eb; --muted:#64748b; }
+/* Dealer dashboard visuals (refined) */
+:root{
+  --ink:#0e1726;
+  --muted:#64748b;
+  --line:#e5e7eb;
+  --brand:#2160ff;
+  --card:#fff;
+  --shadow:0 14px 36px rgba(2,6,23,.06);
+}
 
-.dash{display:grid; grid-template-columns:280px 1fr; gap:16px; padding:16px 0 28px}
-.card{background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 14px 36px rgba(2,6,23,.06); padding:14px}
+.container{width:min(1200px,92%); margin-inline:auto}
 
+/* Layout */
+.dash{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:18px;
+  padding:18px 0 32px;
+}
+
+/* Cards */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:14px;
+}
+
+/* Sidebar */
 .dash-aside{position:sticky; top:76px; align-self:start}
 .dealer-card{display:flex; gap:10px; align-items:center; margin-bottom:10px}
-.dealer-name{font-weight:800}
 .avatar{width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background:#eef2ff}
+.dealer-name{font-weight:800}
 
 .dash-nav{display:grid; gap:8px}
-.dash-nav .tablink{height:40px; border-radius:10px; border:1px solid var(--line); background:#fff; cursor:pointer; text-align:left; padding:0 12px; font-weight:700}
+.dash-nav .tablink{
+  height:40px; border-radius:10px; border:1px solid var(--line);
+  background:#fff; cursor:pointer; text-align:left; padding:0 12px; font-weight:700;
+}
 .dash-nav .tablink.active{background:#f5f8ff; border-color:#dbe4ff}
 
+/* Content panels */
 .dash-content{display:grid; gap:16px}
 .panel{display:none}
 .panel.active{display:block}
 
+/* Grids */
 .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
 .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.grid-2 .grid-2{grid-template-columns:1fr 1fr}
-.grid-3 input, .grid-3 select, .grid-2 input, .grid-2 select{height:42px}
 
-.kpi{display:grid; gap:4px; place-items:start}
-.kpi-num{font-size:28px; font-weight:900}
-
+/* Toolbar & tables */
 .toolbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
 .toolbar input, .toolbar select{height:40px; border:1px solid var(--line); border-radius:10px; padding:0 12px}
 .toolbar .spacer{flex:1}
 
 .table{display:grid}
-.table .row{display:grid; grid-template-columns:2.2fr .9fr .6fr .9fr .9fr .6fr 1.2fr; gap:10px; align-items:center; padding:10px; border-bottom:1px solid var(--line)}
+.table .row{
+  display:grid; align-items:center;
+  grid-template-columns:2.1fr .9fr .6fr .9fr .9fr .6fr 1.2fr;
+  gap:10px; padding:10px; border-bottom:1px solid var(--line);
+}
 .table .row.head{font-weight:800; color:#0b1220; background:#f8fafc; border-top-left-radius:10px; border-top-right-radius:10px}
 .table .row .actions{display:flex; gap:6px; justify-content:flex-end}
 .col-img{width:64px; height:48px; object-fit:cover; border-radius:8px; background:#eef2ff; border:1px solid var(--line)}
 
-.preview{display:flex; gap:12px; align-items:center}
-.preview .thumb{width:160px; height:120px; object-fit:cover; border-radius:12px; border:1px solid var(--line); background:#eef2ff}
-.preview .title{font-weight:800}
-.preview .meta{color:var(--muted)}
-.price-big{font-weight:900}
-
+/* Forms – unified look */
 .stack{display:grid; gap:12px}
 .stack .row{display:flex; gap:8px; align-items:center}
-input, select, textarea{border:1px solid var(--line); border-radius:12px; padding:0 12px; height:42px}
-textarea{height:auto; padding:10px 12px}
 
+label{display:grid; gap:6px; font-weight:600; color:#0b1220}
+.small{font-size:12px}
+.muted{color:var(--muted)}
+
+input, select, textarea{
+  height:44px; padding:0 12px; border:1px solid var(--line); border-radius:12px;
+  background:#fff; outline:0; font:inherit;
+}
+select{appearance:none; background:
+  linear-gradient(180deg,#fff,#fff) padding-box,
+  linear-gradient(180deg,#e5e7eb,#e5e7eb) border-box;
+  background-position:right 10px center; background-repeat:no-repeat;
+}
+textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
+
+/* Buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer}
+.btn-ghost{background:#fff}
+.btn-primary{background:var(--brand); color:#fff; border-color:transparent}
+.btn:hover{transform:translateY(-1px)}
+
+/* KPI */
+.kpi{display:grid; gap:4px; place-items:start}
+.kpi-num{font-size:28px; font-weight:900}
+
+/* ---- ADD LISTING POLISH ---- */
+
+/* Two-panels: form + preview */
+#panel-add .grid-2{
+  grid-template-columns: minmax(0,1.1fr) minmax(0,.9fr);
+}
+
+/* Make/Model compact row */
+#panel-add .grid-2 > .grid-2{
+  grid-template-columns: 1fr 1fr;
+}
+#makeSel, #modelSel{width:100%}
+
+/* Inline tri/dual rows */
+.grid-3 input, .grid-3 select, .grid-2 input, .grid-2 select{height:44px}
+
+/* Helper message */
+.form-msg{
+  display:none; margin-top:-2px;
+  color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; padding:8px 10px; border-radius:10px;
+}
+
+/* Preview card */
+.preview{display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center}
+.preview .thumb{
+  width:160px; height:120px; object-fit:cover; border-radius:12px;
+  border:1px solid var(--line); background:#eef2ff;
+}
+.preview .title{font-weight:800; margin-bottom:2px}
+.preview .meta{color:var(--muted); font-size:14px}
+.price-big{font-weight:900; font-size:18px}
+
+/* Messages */
 .grid-messages{display:grid; grid-template-columns:320px 1fr; gap:12px}
 .threads{padding:0}
 .thread-item{padding:12px; border-bottom:1px solid var(--line); cursor:pointer}
@@ -58,12 +138,11 @@ textarea{height:auto; padding:10px 12px}
 .msg-form{display:flex; gap:8px; margin-top:8px}
 .msg-form input{flex:1}
 
-.form-msg{color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; padding:8px 10px; border-radius:10px; display:none}
-
-@media (max-width: 1000px){
+/* Responsive */
+@media (max-width: 1100px){
   .dash{grid-template-columns:1fr}
+  #panel-add .grid-2{grid-template-columns:1fr}
   .grid-3{grid-template-columns:1fr}
-  .grid-2{grid-template-columns:1fr}
-  .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}
   .grid-messages{grid-template-columns:1fr}
+  .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}
 }
