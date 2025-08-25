@@ -55,6 +55,7 @@
 
   window.MotoriaData = { KEYS, GBP, KM, getCars, getCarById, saveCar, saveSearchFromParams };
 })();
+
 // data.js — add taxonomy helpers
 (function(){
   'use strict';
@@ -86,5 +87,77 @@
   // Attach to existing MotoriaData if present
   window.MotoriaData = Object.assign({}, window.MotoriaData||{}, {
     getTaxonomy, modelsForMake
+  });
+})();
+
+// data.js — dealers helpers (reads CMS dealers; annotate cars with dealer flags)
+(function(){
+  'use strict';
+
+  const KEY_DEALERS_V2 = 'motoria_dealers_v2';
+  const KEY_DEALERS_V1 = 'motoria_dealers_v1';
+
+  function load(k,d){ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d)) }catch(_){ return d } }
+
+  function getDealers(){
+    const v2 = load(KEY_DEALERS_V2, null);
+    if (Array.isArray(v2)) return v2;
+    const v1 = load(KEY_DEALERS_V1, null);
+    if (Array.isArray(v1)) return v1;
+    return [];
+  }
+
+  function dealerByEmail(email){
+    if (!email) return null;
+    const e = String(email).toLowerCase();
+    return getDealers().find(d => String(d.email||'').toLowerCase()===e) || null;
+  }
+
+  function isDealerVerified(email){
+    const d = dealerByEmail(email);
+    return !!(d && d.verified);
+  }
+
+  function isDealerPromoted(email){
+    const d = dealerByEmail(email);
+    return !!(d && d.promoted);
+  }
+
+  /**
+   * annotateCars(cars[])
+   * Returns a new array where each car is tagged:
+   * - dealerVerified: boolean
+   * - dealerPromoted: boolean
+   * Lookup priority: dealerEmail -> (fallback) dealer/company/name string match.
+   */
+  function annotateCars(cars){
+    const list = Array.isArray(cars) ? cars.slice() : [];
+    const dealers = getDealers();
+    const byEmail = new Map(dealers.map(d => [String(d.email||'').toLowerCase(), d]));
+    const byName  = new Map(
+      dealers.map(d => [String(d.company||d.name||'').trim().toLowerCase(), d])
+    );
+
+    return list.map(c => {
+      const email = String(c.dealerEmail||c.sellerEmail||'').toLowerCase();
+      let d = email ? byEmail.get(email) : null;
+      if (!d) {
+        const key = String(c.dealer||c.company||c.locDealer||c.loc||'').trim().toLowerCase();
+        if (key) d = byName.get(key) || null;
+      }
+      return Object.assign({}, c, {
+        dealerVerified: !!(d && d.verified),
+        dealerPromoted: !!(d && d.promoted)
+      });
+    });
+  }
+
+  // Extend MotoriaData without removing prior methods
+  window.MotoriaData = Object.assign({}, window.MotoriaData||{}, {
+    getDealers,
+    dealerByEmail,
+    isDealerVerified,
+    isDealerPromoted,
+    annotateCars
   });
 })();
