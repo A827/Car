@@ -1,18 +1,18 @@
 // app.js — global header/auth glue usable on every page
-(function () {
+(function(){
   'use strict';
 
-  // ===== Simple Auth =====
-  const LS_USERS = 'motoria_users';
+  // ===== Simple Auth (primary) =====
+  const LS_USERS   = 'motoria_users';
   const LS_SESSION = 'motoria_session';
 
-  const getUsers    = () => { try { return JSON.parse(localStorage.getItem(LS_USERS)   || '[]');   } catch { return []; } };
-  const setUsers    = (u) => localStorage.setItem(LS_USERS, JSON.stringify(u));
-  const getSession  = () => { try { return JSON.parse(localStorage.getItem(LS_SESSION) || 'null'); } catch { return null; } };
-  const setSession  = (s) => localStorage.setItem(LS_SESSION, JSON.stringify(s));
-  const clearSession= () => localStorage.removeItem(LS_SESSION);
+  function getUsers(){ try{ return JSON.parse(localStorage.getItem(LS_USERS)   || '[]'); }catch(_){ return []; } }
+  function setUsers(u){ localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+  function getSession(){ try{ return JSON.parse(localStorage.getItem(LS_SESSION) || 'null'); }catch(_){ return null; } }
+  function setSession(s){ localStorage.setItem(LS_SESSION, JSON.stringify(s)); }
+  function clearSession(){ localStorage.removeItem(LS_SESSION); }
 
-  // Seed demo accounts if first run
+  // Seed demo accounts on first run
   if (!localStorage.getItem(LS_USERS)) {
     setUsers([
       { name:'Admin',     email:'admin@motoria.test', pass:'motoria123', role:'admin' },
@@ -20,123 +20,118 @@
     ]);
   }
 
-  // Expose
+  // Expose to pages
   window.MotoriaAuth = { getUsers, setUsers, getSession, setSession, clearSession };
 
-  // ===== Helpers =====
-  function resolveSession() {
+  // ===== Header UI state =====
+  const header    = document.getElementById('siteHeader');
+  const yearEl    = document.getElementById('year');
+  const navToggle = document.getElementById('navToggle');
+  const navMenu   = document.getElementById('navMenu');
+
+  // Elevation on scroll
+  if (header) addEventListener('scroll', ()=>header.classList.toggle('elevated', scrollY>6));
+  if (yearEl)  yearEl.textContent = new Date().getFullYear();
+
+  // Mobile menu
+  navToggle?.addEventListener('click', ()=>{
+    const exp = navToggle.getAttribute('aria-expanded') === 'true';
+    navToggle.setAttribute('aria-expanded', String(!exp));
+    navMenu?.classList.toggle('open');
+  });
+
+  // Helper: route to correct place for "List your car"
+  function goListYourCar(){
     const s = getSession();
-    if (!s) return null;
-    if (s.role) return s;
-    const u = getUsers().find(x => (x.email||'').toLowerCase() === (s.email||'').toLowerCase());
-    if (u) return { ...s, role: u.role || 'user', name: s.name || u.name };
-    if ((s.email||'').toLowerCase() === 'admin@motoria.test') return { ...s, role: 'admin' };
-    return { ...s, role: 'user' };
-  }
-
-  function ensureAuthSlot() {
-    const navMenu = document.getElementById('navMenu');
-    if (!navMenu) return null;
-
-    // Remove any static "Sign in" or "List your car" that might be hard-coded in HTML
-    navMenu.querySelectorAll('a[href$="auth.html"]').forEach(a => a.closest('li')?.remove());
-
-    // Ensure divider exists exactly once
-    if (!navMenu.querySelector('.divider')) {
-      const liDiv = document.createElement('li');
-      liDiv.className = 'divider';
-      liDiv.setAttribute('aria-hidden','true');
-      navMenu.appendChild(liDiv);
-    }
-
-    // Ensure #authSlot exists
-    let slot = document.getElementById('authSlot');
-    if (!slot) {
-      slot = document.createElement('li');
-      slot.id = 'authSlot';
-      navMenu.appendChild(slot);
-    }
-    return slot;
-  }
-
-  function hydrateHeader() {
-    const header    = document.getElementById('siteHeader');
-    const yearEl    = document.getElementById('year');
-    const navToggle = document.getElementById('navToggle');
-    const navMenu   = document.getElementById('navMenu');
-
-    if (header) header.classList.toggle('elevated', scrollY > 6);
-    if (yearEl)  yearEl.textContent = new Date().getFullYear();
-    navToggle?.addEventListener?.('click', () => {
-      const exp = navToggle.getAttribute('aria-expanded') === 'true';
-      navToggle.setAttribute('aria-expanded', String(!exp));
-      navMenu?.classList.toggle('open');
-    }, { once: true });
-
-    const slot = ensureAuthSlot();
-    if (!slot || !navMenu) return;
-
-    // Clear previously injected items
-    [...navMenu.querySelectorAll('[data-auth]')].forEach(n => n.remove());
-    slot.innerHTML = '';
-
-    // Decide what to render
-    const s = resolveSession();
     if (s) {
-      // Persist recovered role if needed
-      const s0 = getSession();
-      if (s0 && !s0.role && s.role) setSession(s);
+      // any logged-in user can access dealer dashboard in this demo
+      location.href = 'dashboard-dealer.html';
+    } else {
+      // send through auth with post-login redirect
+      location.href = 'auth.html?next=dashboard-dealer.html';
+    }
+  }
 
-      // Admin CMS (admins only)
-      if (s.role === 'admin') {
-        slot.insertAdjacentHTML('beforebegin',
-          `<li data-auth="1"><a class="btn btn-ghost" href="cms.html">Admin CMS</a></li>`
-        );
-      }
+  // Event delegation: any link/button that *looks like* "List your car" or has data-action attr
+  document.addEventListener('click', (e)=>{
+    const el = e.target.closest('a,button');
+    if (!el) return;
 
-      // Account + Dealer + Sign out (no Sign in anywhere)
-      slot.insertAdjacentHTML('afterend', `
-        <li data-auth="1"><a class="btn btn-ghost" href="dashboard-user.html" id="accountBtn">My account</a></li>
-        <li data-auth="1"><a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a></li>
-        <li data-auth="1"><button class="btn btn-primary" id="signOutBtn" type="button">Sign out</button></li>
-      `);
+    const wantsList =
+      el.matches('[data-action="list-car"]') ||
+      /list\s*your\s*car/i.test((el.textContent || '').trim());
 
-      document.getElementById('signOutBtn')?.addEventListener('click', () => {
+    if (wantsList){
+      e.preventDefault();
+      goListYourCar();
+    }
+  });
+
+  // Rewrite header auth area depending on session
+  function hydrateHeader(){
+    const session = getSession();
+    const menu = document.getElementById('navMenu');
+    if (!menu) return;
+
+    // Remove any previously-rendered auth nodes
+    [...menu.querySelectorAll('[data-auth]')].forEach(n=>n.remove());
+
+    // Always keep a divider before auth controls
+    const liDivider = document.createElement('li');
+    liDivider.className = 'divider';
+    liDivider.setAttribute('aria-hidden','true');
+    liDivider.setAttribute('data-auth','1');
+    menu.appendChild(liDivider);
+
+    if (session) {
+      // Admin CMS (visible on all pages when logged in)
+      const liCms = document.createElement('li'); liCms.setAttribute('data-auth','1');
+      liCms.innerHTML = `<a class="btn btn-ghost" href="admin.html">Admin CMS</a>`;
+      menu.appendChild(liCms);
+
+      // Account + Dealer
+      const liAccount = document.createElement('li'); liAccount.setAttribute('data-auth','1');
+      liAccount.innerHTML = `<a class="btn btn-ghost" href="dashboard-user.html">My account</a>`;
+      menu.appendChild(liAccount);
+
+      const liDealer = document.createElement('li'); liDealer.setAttribute('data-auth','1');
+      liDealer.innerHTML = `<a class="btn btn-ghost" href="dashboard-dealer.html">Dealer</a>`;
+      menu.appendChild(liDealer);
+
+      // Sign out
+      const liOut = document.createElement('li'); liOut.setAttribute('data-auth','1');
+      liOut.innerHTML = `<button class="btn btn-primary" id="signOutBtn" type="button">Sign out</button>`;
+      menu.appendChild(liOut);
+
+      document.getElementById('signOutBtn')?.addEventListener('click', ()=>{
         clearSession();
         location.href = 'index.html';
       });
     } else {
-      // Logged out: show Sign in + List your car
-      slot.insertAdjacentHTML('afterend', `
-        <li data-auth="1"><a class="btn btn-ghost" href="auth.html" id="signInBtn">Sign in</a></li>
-        <li data-auth="1"><a class="btn btn-primary" href="auth.html">List your car</a></li>
-      `);
+      // Sign in + List your car (click handler will route properly)
+      const liIn = document.createElement('li'); liIn.setAttribute('data-auth','1');
+      liIn.innerHTML = `<a class="btn btn-ghost" href="auth.html" id="signInBtn">Sign in</a>`;
+      menu.appendChild(liIn);
+
+      const liList = document.createElement('li'); liList.setAttribute('data-auth','1');
+      liList.innerHTML = `<a class="btn btn-primary" href="auth.html" data-action="list-car">List your car</a>`;
+      menu.appendChild(liList);
     }
   }
+  hydrateHeader();
 
-  // Robust hydration across all pages
-  function ready(fn){
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn, { once:true });
-    } else { fn(); }
+  // Optional: saved count badge
+  function updateSavedCount(){
+    const el = document.querySelector('.saved-count');
+    if (!el) return;
+    let count = 0;
+    try {
+      const saved = JSON.parse(localStorage.getItem('motoria_saved_cars')||'[]');
+      count = saved.length;
+    } catch(_){}
+    el.textContent = String(count);
   }
-  function waitAndHydrate(retries = 20) {
-    const navMenu = document.getElementById('navMenu');
-    if (navMenu) { hydrateHeader(); return; }
-    if (retries <= 0) return;
-    setTimeout(() => waitAndHydrate(retries - 1), 100);
-  }
+  updateSavedCount();
+  window.addEventListener('storage', (e)=>{ if (e.key==='motoria_saved_cars') updateSavedCount(); });
 
-  // Elevation on scroll + re-hydrate on storage/nav changes
-  addEventListener('scroll', () => {
-    const header = document.getElementById('siteHeader');
-    if (header) header.classList.toggle('elevated', scrollY > 6);
-  });
-  addEventListener('storage', (e) => {
-    if (e.key === LS_SESSION || e.key === LS_USERS) waitAndHydrate(1);
-  });
-  addEventListener('pageshow', () => waitAndHydrate(1));
-  addEventListener('popstate', () => waitAndHydrate(1));
-
-  ready(() => waitAndHydrate());
 })();
