@@ -246,7 +246,6 @@
 
   function baseFiltered(){
     const p = new URLSearchParams(location.search);
-    // Take cars from data.js and annotate with dealer flags
     let data = annotateCars(getCars());
 
     const q = (p.get('q')||'').toLowerCase();
@@ -277,7 +276,7 @@
       case 'year_desc':  data.sort((a,b)=>b.year-a.year);   break;
       case 'km_asc':     data.sort((a,b)=>a.km-b.km);       break;
       default:
-        // Recommended: Promoted → Verified → everything else (then by recency if ts present)
+        // Recommended: Promoted → Verified → recency
         data.sort((a,b)=>{
           const pv = (b.dealerPromoted - a.dealerPromoted) || (b.dealerVerified - a.dealerVerified);
           if (pv) return pv;
@@ -296,7 +295,7 @@
     const slice = data.slice(start, start+PAGE_SIZE);
 
     cardsEl.innerHTML = slice.map(c=>`
-      <article class="card">
+      <article class="card${c.dealerVerified?' verified':''}${c.dealerPromoted?' promoted':''}">
         <img class="thumb" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
         <div class="info">
           <div>
@@ -305,8 +304,8 @@
             </h3>
             <div class="meta-row"><span>${c.year||''}</span> • <span>${KM(+c.km||0)}</span> • <span>${c.fuel||''}</span> • <span>${c.gearbox||''}</span></div>
             <div class="badges">
-              ${c.dealerPromoted ? `<span class="badge">Promoted</span>` : ``}
-              ${c.dealerVerified ? `<span class="badge">Verified</span>` : ``}
+              ${c.dealerPromoted ? `<span class="badge badge-promoted">Promoted</span>` : ``}
+              ${c.dealerVerified ? `<span class="badge badge-verified tip" data-tip="Dealer verified by Motoria">Verified</span>` : ``}
               ${c.loc ? `<span class="badge">${c.loc}</span>` : ``}
             </div>
           </div>

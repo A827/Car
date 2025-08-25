@@ -127,3 +127,30 @@ a{color:inherit;text-decoration:none}
 .site-header{ z-index: 9999; }                 /* keep header on top of all layers */
 .hero-bg, .hero-overlay{ pointer-events: none; } /* hero visuals shouldn't block clicks */
 .nav-menu a{ display:inline-block; padding:8px 10px; } /* bigger hit area */
+
+/* --- Dealer trust accents --- */
+.badge-verified{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.badge-promoted{background:#eef2ff;color:#1e40af;border:1px solid #bfdbfe}
+
+/* Subtle accent on verified/promoted result cards */
+.card.verified{border-color:#a7f3d0; box-shadow: 0 6px 18px rgba(6,95,70,.08)}
+.card.promoted{border-color:#bfdbfe; box-shadow: 0 6px 18px rgba(30,64,175,.08)}
+
+/* Tiny tooltip helper (no JS) */
+.tip{position:relative}
+.tip[data-tip]::after{
+  content: attr(data-tip);
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom: calc(100% + 8px);
+  white-space:nowrap; pointer-events:none;
+  background:#0b1220; color:#fff; font-size:12px; line-height:1; padding:6px 8px; border-radius:6px;
+  opacity:0; visibility:hidden; transition:.15s ease;
+  box-shadow:0 8px 18px rgba(2,6,23,.25);
+}
+.tip[data-tip]::before{
+  content:""; position:absolute; left:50%; transform:translateX(-50%);
+  bottom: calc(100% + 4px);
+  border:6px solid transparent; border-top-color:#0b1220;
+  opacity:0; visibility:hidden; transition:.15s ease;
+}
+.tip:hover::after,.tip:hover::before{opacity:1; visibility:visible}
