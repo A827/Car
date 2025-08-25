@@ -32,6 +32,7 @@
           <li><a href="#">Finance</a></li>
           <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
+          <!-- This placeholder is fine; app.js will replace items after the divider -->
           <li id="authSlot"></li>
         </ul>
       </nav>
@@ -53,13 +54,13 @@
 
         <!-- Search card with tabs -->
         <div class="search-card">
-          <div class="tabs" role="tablist">
-            <button class="tab active" data-tab="buy" role="tab" aria-selected="true">Buy</button>
-            <button class="tab" data-tab="sell" role="tab" aria-selected="false">Sell</button>
+          <div class="tabs" role="tablist" aria-label="Search mode">
+            <button class="tab active" data-tab="buy" role="tab" aria-selected="true" aria-controls="tab-buy">Buy</button>
+            <button class="tab" data-tab="sell" role="tab" aria-selected="false" aria-controls="tab-sell">Sell</button>
           </div>
 
           <!-- BUY form -->
-          <form id="homeSearch" class="buy-form" role="search" aria-label="Car search">
+          <form id="homeSearch" class="buy-form" role="search" aria-label="Car search" tabindex="0" data-tabpanel="buy" aria-labelledby="tab-buy">
             <div class="row">
               <label class="field">
                 <span>Make</span>
@@ -104,14 +105,14 @@
           </form>
 
           <!-- SELL panel -->
-          <div class="sell-panel" role="tabpanel" hidden>
+          <div class="sell-panel" id="tab-sell" role="tabpanel" hidden aria-labelledby="tab-sell">
             <h3>Sell your car with confidence</h3>
             <ul class="list">
               <li>Instant listing builder</li>
               <li>Smart price guidance</li>
               <li>Verified buyers & safe messaging</li>
             </ul>
-            <a class="btn btn-primary" href="#">List your car</a>
+            <a class="btn btn-primary" href="auth.html">List your car</a>
           </div>
         </div>
 
@@ -131,28 +132,28 @@
         </div>
         <div class="grid-cards">
           <div class="mini-card">
-            <img src="assets/cars/sportage.jpg" alt="" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <img src="assets/cars/sportage.jpg" alt="Kia Sportage" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Kia Sportage</strong>
               <span>£19,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/leaf.jpg" alt="">
+            <img src="assets/cars/leaf.jpg" alt="Nissan Leaf" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Nissan Leaf</strong>
               <span>£12,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/octavia.jpg" alt="">
+            <img src="assets/cars/octavia.jpg" alt="Skoda Octavia" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Skoda Octavia</strong>
               <span>£9,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/ioniq.jpg" alt="">
+            <img src="assets/cars/ioniq.jpg" alt="Hyundai Ioniq" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Hyundai Ioniq</strong>
               <span>£15,800</span>
@@ -239,7 +240,7 @@
     </div>
   </footer>
 
-  <!-- Core -->
+  <!-- Core (must come before page script so helpers exist) -->
   <script src="app.js"></script>
   <script src="data.js"></script>
 
@@ -247,48 +248,81 @@
   <script>
     // Header basics
     const header = document.getElementById('siteHeader');
-    addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+    addEventListener('scroll', ()=>header.classList.toggle('elevated', scrollY>6));
     document.getElementById('year').textContent = new Date().getFullYear();
-    const navToggle=document.getElementById('navToggle');
-    const navMenu=document.getElementById('navMenu');
+    const navToggle = document.getElementById('navToggle');
+    const navMenu   = document.getElementById('navMenu');
     navToggle?.addEventListener('click', ()=>{
       const exp = navToggle.getAttribute('aria-expanded')==='true';
       navToggle.setAttribute('aria-expanded', String(!exp));
       navMenu.classList.toggle('open');
     });
 
-    // Tabs
-    const tabs = document.querySelectorAll('.tab');
+    // Tabs + keyboard a11y
+    const tabs = [...document.querySelectorAll('.tab')];
     const sellPanel = document.querySelector('.sell-panel');
     const buyForm = document.getElementById('homeSearch');
+
+    function setTab(key){
+      const isBuy = key === 'buy';
+      tabs.forEach(x=>{
+        const active = x.dataset.tab === key;
+        x.classList.toggle('active', active);
+        x.setAttribute('aria-selected', String(active));
+      });
+      buyForm.style.display = isBuy ? '' : 'none';
+      sellPanel.hidden = isBuy;
+      (isBuy ? buyForm : sellPanel).focus({ preventScroll:true });
+    }
     tabs.forEach(t=>{
-      t.addEventListener('click', ()=>{
-        tabs.forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-        const k = t.dataset.tab;
-        const isBuy = k==='buy';
-        buyForm.style.display = isBuy ? '' : 'none';
-        sellPanel.hidden = isBuy;
+      t.addEventListener('click', ()=> setTab(t.dataset.tab));
+      t.addEventListener('keydown', e=>{
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+          e.preventDefault();
+          const i = tabs.indexOf(t);
+          const next = e.key === 'ArrowRight' ? (i+1)%tabs.length : (i-1+tabs.length)%tabs.length;
+          tabs[next].focus();
+          setTab(tabs[next].dataset.tab);
+        }
       });
     });
 
-    // Taxonomy -> make/model
+    // Taxonomy -> make/model (with fallback + URL prefill)
     (function hydrateTaxonomy(){
       const MD = window.MotoriaData || {};
       const makeSel = document.getElementById('makeSelect');
       const modelSel = document.getElementById('modelSelect');
-      if (MD.getTaxonomy && MD.modelsForMake){
-        const taxo = MD.getTaxonomy();
-        makeSel.innerHTML = '<option value="">Any</option>' + taxo.makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
-        function refresh(){
-          const make = makeSel.value;
-          const models = make ? MD.modelsForMake(make) : [];
-          modelSel.disabled = !make;
-          modelSel.innerHTML = '<option value="">Any</option>' + models.map(x=>`<option value="${x}">${x}</option>`).join('');
-        }
-        refresh();
-        makeSel.addEventListener('change', refresh);
+
+      const fallback = {
+        Volkswagen:['Golf','Polo','Passat','T-Roc'],
+        BMW:['1 Series','3 Series','X1','X3'],
+        Audi:['A3','A4','Q2','Q3'],
+        Ford:['Fiesta','Focus','Puma','Kuga'],
+        Toyota:['Corolla','Yaris','C-HR','RAV4'],
+        Kia:['Sportage','Ceed','Rio','Stonic'],
+        Skoda:['Octavia','Fabia','Superb','Karoq'],
+        Hyundai:['Ioniq','i10','i20','Tucson']
+      };
+
+      const params = new URLSearchParams(location.search);
+      const selectedMake  = params.get('make')  || '';
+      const selectedModel = params.get('model') || '';
+
+      const hasTaxo = !!(MD.getTaxonomy && MD.modelsForMake);
+      const makes = hasTaxo ? MD.getTaxonomy().makes.map(m=>m.name) : Object.keys(fallback);
+
+      makeSel.innerHTML = '<option value="">Any</option>' + makes.map(m=>`<option value="${m}">${m}</option>`).join('');
+      if (selectedMake && makes.includes(selectedMake)) makeSel.value = selectedMake;
+
+      function refreshModels(){
+        const mk = makeSel.value;
+        const models = mk ? (hasTaxo ? MD.modelsForMake(mk) : (fallback[mk]||[])) : [];
+        modelSel.disabled = !mk;
+        modelSel.innerHTML = '<option value="">Any</option>' + models.map(x=>`<option value="${x}">${x}</option>`).join('');
+        if (selectedModel && models.includes(selectedModel)) modelSel.value = selectedModel;
       }
+      refreshModels();
+      makeSel.addEventListener('change', refreshModels);
     })();
 
     // Search -> results
@@ -337,7 +371,7 @@
       if (e.key === 'ArrowLeft')  prevBtn.click();
     });
 
-    // Cute rolling stat count (pure cosmetic)
+    // Cosmetic rolling stat
     (function statCounter(){
       const el = document.getElementById('statListings');
       if (!el) return;
