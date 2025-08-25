@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Dealer Dashboard</title>
+  <title>Motoria • Dealer dashboard</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dealer.css" />
+  <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
   <!-- Header -->
@@ -26,154 +26,207 @@
         </button>
         <ul id="navMenu" class="nav-menu">
           <li><a href="results.html">Buy</a></li>
-          <li><a href="#">Sell</a></li>
-          <li><a href="#">Finance</a></li>
-          <li><a href="#">Dealers</a></li>
+          <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <li><a class="btn btn-ghost" href="auth.html">Sign in</a></li>
-          <li><a class="btn btn-primary" href="dashboard-dealer.html">Dealer</a></li>
+          <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Main -->
-  <main class="container dealer">
+  <main class="container dash">
     <!-- Sidebar -->
-    <aside class="dealer-nav glass" aria-label="Dealer navigation">
-      <div class="dealer-head">
+    <aside class="dash-aside card">
+      <div class="dealer-card">
         <div class="avatar">🏷️</div>
         <div>
-          <div class="name" id="dealerName">Dealer</div>
-          <div class="muted small" id="dealerEmail">dealer@motoria.test</div>
+          <div id="dealerName" class="dealer-name">Dealer</div>
+          <div id="dealerEmail" class="muted small">dealer@example.com</div>
         </div>
       </div>
-      <button class="tablink active" data-view="overview">Overview</button>
-      <button class="tablink" data-view="inventory">Inventory</button>
-      <button class="tablink" data-view="add">Add listing</button>
-      <button class="tablink" data-view="messages">Messages</button>
-      <button class="tablink" data-view="settings">Settings</button>
+      <nav class="dash-nav">
+        <button class="tablink active" data-view="overview">Overview</button>
+        <button class="tablink" data-view="inventory">Inventory</button>
+        <button class="tablink" data-view="add">Add listing</button>
+        <button class="tablink" data-view="messages">Messages</button>
+        <button class="tablink" data-view="settings">Settings</button>
+      </nav>
     </aside>
 
-    <!-- Panels -->
-    <section class="dealer-main">
-      <!-- Overview -->
-      <section class="panel active" id="panel-overview">
-        <div class="kpis">
-          <div class="kpi glass"><div class="label">Active listings</div><div class="val" id="kpiActive">0</div></div>
-          <div class="kpi glass"><div class="label">Total views</div><div class="val" id="kpiViews">0</div></div>
-          <div class="kpi glass"><div class="label">Leads</div><div class="val" id="kpiLeads">0</div></div>
+    <!-- Content -->
+    <section class="dash-content">
+      <!-- OVERVIEW -->
+      <div id="panel-overview" class="panel active">
+        <div class="grid-3">
+          <div class="kpi card"><div class="kpi-num" id="kpiActive">0</div><div class="muted">Active listings</div></div>
+          <div class="kpi card"><div class="kpi-num" id="kpiViews">0</div><div class="muted">Total views</div></div>
+          <div class="kpi card"><div class="kpi-num" id="kpiLeads">0</div><div class="muted">Leads</div></div>
         </div>
 
-        <div class="glass block">
-          <div class="block-head">
-            <h2>Recent inventory</h2>
-            <div class="row">
-              <button id="exportCsv" class="btn btn-ghost">Export CSV</button>
-              <label class="btn btn-ghost filebtn">
-                Import CSV
-                <input id="importCsv" type="file" accept=".csv,text/csv" hidden />
-              </label>
-              <a class="btn btn-primary" href="#" data-switch="add">Add listing</a>
+        <div class="card">
+          <div class="section-head">
+            <h2>Recently edited</h2>
+            <a href="#" class="btn btn-primary" data-switch="add">Add new</a>
+          </div>
+          <div id="tableRecent" class="table"></div>
+        </div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div id="panel-inventory" class="panel">
+        <div class="toolbar">
+          <input id="invSearch" placeholder="Search by title or location…" />
+          <select id="invStatus">
+            <option value="">All statuses</option>
+            <option value="live">Live</option>
+            <option value="draft">Draft</option>
+            <option value="sold">Sold</option>
+          </select>
+          <div class="spacer"></div>
+          <label class="btn btn-ghost">
+            Import CSV
+            <input id="importCsv" type="file" accept=".csv" hidden />
+          </label>
+          <button id="exportCsv" class="btn btn-ghost">Export CSV</button>
+          <a class="btn btn-primary" data-switch="add" href="#">Add listing</a>
+        </div>
+        <div id="tableInventory" class="table"></div>
+      </div>
+
+      <!-- ADD LISTING (new tidy layout) -->
+      <div id="panel-add" class="panel">
+        <div class="grid-2">
+          <form id="listingForm" class="card stack">
+            <div>
+              <h2 id="addTitle" style="margin:0">Add listing</h2>
+              <p class="muted small" style="margin:4px 0 0">Fields marked * are required.</p>
             </div>
+
+            <div class="grid-2">
+              <label>Make *</label>
+              <div class="grid-2">
+                <select name="make" id="makeSel" required></select>
+                <select name="model" id="modelSel" required disabled>
+                  <option value="">Model</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <label>Year *
+                <input name="year" type="number" min="1990" required />
+              </label>
+              <label>Price (£) *
+                <input name="price" type="number" min="0" step="100" required />
+              </label>
+              <label>Mileage (km)
+                <input name="km" type="number" min="0" step="1000" />
+              </label>
+            </div>
+
+            <div class="grid-3">
+              <label>Fuel
+                <select name="fuel">
+                  <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+                </select>
+              </label>
+              <label>Gearbox
+                <select name="gearbox">
+                  <option>Manual</option><option>Automatic</option>
+                </select>
+              </label>
+              <label>Location
+                <input name="loc" placeholder="City" />
+              </label>
+            </div>
+
+            <label>Title *
+              <input name="title" placeholder="e.g. Kia Sportage 1.6 T‑GDi" required />
+            </label>
+
+            <label>Photos (URL) *
+              <input name="img" id="imgUrl" placeholder="https://…" required />
+              <div class="muted small">Tip: paste the first photo URL; you can edit later to add a gallery.</div>
+            </label>
+
+            <label>Description
+              <textarea name="desc" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
+            </label>
+
+            <div class="grid-3">
+              <label>Status
+                <select name="status">
+                  <option value="live">Live</option>
+                  <option value="draft">Draft</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </label>
+              <label>Colour
+                <input name="colour" />
+              </label>
+              <label>Owners
+                <input name="owners" type="number" min="0" />
+              </label>
+            </div>
+
+            <input type="hidden" name="id" />
+            <div class="row">
+              <button class="btn btn-primary" type="submit">Save listing</button>
+              <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
+            </div>
+            <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
+          </form>
+
+          <!-- Live preview -->
+          <div class="card">
+            <h2 style="margin-top:0">Preview</h2>
+            <article class="preview">
+              <img id="prevImg" class="thumb" alt="">
+              <div class="info">
+                <div class="title" id="prevTitle">Title appears here</div>
+                <div class="meta" id="prevMeta">Year • Mileage • Fuel • Gearbox</div>
+                <div class="price-big" id="prevPrice">£0</div>
+              </div>
+            </article>
           </div>
-          <div id="tableRecent" class="table table-inventory"></div>
         </div>
-      </section>
+      </div>
 
-      <!-- Inventory -->
-      <section class="panel" id="panel-inventory">
-        <div class="panel-head">
-          <h2>Inventory</h2>
-          <div class="row">
-            <input id="invSearch" class="filter" placeholder="Search title / make / model…" />
-            <select id="invStatus" class="filter">
-              <option value="">All statuses</option>
-              <option value="live">Live</option>
-              <option value="draft">Draft</option>
-              <option value="sold">Sold</option>
-            </select>
-          </div>
-        </div>
-        <div id="tableInventory" class="table table-inventory"></div>
-      </section>
-
-      <!-- Add listing -->
-      <section class="panel" id="panel-add">
-        <div class="panel-head"><h2 id="addTitle">Add listing</h2></div>
-        <form id="listingForm" class="listing-form glass">
-          <div class="row">
-            <label>Title<input name="title" required placeholder="e.g. Kia Sportage 1.6 T-GDi" /></label>
-            <label>Price (£)<input name="price" type="number" required min="0" /></label>
-          </div>
-          <div class="row">
-            <label>Year<input name="year" type="number" required min="1980" max="2026" /></label>
-            <label>Mileage (km)<input name="km" type="number" required min="0" /></label>
-          </div>
-          <div class="row">
-            <label>Fuel
-              <select name="fuel" required>
-                <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
-              </select>
-            </label>
-            <label>Gearbox
-              <select name="gearbox" required>
-                <option>Manual</option><option>Automatic</option>
-              </select>
-            </label>
-          </div>
-          <div class="row">
-            <label>Location<input name="loc" placeholder="City" /></label>
-            <label>Status
-              <select name="status">
-                <option value="live">Live</option>
-                <option value="draft">Draft</option>
-                <option value="sold">Sold</option>
-              </select>
-            </label>
-          </div>
-          <label>Image URL
-            <input name="img" placeholder="assets/cars/sportage.jpg" />
-          </label>
-          <label>Description
-            <textarea name="desc" rows="4" placeholder="Key selling points, history, spec…"></textarea>
-          </label>
-
-          <div class="actions">
-            <button class="btn btn-primary" type="submit">Save</button>
-            <button id="cancelEdit" class="btn btn-ghost" type="button" hidden>Cancel</button>
-          </div>
-          <input type="hidden" name="id" />
-        </form>
-      </section>
-
-      <!-- Messages -->
-      <section class="panel" id="panel-messages">
-        <div class="panel-head"><h2>Messages</h2></div>
-        <div class="messages">
-          <aside class="threads" id="threads"></aside>
-          <div class="thread-view glass-min" id="threadView">
-            <div class="thread-empty muted">Select a conversation.</div>
-            <div class="thread" id="thread"></div>
+      <!-- MESSAGES -->
+      <div id="panel-messages" class="panel">
+        <div class="grid-messages">
+          <div id="threads" class="threads card"></div>
+          <div class="thread card">
+            <div id="thread" class="thread-body"><div class="thread-empty muted">Select a conversation…</div></div>
             <form id="msgForm" class="msg-form">
-              <input name="text" placeholder="Type a reply…" autocomplete="off" />
-              <button class="btn btn-primary" type="submit">Send</button>
+              <input name="text" placeholder="Write a message…" />
+              <button class="btn btn-primary">Send</button>
             </form>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- Settings -->
-      <section class="panel" id="panel-settings">
-        <div class="panel-head"><h2>Settings</h2></div>
-        <form id="settingsForm" class="glass-min settings-form">
-          <label>Dealer name<input name="dealerName" /></label>
-          <label>Contact email<input name="dealerEmail" type="email" /></label>
-          <label>Phone<input name="dealerPhone" /></label>
-          <button class="btn btn-primary" type="submit">Save</button>
-          <div id="settingsSaved" class="small muted" role="status" aria-live="polite"></div>
+      <!-- SETTINGS -->
+      <div id="panel-settings" class="panel">
+        <form id="settingsForm" class="card stack">
+          <h2 style="margin:0">Dealer settings</h2>
+          <div class="grid-3">
+            <label>Dealer name
+              <input name="dealerName" />
+            </label>
+            <label>Email
+              <input name="dealerEmail" type="email" />
+            </label>
+            <label>Phone
+              <input name="dealerPhone" />
+            </label>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <span id="settingsSaved" class="muted" style="margin-left:8px"></span>
+          </div>
         </form>
-      </section>
+      </div>
     </section>
   </main>
 
@@ -194,6 +247,7 @@
   </footer>
 
   <script src="app.js"></script>
+  <script src="data.js"></script>
   <script src="dealer.js"></script>
 </body>
 </html>
