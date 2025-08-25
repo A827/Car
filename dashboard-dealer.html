@@ -94,105 +94,107 @@
       </div>
 
       <!-- ADD LISTING -->
-      <div id="panel-add" class="panel">
-        <div class="grid-2">
-          <form id="listingForm" class="card stack">
-            <div>
-              <h2 id="addTitle" style="margin:0">Add listing</h2>
-              <p class="muted small" style="margin:4px 0 0">Fields marked * are required.</p>
-            </div>
-
-            <!-- Make / Model (clean side-by-side fields) -->
-            <div class="grid-2">
-              <label>Make *
-                <select name="make" id="makeSel" required></select>
-              </label>
-              <label>Model *
-                <select name="model" id="modelSel" required disabled>
-                  <option value="">Model</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="grid-3">
-              <label>Year *
-                <input name="year" type="number" min="1990" required />
-              </label>
-              <label>Price (£) *
-                <input name="price" type="number" min="0" step="100" required />
-              </label>
-              <label>Mileage (km)
-                <input name="km" type="number" min="0" step="1000" />
-              </label>
-            </div>
-
-            <div class="grid-3">
-              <label>Fuel
-                <select name="fuel">
-                  <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
-                </select>
-              </label>
-              <label>Gearbox
-                <select name="gearbox">
-                  <option>Manual</option><option>Automatic</option>
-                </select>
-              </label>
-              <label>Location
-                <input name="loc" placeholder="City" />
-              </label>
-            </div>
-
-            <label>Title *
-              <input name="title" placeholder="e.g. Kia Sportage 1.6 T‑GDi" required />
-            </label>
-
-            <label>Photos (URL) *
-              <input name="img" id="imgUrl" placeholder="https://…" required />
-              <div class="muted small">Tip: paste the first photo URL; you can edit later to add a gallery.</div>
-            </label>
-
-            <label>Description
-              <textarea name="desc" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
-            </label>
-
-            <div class="grid-3">
-              <label>Status
-                <select name="status">
-                  <option value="live">Live</option>
-                  <option value="draft">Draft</option>
-                  <option value="sold">Sold</option>
-                </select>
-              </label>
-              <label>Colour
-                <input name="colour" />
-              </label>
-              <label>Owners
-                <input name="owners" type="number" min="0" />
-              </label>
-            </div>
-
-            <input type="hidden" name="id" />
-            <div class="row">
-              <button class="btn btn-primary" type="submit">Save listing</button>
-              <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
-            </div>
-            <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
-          </form>
-
-          <!-- Preview -->
-          <div class="card">
-            <h2 style="margin-top:0">Preview</h2>
-            <article class="preview">
-              <img id="prevImg" class="thumb" alt="">
-              <div class="info">
-                <div class="title" id="prevTitle">Title appears here</div>
-                <div class="meta" id="prevMeta">Year • Mileage • Fuel • Gearbox</div>
-                <div class="price-big" id="prevPrice">£0</div>
-              </div>
-            </article>
-          </div>
-        </div>
+<div id="panel-add" class="panel">
+  <div class="grid-2">
+    <form id="listingForm" class="card stack" autocomplete="off">
+      <div>
+        <h2 id="addTitle" style="margin:0">Add listing</h2>
+        <p class="muted small" style="margin:4px 0 0">Fields marked * are required.</p>
       </div>
+
+      <!-- Make / Model -->
+      <div class="grid-2">
+        <label>Make *
+          <select name="make" id="makeSel" required></select>
+        </label>
+        <label>Model *
+          <select name="model" id="modelSel" required disabled>
+            <option value="">Model</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Year / Price / Mileage -->
+      <div class="grid-3">
+        <label>Year *
+          <input name="year" id="yearInp" type="number" min="1990" required />
+        </label>
+        <label>Price (£) *
+          <input name="price" id="priceInp" type="number" min="0" step="100" required />
+        </label>
+        <label>Mileage (km)
+          <input name="km" id="kmInp" type="number" min="0" step="1000" />
+        </label>
+      </div>
+
+      <!-- Fuel / Gearbox / Location -->
+      <div class="grid-3">
+        <label>Fuel
+          <select name="fuel" id="fuelSel">
+            <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+          </select>
+        </label>
+        <label>Gearbox
+          <select name="gearbox" id="boxSel">
+            <option>Manual</option><option>Automatic</option>
+          </select>
+        </label>
+        <label>Location
+          <input name="loc" id="locInp" placeholder="City" />
+        </label>
+      </div>
+
+      <label>Title *
+        <input name="title" id="titleInp" placeholder="e.g. Kia Sportage 1.6 T‑GDi" required />
+      </label>
+
+      <label>Photos (URL) *
+        <input name="img" id="imgUrl" placeholder="https://…" required />
+        <div class="muted small">Tip: paste the first photo URL; you can edit later to add a gallery.</div>
+      </label>
+
+      <label>Description
+        <textarea name="desc" id="descInp" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
+      </label>
+
+      <div class="grid-3">
+        <label>Status
+          <select name="status" id="statusSel">
+            <option value="live">Live</option>
+            <option value="draft">Draft</option>
+            <option value="sold">Sold</option>
+          </select>
+        </label>
+        <label>Colour
+          <input name="colour" id="colourInp" />
+        </label>
+        <label>Owners
+          <input name="owners" id="ownersInp" type="number" min="0" />
+        </label>
+      </div>
+
+      <input type="hidden" name="id" id="idHidden" />
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Save listing</button>
+        <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
+      </div>
+      <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
+    </form>
+
+    <!-- Preview -->
+    <div class="card">
+      <h2 style="margin-top:0">Preview</h2>
+      <article class="preview">
+        <img id="prevImg" class="thumb" alt="">
+        <div class="info">
+          <div class="title" id="prevTitle">Title appears here</div>
+          <div class="meta" id="prevMeta">Year • Mileage • Fuel • Gearbox</div>
+          <div class="price-big" id="prevPrice">£0</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
 
       <!-- MESSAGES -->
       <div id="panel-messages" class="panel">
