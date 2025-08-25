@@ -49,7 +49,7 @@
         </label>
         <label class="field">
           <span class="label">Sort by</span>
-          <select name="sort" id="sortSelect">
+          <select name="sort" id="sortSelect" aria-label="Sort results">
             <option value="relevance">Recommended</option>
             <option value="price_asc">Price ↑</option>
             <option value="price_desc">Price ↓</option>
@@ -60,7 +60,7 @@
         <button class="btn btn-primary search-btn" type="submit">Search</button>
       </form>
 
-      <ul id="chipSummary" class="usp-list" style="margin-top:10px"></ul>
+      <ul id="chipSummary" class="usp-list" style="margin-top:10px" aria-label="Active filters"></ul>
     </div>
   </section>
 
@@ -69,7 +69,7 @@
     <div class="container" style="display:grid;grid-template-columns:280px 1fr;gap:18px">
       <!-- Sidebar filters -->
       <aside>
-        <form id="filtersForm" class="card" style="padding:12px">
+        <form id="filtersForm" class="card" style="padding:12px" aria-label="Filters">
           <h3 style="margin:0 0 10px">Filters</h3>
 
           <label class="field">
@@ -115,7 +115,7 @@
 
         <div class="card" style="padding:12px;margin-top:12px">
           <h3 style="margin:0 0 8px">View</h3>
-          <div class="row">
+          <div class="row" role="group" aria-label="View mode">
             <button id="viewList" class="btn btn-ghost" aria-pressed="true">List</button>
             <button id="viewGrid" class="btn btn-ghost" aria-pressed="false">Grid</button>
           </div>
@@ -127,7 +127,7 @@
       </aside>
 
       <!-- Results -->
-      <section>
+      <section aria-live="polite">
         <div class="section-head">
           <h2 style="margin:0"><span id="resultCount">0</span></h2>
           <div class="actions">
@@ -162,7 +162,7 @@
   <script src="data.js"></script>
 
   <script>
-  // Header / footer
+  /* ===== Header / footer ===== */
   const header = document.getElementById('siteHeader');
   addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
   document.getElementById('year').textContent = new Date().getFullYear();
@@ -174,15 +174,26 @@
     navMenu.classList.toggle('open');
   });
 
-  // Shorthands
+  /* ===== Shorthands ===== */
   const qs  = (s,el=document)=>el.querySelector(s);
-  const qsa = (s,el=document)=>[...el.querySelectorAll(s)];
+  const qsa = (s,el=document)=>Array.from(el.querySelectorAll(s));
   const GBP = window.MotoriaData.GBP;
   const KM  = window.MotoriaData.KM;
-  const annotateCars = window.MotoriaData.annotateCars;
   const getCars = window.MotoriaData.getCars;
+  let annotateCars = window.MotoriaData.annotateCars;
 
-  // DOM
+  // Fallback: if MotoriaData.annotateCars isn't provided, create a harmless one
+  if (typeof annotateCars !== 'function') {
+    annotateCars = function(arr){
+      return (arr||[]).map(c=>Object.assign({
+        dealerVerified: !!c.dealerVerified,
+        dealerPromoted: !!c.dealerPromoted,
+        ts: c.ts || 0
+      }, c));
+    };
+  }
+
+  /* ===== DOM refs ===== */
   const cardsEl      = qs('#cards');
   const resultCount  = qs('#resultCount');
   const pageInfo     = qs('#pageInfo');
@@ -203,7 +214,7 @@
     state.sort = p.get('sort') || 'relevance';
     state.view = p.get('view') || 'list';
 
-    // quick search
+    // quick search fields
     qs('#quickSearch [name="q"]').value   = p.get('q')   || '';
     qs('#quickSearch [name="loc"]').value = p.get('loc') || '';
     sortSelect.value = state.sort;
@@ -226,8 +237,7 @@
     if (p.get('km_max')) chips.push(['km_max', `≤ ${(+p.get('km_max')).toLocaleString('en-GB')} km`]);
     p.getAll('fuel').forEach(v=>chips.push(['fuel', v]));
     p.getAll('gearbox').forEach(v=>chips.push(['gearbox', v]));
-
-    // NEW: show chips for dealer filters
+    // dealer filters (if any)
     if (p.get('dealer_email')) chips.push(['dealer_email', p.get('dealer_email')]);
     if (p.get('dealer')) chips.push(['dealer', p.get('dealer')]);
 
@@ -259,7 +269,7 @@
     const fuels = p.getAll('fuel');
     const boxes = p.getAll('gearbox');
 
-    // NEW: dealer filters
+    // dealer filters
     const filterDealerEmail = (p.get('dealer_email')||'').toLowerCase();
     const filterDealerName  = (p.get('dealer')||'').toLowerCase();
 
@@ -281,7 +291,6 @@
         const dn = String(c.dealer||c.company||'').toLowerCase();
         if (!dn.includes(filterDealerName)) return false;
       }
-
       return true;
     });
 
@@ -293,7 +302,7 @@
       case 'km_asc':     data.sort((a,b)=>a.km-b.km);       break;
       default:
         data.sort((a,b)=>{
-          const pv = (b.dealerPromoted - a.dealerPromoted) || (b.dealerVerified - a.dealerVerified);
+          const pv = (+b.dealerPromoted - +a.dealerPromoted) || (+b.dealerVerified - +a.dealerVerified);
           if (pv) return pv;
           return (b.ts||0) - (a.ts||0);
         });
@@ -317,7 +326,12 @@
             <h3 class="title">
               <a href="detail.html?id=${c.id}" style="color:inherit;text-decoration:none">${c.title}</a>
             </h3>
-            <div class="meta-row"><span>${c.year||''}</span> • <span>${KM(+c.km||0)}</span> • <span>${c.fuel||''}</span> • <span>${c.gearbox||''}</span></div>
+            <div class="meta-row">
+              <span>${c.year||''}</span> •
+              <span>${KM(+c.km||0)}</span> •
+              <span>${c.fuel||''}</span> •
+              <span>${c.gearbox||''}</span>
+            </div>
             <div class="badges">
               ${c.dealerPromoted ? `<span class="badge badge-promoted">Promoted</span>` : ``}
               ${c.dealerVerified ? `<span class="badge badge-verified tip" data-tip="Dealer verified by Motoria">Verified</span>` : ``}
