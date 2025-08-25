@@ -1,62 +1,72 @@
-/* layout */
-.crumbs{font-size:14px;color:#64748b;padding:8px 0}
-.crumbs a{color:inherit}
-.detail-layout{display:grid;grid-template-columns: 1.6fr .9fr;gap:20px;padding:20px 0 44px}
+/* Premium car detail layout */
+:root{
+  --ink:#0e1726;
+  --muted:#64748b;
+  --line:#e5e7eb;
+  --brand:#2160ff;
+}
 
-/* glass blocks */
-.glass{background:rgba(255,255,255,.9);border:1px solid #e5e7eb;border-radius:16px;box-shadow:var(--shadow-soft);padding:16px}
-.glass-min{background:#fff;border:1px solid #eef2f7;border-radius:12px;padding:12px}
+.crumbs{font-size:14px; color:var(--muted); padding:12px 0}
+.crumbs a{color:inherit; text-decoration:none}
+.crumbs a:hover{color:#111}
 
-/* gallery */
-.gallery{display:grid;gap:12px}
-.gallery .hero-img{border-radius:16px;overflow:hidden;background:#f3f4f6}
-.gallery .hero-img img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
-.thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.thumbs img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;cursor:pointer;border:1px solid #e5e7eb;background:#f3f4f6}
+/* HERO */
+.hero{display:grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap:18px; align-items:start; padding:10px 0 6px}
+.gallery{background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 14px 36px rgba(2,6,23,.06); padding:10px}
+.hero-img{display:block; width:100%; aspect-ratio: 16/9; object-fit:cover; border-radius:12px; background:linear-gradient(135deg,#f5f7fb,#eaf0ff)}
+.thumbs{display:grid; grid-auto-flow:column; grid-auto-columns: 100px; gap:8px; margin-top:8px; overflow:auto; padding-bottom:2px}
+.thumbs::-webkit-scrollbar{height:0}
+.thumb{background:#fff; border:1px solid var(--line); border-radius:10px; padding:2px; cursor:pointer}
+.thumb img{width:100%; aspect-ratio: 16/10; object-fit:cover; border-radius:8px}
+.thumb.active{border-color:#94a3b8; box-shadow:0 0 0 2px #e2e8f0 inset}
 
-/* sticky summary */
-.summary{position:sticky;top:78px;height:max-content}
-.summary-top{display:flex;align-items:start;justify-content:space-between;gap:8px}
-.summary h1{margin:0;font-size:22px;line-height:1.2}
-.btn-row{display:flex;gap:6px}
-.icon-btn{height:36px;width:36px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
-.badges-row{display:flex;gap:8px;margin:8px 0 2px}
-.badge{font-size:12px;background:var(--brand-weak);color:var(--brand-ink);padding:4px 8px;border-radius:999px}
-.badge-verify{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
-.summary .price{font-size:28px;font-weight:800;margin:6px 0}
-.summary .specs{color:#64748b;margin-bottom:8px}
-.seller-top{display:flex;align-items:center;justify-content:space-between}
+.hero-meta{display:grid; gap:12px}
+.car-title{margin:0}
+.price-actions{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.price-big{font-weight:900; font-size:26px}
+
+.seller.card{padding:12px}
+.seller-row{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.seller-name{font-weight:800}
+.badges{display:flex; gap:6px; list-style:none; margin:0; padding:0}
+.badge{font-size:12px; background:#eef2ff; color:#1e3a8a; padding:4px 8px; border-radius:999px}
 .stars{color:#f59e0b}
-.cta-col{display:flex;gap:10px;margin:12px 0 6px}
-.chip-list{display:flex;gap:8px;flex-wrap:wrap;list-style:none;padding:0;margin:10px 0 0}
-.chip-list li{background:#fff;border:1px solid #e5e7eb;border-radius:9999px;padding:6px 10px;font-weight:600}
 
-/* details section */
-.details .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kv{list-style:none;padding:0;margin:0;display:grid;gap:8px}
-.kv li{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;background:#fff;border:1px solid #e5e7eb;border-radius:10px}
-.kv span{color:#64748b}
-.pill-list{list-style:none;padding:0;display:flex;gap:8px;flex-wrap:wrap}
-.pill-list li{background:#fff;border:1px solid #e5e7eb;border-radius:9999px;padding:6px 10px;font-weight:600}
+/* GRID */
+.details-grid{display:grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap:18px; padding:8px 0 28px}
+.stack{display:grid; gap:14px}
+.stack.gap8{gap:8px}
 
-/* finance */
-.finance{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;align-items:end}
-.finance label{display:grid;gap:6px;font-weight:600}
-.finance input{height:40px;border:1px solid #e5e7eb;border-radius:10px;padding:0 10px}
-.finance .small{grid-column:1/-1}
+.card{background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 14px 36px rgba(2,6,23,.06); padding:14px}
+.card h2{margin:0 0 8px}
 
-/* similar carousel uses global .carousel styles */
+.kv{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+.kv div{display:grid; grid-template-columns:auto 1fr; gap:6px; align-items:baseline}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0; font-weight:700}
 
-/* contact */
-.contact-form{display:grid;gap:10px}
-.contact-form .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.contact-form input,.contact-form textarea{border:1px solid #e5e7eb;border-radius:12px;padding:10px;font:inherit;background:#fff}
-.small{font-size:12px}
+.bullets{padding-left:18px; margin:0}
+.bullets.two{columns:2; column-gap:28px}
+.bullets li{margin:6px 0}
 
-/* responsive */
-@media (max-width:980px){
-  .detail-layout{grid-template-columns:1fr}
-  .summary{position:static}
-  .thumbs{grid-template-columns:repeat(4,1fr)}
-  .finance{grid-template-columns:1fr 1fr}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.stack label{display:grid; gap:6px}
+input, select, textarea{
+  height:42px; padding:0 12px; border:1px solid var(--line); border-radius:12px; background:#fff; outline:0
+}
+textarea{height:auto; padding:10px 12px; resize:vertical}
+
+/* Similar carousel */
+.carousel{display:grid; grid-auto-flow:column; grid-auto-columns: clamp(220px, 30%, 300px); gap:12px; overflow:auto; scroll-snap-type:x mandatory; padding:6px 2px}
+.carousel::-webkit-scrollbar{height:0}
+.card-img{display:block; width:100%; aspect-ratio: 16/9; object-fit:cover; background:linear-gradient(135deg,#f5f7fb,#eaf0ff)}
+.card .card-body{padding:10px; display:grid; gap:4px}
+.price{font-weight:900}
+
+/* Responsive */
+@media (max-width: 1024px){
+  .hero{grid-template-columns:1fr}
+  .details-grid{grid-template-columns:1fr}
+  .price-actions{align-items:flex-start; flex-direction:column}
+  .bullets.two{columns:1}
 }
