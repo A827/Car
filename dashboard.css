@@ -1,22 +1,27 @@
-/* Dealer dashboard visuals (refined) */
+/* Dealer dashboard — clean, structured layout */
 :root{
   --ink:#0e1726;
   --muted:#64748b;
   --line:#e5e7eb;
   --brand:#2160ff;
   --card:#fff;
-  --shadow:0 14px 36px rgba(2,6,23,.06);
+  --soft:#f8fafc;
+  --shadow:0 16px 40px rgba(2,6,23,.06);
 }
 
 .container{width:min(1200px,92%); margin-inline:auto}
 
+/* Mast */
+.dash-mast{background:linear-gradient(180deg,#f7faff,#ffffff); border-bottom:1px solid #eef2f7}
+.dash-mast .container{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding:18px 0}
+.dash-mast h1{margin:0}
+.mast-kpi{display:flex; gap:18px}
+.kpi{display:grid; gap:2px}
+.kpi-num{font-weight:900; font-size:22px}
+.kpi-label{color:var(--muted); font-size:12px}
+
 /* Layout */
-.dash{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  gap:18px;
-  padding:18px 0 32px;
-}
+.dash{display:grid; grid-template-columns:300px 1fr; gap:18px; padding:24px 0 40px}
 
 /* Cards */
 .card{
@@ -24,36 +29,37 @@
   border:1px solid var(--line);
   border-radius:16px;
   box-shadow:var(--shadow);
-  padding:14px;
+  padding:16px;
 }
 
 /* Sidebar */
-.dash-aside{position:sticky; top:76px; align-self:start}
-.dealer-card{display:flex; gap:10px; align-items:center; margin-bottom:10px}
-.avatar{width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background:#eef2ff}
+.dash-aside{position:sticky; top:86px; align-self:start}
+.dealer-card{display:flex; gap:10px; align-items:center; margin-bottom:12px}
+.avatar{width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:#eef2ff}
 .dealer-name{font-weight:800}
 
-.dash-nav{display:grid; gap:8px}
+.dash-nav{display:grid; gap:8px; margin-top:8px}
 .dash-nav .tablink{
-  height:40px; border-radius:10px; border:1px solid var(--line);
+  height:42px; border-radius:10px; border:1px solid var(--line);
   background:#fff; cursor:pointer; text-align:left; padding:0 12px; font-weight:700;
 }
 .dash-nav .tablink.active{background:#f5f8ff; border-color:#dbe4ff}
 
-/* Content panels */
+.aside-help{margin-top:12px; border-top:1px dashed #e6eaf2; padding-top:12px}
+.aside-help .help-title{font-weight:800; margin-bottom:6px}
+.aside-help ul{margin:0; padding-left:16px; color:var(--muted)}
+
+/* Content */
 .dash-content{display:grid; gap:16px}
 .panel{display:none}
 .panel.active{display:block}
 
-/* Grids */
-.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+/* Section header */
+.section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+.row{display:flex; align-items:center}
+.gap8{gap:8px}
 
-/* Toolbar & tables */
-.toolbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
-.toolbar input, .toolbar select{height:40px; border:1px solid var(--line); border-radius:10px; padding:0 12px}
-.toolbar .spacer{flex:1}
-
+/* Table */
 .table{display:grid}
 .table .row{
   display:grid; align-items:center;
@@ -64,73 +70,34 @@
 .table .row .actions{display:flex; gap:6px; justify-content:flex-end}
 .col-img{width:64px; height:48px; object-fit:cover; border-radius:8px; background:#eef2ff; border:1px solid var(--line)}
 
-/* Forms – unified look */
-.stack{display:grid; gap:12px}
-.stack .row{display:flex; gap:8px; align-items:center}
+/* Toolbar */
+.toolbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
+.toolbar input, .toolbar select{height:40px; border:1px solid var(--line); border-radius:10px; padding:0 12px; background:#fff}
+.toolbar .spacer{flex:1}
 
+/* Forms */
+.stack{display:grid; gap:14px}
 label{display:grid; gap:6px; font-weight:600; color:#0b1220}
 .small{font-size:12px}
 .muted{color:var(--muted)}
 
 input, select, textarea{
-  height:44px; padding:0 12px; border:1px solid var(--line); border-radius:12px;
+  height:46px; padding:0 12px; border:1px solid #d1d5db; border-radius:12px;
   background:#fff; outline:0; font:inherit;
 }
-textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
+textarea{height:auto; min-height:110px; padding:12px; resize:vertical}
 
-/* Disabled selects look clear */
-#panel-add select:disabled{
-  opacity:.7;
-  background:#f8fafc;
-  color:#94a3b8;
-  cursor:not-allowed;
-}
+/* Fieldsets */
+.fieldset{border:1px solid var(--line); border-radius:14px; padding:14px}
+.fieldset legend{font-weight:800; padding:0 6px}
 
-/* Buttons */
-.btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer}
-.btn-ghost{background:#fff}
-.btn-primary{background:var(--brand); color:#fff; border-color:transparent}
-.btn:hover{transform:translateY(-1px)}
-
-/* KPI */
-.kpi{display:grid; gap:4px; place-items:start}
-.kpi-num{font-size:28px; font-weight:900}
-
-/* ---- ADD LISTING ---- */
-
-/* Two-panels: form + preview (balanced) */
-#panel-add > .grid-2{
-  grid-template-columns: minmax(0, 760px) 420px;
-  gap: 24px;
-}
-
-/* Full-width selects inside label */
-#panel-add .grid-2 > label select{ width:100%; }
-
-/* Even inline rows */
-#panel-add .grid-3{grid-template-columns:repeat(3, 1fr); gap:12px}
-
-/* Controls rhythm */
-#panel-add .card{padding:18px 20px}
-#panel-add h2{margin:0 0 6px}
-#panel-add label{font-weight:700; color:#0b1220}
-#panel-add .muted.small{margin-top:-2px}
-#panel-add input,
-#panel-add select,
-#panel-add textarea{
-  height:46px;
-  border:1px solid #d1d5db;
-  border-radius:12px;
-  padding:0 12px;
-}
-#panel-add textarea{min-height:110px; padding:12px}
-#panel-add input::placeholder,
-#panel-add textarea::placeholder{color:#94a3b8}
+/* Grids */
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.grid-2{display:grid; grid-template-columns:minmax(0, 760px) 380px; gap:24px}
 
 /* Preview card */
-#panel-add .grid-2 > .card:last-child{
-  position:sticky; top:86px; align-self:start; min-width:360px;
-}
+.preview-card{position:sticky; top:86px; align-self:start; min-width:360px}
+.preview-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px}
 .preview{display:grid; grid-template-columns:220px 1fr; gap:14px; align-items:center}
 .preview .thumb{
   width:220px; height:160px; object-fit:cover; border-radius:14px;
@@ -139,6 +106,10 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 .preview .title{font-weight:800; font-size:16px; margin-bottom:2px}
 .preview .meta{font-size:14px; color:#64748b}
 .price-big{font-weight:900; font-size:20px}
+
+/* Form actions */
+.form-actions{display:flex; align-items:center; gap:8px}
+.form-msg{font-weight:700; color:#16a34a}
 
 /* Messages */
 .grid-messages{display:grid; grid-template-columns:320px 1fr; gap:12px}
@@ -149,30 +120,26 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 .msg{margin:10px 0}
 .msg .text{padding:10px 12px; border-radius:12px; background:#f1f5ff; display:inline-block}
 .msg.me .text{background:#e7f0ff}
-.msg .meta{font-size:12px; color: var(--muted); margin-top:4px}
+.msg .meta{font-size:12px; color:var(--muted); margin-top:4px}
 .msg-form{display:flex; gap:8px; margin-top:8px}
 .msg-form input{flex:1}
 
-/* Utility: visually-hidden (used in dashboard HTML headings) */
-.visually-hidden{
-  position:absolute !important;
-  height:1px; width:1px;
-  overflow:hidden; clip:rect(1px, 1px, 1px, 1px);
-  white-space:nowrap; border:0; padding:0; margin:-1px;
+/* Disabled selects hint */
+#panel-add select:disabled{
+  opacity:.75; background:#f8fafc; color:#94a3b8; cursor:not-allowed;
 }
 
-/* Optional: inline form message styling */
-.form-msg{
-  font-size:12px; color:#065f46; background:#ecfdf5;
-  border:1px solid #a7f3d0; border-radius:10px; padding:8px 10px; display:none;
-}
-.form-msg.show{display:block}
+/* Buttons (inherit from styles.css) */
+.btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer}
+.btn-ghost{background:#fff}
+.btn-primary{background:var(--brand); color:#fff; border-color:transparent}
+.btn:hover{transform:translateY(-1px)}
 
 /* Responsive */
 @media (max-width: 1200px){
   .dash{grid-template-columns:1fr}
-  #panel-add > .grid-2{ grid-template-columns: 1fr; }
-  #panel-add .grid-2 > .card:last-child{ position:static; min-width:auto; }
+  .grid-2{grid-template-columns:1fr}
+  .preview-card{position:static; min-width:auto}
   .grid-3{grid-template-columns:1fr}
   .grid-messages{grid-template-columns:1fr}
   .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}

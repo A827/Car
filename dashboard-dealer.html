@@ -28,160 +28,203 @@
           <li><a href="results.html">Buy</a></li>
           <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <!-- Auth buttons hydrated by app.js -->
-          <li id="authSlot"></li>
+          <!-- Auth buttons come from app.js -->
         </ul>
       </nav>
     </div>
   </header>
 
+  <!-- Page mast -->
+  <section class="dash-mast">
+    <div class="container">
+      <div class="mast-left">
+        <h1>Dealer dashboard</h1>
+        <p class="muted">Create listings, manage inventory, and respond to buyer messages.</p>
+      </div>
+      <div class="mast-kpi">
+        <div class="kpi">
+          <div class="kpi-num" id="kpiActive">0</div>
+          <div class="kpi-label">Active</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num" id="kpiViews">0</div>
+          <div class="kpi-label">Views</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num" id="kpiLeads">0</div>
+          <div class="kpi-label">Leads</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <main class="container dash">
     <!-- Sidebar -->
     <aside class="dash-aside card">
       <div class="dealer-card">
-        <div class="avatar" aria-hidden="true">🏷️</div>
+        <div class="avatar">🏷️</div>
         <div>
           <div id="dealerName" class="dealer-name">Dealer</div>
           <div id="dealerEmail" class="muted small">dealer@example.com</div>
         </div>
       </div>
-      <nav class="dash-nav" aria-label="Dashboard">
-        <button class="tablink active" data-view="overview" type="button">Overview</button>
-        <button class="tablink" data-view="inventory" type="button">Inventory</button>
-        <button class="tablink" data-view="add" type="button">Add listing</button>
-        <button class="tablink" data-view="messages" type="button">Messages</button>
-        <button class="tablink" data-view="settings" type="button">Settings</button>
+
+      <nav class="dash-nav" role="tablist" aria-label="Dashboard sections">
+        <button class="tablink active" data-view="overview" role="tab" aria-selected="true">Overview</button>
+        <button class="tablink" data-view="inventory" role="tab" aria-selected="false">Inventory</button>
+        <button class="tablink" data-view="add" role="tab" aria-selected="false">Add listing</button>
+        <button class="tablink" data-view="messages" role="tab" aria-selected="false">Messages</button>
+        <button class="tablink" data-view="settings" role="tab" aria-selected="false">Settings</button>
       </nav>
+
+      <div class="aside-help">
+        <div class="help-title">Tips</div>
+        <ul>
+          <li>Use clear daylight photos</li>
+          <li>Include service history</li>
+          <li>Price competitively</li>
+        </ul>
+      </div>
     </aside>
 
     <!-- Content -->
     <section class="dash-content">
       <!-- OVERVIEW -->
-      <div id="panel-overview" class="panel active" role="region" aria-labelledby="kpiHeading">
-        <h2 id="kpiHeading" class="visually-hidden">Overview KPIs</h2>
-        <div class="grid-3">
-          <div class="kpi card"><div class="kpi-num" id="kpiActive">0</div><div class="muted">Active listings</div></div>
-          <div class="kpi card"><div class="kpi-num" id="kpiViews">0</div><div class="muted">Total views</div></div>
-          <div class="kpi card"><div class="kpi-num" id="kpiLeads">0</div><div class="muted">Leads</div></div>
-        </div>
-
+      <div id="panel-overview" class="panel active" role="tabpanel">
         <div class="card">
           <div class="section-head">
             <h2>Recently edited</h2>
             <a href="#" class="btn btn-primary" data-switch="add">Add new</a>
           </div>
-          <div id="tableRecent" class="table" aria-live="polite"></div>
+          <div id="tableRecent" class="table"></div>
         </div>
       </div>
 
       <!-- INVENTORY -->
-      <div id="panel-inventory" class="panel" role="region" aria-labelledby="invHeading">
-        <h2 id="invHeading" class="visually-hidden">Inventory</h2>
-        <div class="toolbar" role="group" aria-label="Inventory tools">
-          <input id="invSearch" placeholder="Search by title or location…" aria-label="Search inventory" />
-          <select id="invStatus" aria-label="Filter by status">
-            <option value="">All statuses</option>
-            <option value="live">Live</option>
-            <option value="draft">Draft</option>
-            <option value="sold">Sold</option>
-          </select>
-          <div class="spacer" aria-hidden="true"></div>
-          <label class="btn btn-ghost" for="importCsv">Import CSV</label>
-          <input id="importCsv" type="file" accept=".csv" hidden />
-          <button id="exportCsv" class="btn btn-ghost" type="button">Export CSV</button>
-          <a class="btn btn-primary" data-switch="add" href="#">Add listing</a>
+      <div id="panel-inventory" class="panel" role="tabpanel">
+        <div class="card">
+          <div class="section-head">
+            <h2>Inventory</h2>
+            <div class="row gap8">
+              <label class="btn btn-ghost">
+                Import CSV
+                <input id="importCsv" type="file" accept=".csv" hidden />
+              </label>
+              <button id="exportCsv" class="btn btn-ghost">Export CSV</button>
+              <a class="btn btn-primary" data-switch="add" href="#">Add listing</a>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input id="invSearch" placeholder="Search by title or location…" />
+            <select id="invStatus">
+              <option value="">All statuses</option>
+              <option value="live">Live</option>
+              <option value="draft">Draft</option>
+              <option value="sold">Sold</option>
+            </select>
+            <div class="spacer"></div>
+          </div>
+          <div id="tableInventory" class="table"></div>
         </div>
-        <div id="tableInventory" class="table" aria-live="polite"></div>
       </div>
 
       <!-- ADD LISTING -->
-      <div id="panel-add" class="panel" role="region" aria-labelledby="addHeading">
+      <div id="panel-add" class="panel" role="tabpanel">
         <div class="grid-2">
-          <form id="listingForm" class="card stack" autocomplete="off" novalidate>
-            <div>
-              <h2 id="addHeading" style="margin:0">Add listing</h2>
-              <p class="muted small" style="margin:4px 0 0">Fields marked * are required.</p>
-            </div>
+          <!-- Form -->
+          <form id="listingForm" class="card stack" autocomplete="off">
+            <header class="form-head">
+              <h2 id="addTitle">Add listing</h2>
+              <div class="muted small">Fields marked * are required.</div>
+            </header>
 
-            <div class="grid-2">
-              <label>Make *
-                <select name="make" id="makeSel" required aria-required="true"></select>
-              </label>
-              <label>Model *
-                <select name="model" id="modelSel" required disabled aria-required="true">
-                  <option value="">Model</option>
-                </select>
-              </label>
-            </div>
+            <fieldset class="fieldset">
+              <legend>Vehicle</legend>
+              <div class="grid-2">
+                <label>Make *
+                  <select name="make" id="makeSel" required></select>
+                </label>
+                <label>Model *
+                  <select name="model" id="modelSel" required disabled>
+                    <option value="">Model</option>
+                  </select>
+                </label>
+              </div>
+              <div class="grid-3">
+                <label>Year *
+                  <input name="year" id="yearInp" type="number" min="1990" required />
+                </label>
+                <label>Price (£) *
+                  <input name="price" id="priceInp" type="number" min="0" step="100" required />
+                </label>
+                <label>Mileage (km)
+                  <input name="km" id="kmInp" type="number" min="0" step="1000" />
+                </label>
+              </div>
+              <div class="grid-3">
+                <label>Fuel
+                  <select name="fuel" id="fuelSel">
+                    <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+                  </select>
+                </label>
+                <label>Gearbox
+                  <select name="gearbox" id="boxSel">
+                    <option>Manual</option><option>Automatic</option>
+                  </select>
+                </label>
+                <label>Location
+                  <input name="loc" id="locInp" placeholder="City" />
+                </label>
+              </div>
+            </fieldset>
 
-            <div class="grid-3">
-              <label>Year *
-                <input name="year" id="yearInp" type="number" min="1990" required />
+            <fieldset class="fieldset">
+              <legend>Listing</legend>
+              <label>Title *
+                <input name="title" id="titleInp" placeholder="e.g. Kia Sportage 1.6 T‑GDi" required />
               </label>
-              <label>Price (£) *
-                <input name="price" id="priceInp" type="number" min="0" step="100" required />
+              <label>Photos (URL) *
+                <input name="img" id="imgUrl" placeholder="https://…" required />
+                <div class="muted small">Tip: add a direct image URL (jpg/png/webp). You can add a gallery later.</div>
               </label>
-              <label>Mileage (km)
-                <input name="km" id="kmInp" type="number" min="0" step="1000" />
+              <label>Description
+                <textarea name="desc" id="descInp" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
               </label>
-            </div>
+            </fieldset>
 
-            <div class="grid-3">
-              <label>Fuel
-                <select name="fuel" id="fuelSel">
-                  <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
-                </select>
-              </label>
-              <label>Gearbox
-                <select name="gearbox" id="boxSel">
-                  <option>Manual</option><option>Automatic</option>
-                </select>
-              </label>
-              <label>Location
-                <input name="loc" id="locInp" placeholder="City" />
-              </label>
-            </div>
-
-            <label>Title *
-              <input name="title" id="titleInp" placeholder="e.g. Kia Sportage 1.6 T‑GDi" required />
-            </label>
-
-            <label>Photos (URL) *
-              <input name="img" id="imgUrl" placeholder="https://…" required />
-              <div class="muted small">Tip: paste the first photo URL; you can edit later to add a gallery.</div>
-            </label>
-
-            <label>Description
-              <textarea name="desc" id="descInp" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
-            </label>
-
-            <div class="grid-3">
-              <label>Status
-                <select name="status" id="statusSel">
-                  <option value="live">Live</option>
-                  <option value="draft">Draft</option>
-                  <option value="sold">Sold</option>
-                </select>
-              </label>
-              <label>Colour
-                <input name="colour" id="colourInp" />
-              </label>
-              <label>Owners
-                <input name="owners" id="ownersInp" type="number" min="0" />
-              </label>
-            </div>
+            <fieldset class="fieldset">
+              <legend>Extras</legend>
+              <div class="grid-3">
+                <label>Status
+                  <select name="status" id="statusSel">
+                    <option value="live">Live</option>
+                    <option value="draft">Draft</option>
+                    <option value="sold">Sold</option>
+                  </select>
+                </label>
+                <label>Colour
+                  <input name="colour" id="colourInp" />
+                </label>
+                <label>Owners
+                  <input name="owners" id="ownersInp" type="number" min="0" />
+                </label>
+              </div>
+            </fieldset>
 
             <input type="hidden" name="id" id="idHidden" />
-            <div class="row" role="group" aria-label="Listing actions">
+            <div class="form-actions">
               <button class="btn btn-primary" type="submit">Save listing</button>
               <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
+              <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
             </div>
-            <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
           </form>
 
-          <!-- Preview -->
-          <div class="card">
-            <h2 style="margin-top:0">Preview</h2>
+          <!-- Preview (sticky) -->
+          <aside class="card preview-card">
+            <div class="preview-head">
+              <h2>Preview</h2>
+              <span class="muted small">Auto‑updates as you type</span>
+            </div>
             <article class="preview">
               <img id="prevImg" class="thumb" alt="">
               <div class="info">
@@ -190,29 +233,28 @@
                 <div class="price-big" id="prevPrice">£0</div>
               </div>
             </article>
-          </div>
+          </aside>
         </div>
       </div>
 
       <!-- MESSAGES -->
-      <div id="panel-messages" class="panel" role="region" aria-labelledby="msgHeading">
-        <h2 id="msgHeading" class="visually-hidden">Messages</h2>
+      <div id="panel-messages" class="panel" role="tabpanel">
         <div class="grid-messages">
-          <div id="threads" class="threads card" aria-live="polite"></div>
+          <div id="threads" class="threads card" aria-label="Conversations"></div>
           <div class="thread card">
             <div id="thread" class="thread-body"><div class="thread-empty muted">Select a conversation…</div></div>
             <form id="msgForm" class="msg-form">
-              <input name="text" placeholder="Write a message…" aria-label="Message" />
-              <button class="btn btn-primary" type="submit">Send</button>
+              <input name="text" placeholder="Write a message…" />
+              <button class="btn btn-primary">Send</button>
             </form>
           </div>
         </div>
       </div>
 
       <!-- SETTINGS -->
-      <div id="panel-settings" class="panel" role="region" aria-labelledby="settingsHeading">
+      <div id="panel-settings" class="panel" role="tabpanel">
         <form id="settingsForm" class="card stack">
-          <h2 id="settingsHeading" style="margin:0">Dealer settings</h2>
+          <h2 style="margin:0">Dealer settings</h2>
           <div class="grid-3">
             <label>Dealer name
               <input name="dealerName" />
