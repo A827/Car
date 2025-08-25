@@ -146,3 +146,50 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
   .grid-messages{grid-template-columns:1fr}
   .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}
 }
+/* === Add‑listing polish overrides (drop at end of dashboard.css) === */
+
+/* 1) Stronger two‑column split + tidy gaps */
+#panel-add .grid-2{
+  grid-template-columns: minmax(0,720px) minmax(0,1fr);
+  gap:22px;
+}
+
+/* 2) Form rhythm: consistent padding, line height, bolder labels */
+#panel-add .card{padding:18px 20px}
+#panel-add h2{margin:0 0 6px}
+#panel-add label{font-weight:700; color:#0b1220}
+#panel-add .muted.small{margin-top:-2px}
+
+/* 3) Controls: same height, crisper borders, clearer placeholders */
+#panel-add input,
+#panel-add select,
+#panel-add textarea{
+  height:46px;
+  border:1px solid #d1d5db; /* a touch darker than --line */
+  border-radius:12px;
+  padding:0 12px;
+}
+#panel-add textarea{min-height:110px; padding:12px}
+#panel-add input::placeholder,
+#panel-add textarea::placeholder{color:#94a3b8}
+
+/* 4) Inline rows look even (Year/Price/Mileage and Make/Model) */
+#panel-add .grid-3{grid-template-columns:repeat(3, 1fr); gap:12px}
+#panel-add .grid-2 > .grid-2{grid-template-columns:1fr 1fr; gap:12px}
+#makeSel,#modelSel{width:100%}
+
+/* 5) Preview: sticky, bigger thumb, better hierarchy */
+#panel-add .grid-2 > .card:last-child{
+  position:sticky; top:86px; align-self:start;
+}
+.preview{grid-template-columns:200px 1fr; gap:14px}
+.preview .thumb{
+  width:200px; height:150px; border-radius:14px;
+  border:1px solid #e2e8f0; background:#f3f6ff;
+}
+.preview .title{font-weight:800; font-size:16px; margin-bottom:2px}
+.preview .meta{font-size:14px; color:#64748b}
+.preview .price-big{font-size:20px}
+
+/* 6) Buttons: a hair larger for better touch targets */
+#panel-add .btn{height:44px; padding:0 18px}
