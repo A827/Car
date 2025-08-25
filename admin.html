@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Motoria • Admin CMS</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="Motoria home">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+          <circle cx="20" cy="48" r="6"></circle>
+          <circle cx="48" cy="48" r="6"></circle>
+        </svg>
+        <span class="brand-name">Motoria</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <ul id="navMenu" class="nav-menu">
+          <li><a href="results.html">Buy</a></li>
+          <li><a href="dashboard-dealer.html">Dealer</a></li>
+          <li class="divider" aria-hidden="true"></li>
+          <!-- Auth buttons injected by app.js -->
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container admin-grid">
+    <!-- Sidebar -->
+    <aside class="card admin-aside">
+      <h2 class="h6">Admin</h2>
+      <nav class="admin-nav">
+        <button class="navbtn active" data-view="taxonomy">Makes & Models</button>
+        <button class="navbtn" data-view="dealers">Dealers</button>
+        <button class="navbtn" data-view="settings">Settings</button>
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <section class="admin-content">
+      <!-- Taxonomy -->
+      <div id="panel-taxonomy" class="panel active card">
+        <div class="section-head">
+          <h2>Makes & Models</h2>
+          <div class="muted">Controls the dropdowns on search/listing forms.</div>
+        </div>
+
+        <div class="taxo-grid">
+          <div class="taxo-col">
+            <div class="row">
+              <input id="makeInput" placeholder="New make (e.g. Kia)" />
+              <button id="addMake" class="btn btn-primary">Add make</button>
+            </div>
+            <ul id="makeList" class="list"></ul>
+          </div>
+
+          <div class="taxo-col">
+            <div class="row">
+              <input id="modelInput" placeholder="New model (e.g. Sportage)" />
+              <button id="addModel" class="btn btn-primary" disabled>Add model</button>
+            </div>
+            <ul id="modelList" class="list"></ul>
+          </div>
+        </div>
+
+        <div class="row end">
+          <button id="saveTaxo" class="btn btn-primary">Save taxonomy</button>
+          <span id="taxoMsg" class="muted"></span>
+        </div>
+      </div>
+
+      <!-- Dealers -->
+      <div id="panel-dealers" class="panel card">
+        <div class="section-head">
+          <h2>Dealers</h2>
+          <div class="muted">Add and manage dealer accounts (local demo).</div>
+        </div>
+
+        <form id="dealerForm" class="grid-3 soft">
+          <label>Name<input name="name" required /></label>
+          <label>Email<input name="email" type="email" required /></label>
+          <label>Phone<input name="phone" /></label>
+          <label>Location<input name="loc" /></label>
+          <label>Verified
+            <select name="verified">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </label>
+          <div class="row end">
+            <button class="btn btn-primary">Add dealer</button>
+          </div>
+        </form>
+
+        <div class="table" id="dealerTable"></div>
+      </div>
+
+      <!-- Settings -->
+      <div id="panel-settings" class="panel card">
+        <h2>Admin settings</h2>
+        <p class="muted">Placeholder for future site-wide configurations.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand-footer">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+            <circle cx="20" cy="48" r="6"></circle>
+            <circle cx="48" cy="48" r="6"></circle>
+          </svg>
+          <span>Motoria</span>
+        </div>
+        <p class="muted">© <span id="year"></span> Motoria Ltd.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- scripts -->
+  <script src="app.js"></script>
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

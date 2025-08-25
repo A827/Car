@@ -1,0 +1,49 @@
+:root{
+  --ink:#0e1726; --muted:#64748b; --line:#e5e7eb; --brand:#2160ff;
+  --card:#fff; --shadow:0 14px 36px rgba(2,6,23,.06);
+}
+.container{width:min(1200px,92%); margin-inline:auto}
+
+.card{background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:16px}
+.h6{margin:0 0 8px; font-size:14px; color:#0b1220}
+.muted{color:var(--muted); font-size:14px}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer}
+.btn-primary{background:var(--brand); color:#fff; border-color:transparent}
+.btn:hover{transform:translateY(-1px)}
+
+input, select{height:44px; padding:0 12px; border:1px solid var(--line); border-radius:12px; background:#fff; outline:0; font:inherit}
+.row{display:flex; gap:10px; align-items:center}
+.row.end{justify-content:flex-end}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.soft label{display:grid; gap:6px; font-weight:600; color:#0b1220}
+
+.admin-grid{display:grid; grid-template-columns:260px 1fr; gap:18px; padding:18px 0 32px}
+.admin-aside{position:sticky; top:76px; align-self:start}
+.admin-nav{display:grid; gap:8px}
+.navbtn{height:40px; border-radius:10px; border:1px solid var(--line); background:#fff; cursor:pointer; text-align:left; padding:0 12px; font-weight:700}
+.navbtn.active{background:#f5f8ff; border-color:#dbe4ff}
+.admin-content{display:grid; gap:16px}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:8px}
+.list{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+.list li{display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
+.list .small{font-size:12px}
+
+.taxo-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px}
+.taxo-col .row input{flex:1}
+.badge{display:inline-block; font-size:12px; background:#eef2ff; color:#0a2e8a; border-radius:999px; padding:4px 8px}
+
+/* Table */
+.table .row{display:grid; grid-template-columns:2fr 1.4fr .8fr .8fr .8fr; gap:10px; padding:10px; border-bottom:1px solid var(--line)}
+.table .row.head{font-weight:800; background:#f8fafc; border-top-left-radius:10px; border-top-right-radius:10px}
+.table .row .actions{display:flex; gap:6px; justify-content:flex-end}
+
+@media (max-width: 1024px){
+  .admin-grid{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr}
+  .taxo-grid{grid-template-columns:1fr}
+}
