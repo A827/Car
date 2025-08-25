@@ -6,9 +6,7 @@
   <title>Motoria • Buy & Sell Cars</title>
   <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <!-- Global styles -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Modern homepage layer -->
   <link rel="stylesheet" href="home.css" />
 </head>
 <body>
@@ -28,122 +26,184 @@
           <span></span><span></span><span></span>
         </button>
         <ul id="navMenu" class="nav-menu">
+          <li><a class="active" href="index.html">Home</a></li>
           <li><a href="results.html">Buy</a></li>
           <li><a href="#">Sell</a></li>
           <li><a href="#">Finance</a></li>
-          <li><a href="#">Dealers</a></li>
+          <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <!-- Auth buttons are injected by app.js -->
           <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Modern Hero -->
-  <section class="pro-hero">
-    <div class="pro-hero-bg" aria-hidden="true">
-      <!-- abstract background shapes -->
-      <svg class="blob a" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"><g transform="translate(300,300)"><path d="M147.7 -170.7C181.3 -130 188.7 -65 188.3 -0.2C187.9 64.7 179.8 129.5 146.2 168.7C112.7 208 53.7 221.7 -6.4 230.6C-66.6 239.4 -133.2 243.4 -168.4 208.9C-203.7 174.4 -207.6 101.4 -209.4 34.6C-211.2 -32.2 -211 -92.8 -181.6 -131.7C-152.1 -170.6 -93.4 -187.7 -34.5 -180.4C24.4 -173.2 48.9 -141.5 147.7 -170.7Z" fill="url(#g1)"/></g><defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#e9efff"/><stop offset="1" stop-color="#dbe4ff"/></linearGradient></defs></svg>
-      <svg class="blob b" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"><g transform="translate(300,300)"><path d="M140.3 -163.5C175.6 -139.6 191.2 -87.2 197.4 -32.1C203.6 23 200.4 81 172.3 121.9C144.2 162.8 91.2 186.6 38.8 194.7C-13.5 202.8 -65.5 195.3 -109 170.5C-152.5 145.8 -187.6 103.7 -199.2 56.5C-210.9 9.3 -199  -43.1 -172.8 -86.8C-146.5 -130.5 -105.9 -165.4 -58.1 -184.5C-10.2 -203.5 44.9 -206.7 94.1 -190.7C143.3 -174.7 186.6 -139.5 140.3 -163.5Z" fill="url(#g2)"/></g><defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#f5faff"/><stop offset="1" stop-color="#eef6ff"/></linearGradient></defs></svg>
+  <!-- HERO -->
+  <section class="hero-pro">
+    <div class="hero-art" aria-hidden="true">
+      <div class="glow a"></div>
+      <div class="glow b"></div>
+      <div class="mesh"></div>
     </div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="eyebrow">Trusted marketplace</div>
+        <h1>Find the right car — <span class="accent">faster</span>.</h1>
+        <p class="lede">Powerful search. Verified dealers. Clear history and finance options.</p>
 
-    <div class="container pro-hero-inner">
-      <div class="pro-hero-text">
-        <h1>Find the right car — fast.</h1>
-        <p class="lead">Search verified listings from trusted dealers and private sellers. Transparent history, flexible finance.</p>
+        <!-- Search card with tabs -->
+        <div class="search-card">
+          <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="buy" role="tab" aria-selected="true">Buy</button>
+            <button class="tab" data-tab="sell" role="tab" aria-selected="false">Sell</button>
+          </div>
+
+          <!-- BUY form -->
+          <form id="homeSearch" class="buy-form" role="search" aria-label="Car search">
+            <div class="row">
+              <label class="field">
+                <span>Make</span>
+                <select id="makeSelect" name="make">
+                  <option value="">Any</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Model</span>
+                <select id="modelSelect" name="model" disabled>
+                  <option value="">Any</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>City / Postcode</span>
+                <input name="loc" placeholder="e.g. SW1A or London" />
+              </label>
+            </div>
+            <div class="row">
+              <label class="field sm">
+                <span>Max price</span>
+                <select name="max">
+                  <option value="">Any</option><option>5000</option><option>10000</option>
+                  <option>15000</option><option>20000</option><option>30000</option><option>50000</option>
+                </select>
+              </label>
+              <label class="field sm">
+                <span>Year from</span>
+                <select name="year_min">
+                  <option value="">Any</option><option>2015</option><option>2017</option>
+                  <option>2019</option><option>2020</option><option>2022</option>
+                </select>
+              </label>
+              <button class="btn btn-primary go" type="submit" aria-label="Search cars">Search</button>
+            </div>
+            <div class="quick-links" aria-label="Quick picks">
+              <a href="results.html?fuel=Electric" class="pill">Electric</a>
+              <a href="results.html?max=10000" class="pill">Under £10k</a>
+              <a href="results.html?gearbox=Automatic" class="pill">Automatic</a>
+              <a href="results.html?q=Sportage" class="pill">Kia Sportage</a>
+            </div>
+          </form>
+
+          <!-- SELL panel -->
+          <div class="sell-panel" role="tabpanel" hidden>
+            <h3>Sell your car with confidence</h3>
+            <ul class="list">
+              <li>Instant listing builder</li>
+              <li>Smart price guidance</li>
+              <li>Verified buyers & safe messaging</li>
+            </ul>
+            <a class="btn btn-primary" href="#">List your car</a>
+          </div>
+        </div>
+
+        <!-- Social proof -->
+        <div class="trust-row">
+          <div class="trust-item"><span class="dot"></span> 1000+ verified dealers</div>
+          <div class="trust-item"><span class="dot"></span> Free history checks</div>
+          <div class="trust-item"><span class="dot"></span> Finance-friendly</div>
+        </div>
       </div>
 
-      <!-- Glass search card -->
-      <form id="homeSearch" class="glass-search" role="search" aria-label="Car search">
-        <div class="row">
-          <label class="field">
-            <span>Make</span>
-            <select id="makeSelect" name="make">
-              <option value="">Any</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Model</span>
-            <select id="modelSelect" name="model" disabled>
-              <option value="">Any</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Postcode / City</span>
-            <input name="loc" placeholder="e.g. SW1A or London" />
-          </label>
+      <!-- Right column visual -->
+      <div class="hero-right">
+        <div class="stat-card">
+          <div class="stat"><span id="statListings">2,480</span><small>cars</small></div>
+          <div class="muted">Live nationwide</div>
         </div>
-        <div class="row">
-          <label class="field sm">
-            <span>Max price</span>
-            <select name="max">
-              <option value="">Any</option><option>5000</option><option>10000</option>
-              <option>15000</option><option>20000</option><option>30000</option><option>50000</option>
-            </select>
-          </label>
-          <label class="field sm">
-            <span>Year from</span>
-            <select name="year_min">
-              <option value="">Any</option><option>2015</option><option>2017</option>
-              <option>2019</option><option>2020</option><option>2022</option>
-            </select>
-          </label>
-          <button class="btn btn-primary go" type="submit">Search</button>
+        <div class="grid-cards">
+          <div class="mini-card">
+            <img src="assets/cars/sportage.jpg" alt="" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <div class="mini-meta">
+              <strong>Kia Sportage</strong>
+              <span>£19,900</span>
+            </div>
+          </div>
+          <div class="mini-card">
+            <img src="assets/cars/leaf.jpg" alt="">
+            <div class="mini-meta">
+              <strong>Nissan Leaf</strong>
+              <span>£12,900</span>
+            </div>
+          </div>
+          <div class="mini-card">
+            <img src="assets/cars/octavia.jpg" alt="">
+            <div class="mini-meta">
+              <strong>Skoda Octavia</strong>
+              <span>£9,900</span>
+            </div>
+          </div>
+          <div class="mini-card">
+            <img src="assets/cars/ioniq.jpg" alt="">
+            <div class="mini-meta">
+              <strong>Hyundai Ioniq</strong>
+              <span>£15,800</span>
+            </div>
+          </div>
         </div>
-        <div class="quick-links" aria-label="Quick picks">
-          <a href="results.html?fuel=Electric" class="pill">Electric</a>
-          <a href="results.html?max=10000" class="pill">Under £10k</a>
-          <a href="results.html?gearbox=Automatic" class="pill">Automatic</a>
-          <a href="results.html?q=Sportage" class="pill">Kia Sportage</a>
-        </div>
-      </form>
-
-      <!-- Trust row -->
-      <div class="trust-row">
-        <div class="trust-item"><span class="dot"></span> Verified sellers</div>
-        <div class="trust-item"><span class="dot"></span> Free history checks</div>
-        <div class="trust-item"><span class="dot"></span> Flexible finance</div>
       </div>
+
     </div>
   </section>
 
-  <!-- Brand strip -->
-  <section class="container section brand-pro">
+  <!-- Explore tiles -->
+  <section class="container section explore">
     <div class="section-head">
-      <h2>Browse by brand</h2>
+      <h2>Explore Motoria</h2>
     </div>
-    <div class="brand-pro-grid" id="brandStrip">
-      <a href="results.html?make=Volkswagen" class="brand-pro-tile">Volkswagen</a>
-      <a href="results.html?make=BMW" class="brand-pro-tile">BMW</a>
-      <a href="results.html?make=Audi" class="brand-pro-tile">Audi</a>
-      <a href="results.html?make=Ford" class="brand-pro-tile">Ford</a>
-      <a href="results.html?make=Toyota" class="brand-pro-tile">Toyota</a>
-      <a href="results.html?make=Kia" class="brand-pro-tile">Kia</a>
+    <div class="explore-grid">
+      <a class="explore-tile" href="results.html?fuel=Electric">
+        <div class="tone electric"></div>
+        <div class="tile-body">
+          <h3>Go Electric</h3>
+          <p>City-friendly EVs and long‑range options.</p>
+        </div>
+      </a>
+      <a class="explore-tile" href="results.html?max=10000">
+        <div class="tone budget"></div>
+        <div class="tile-body">
+          <h3>Best under £10k</h3>
+          <p>Value picks that won’t break the bank.</p>
+        </div>
+      </a>
+      <a class="explore-tile" href="dealers.html">
+        <div class="tone dealers"></div>
+        <div class="tile-body">
+          <h3>Verified Dealers</h3>
+          <p>Browse trusted partners near you.</p>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- Featured listings -->
+  <!-- Featured -->
   <section class="container section">
     <div class="section-head">
-      <h2>Featured</h2>
+      <h2>Featured today</h2>
       <div class="actions">
         <button class="carousel-btn" id="prevBtn" aria-label="Previous listings">&#10094;</button>
         <button class="carousel-btn" id="nextBtn" aria-label="Next listings">&#10095;</button>
       </div>
     </div>
     <div class="carousel" id="carousel" tabindex="0" aria-label="Featured listings"></div>
-  </section>
-
-  <!-- CTA -->
-  <section class="cta container">
-    <div class="cta-card pro-cta">
-      <div>
-        <h3>List your car</h3>
-        <p>Reach serious buyers with professional tools and safe messaging.</p>
-      </div>
-      <a class="btn btn-primary" href="#">Get started</a>
-    </div>
   </section>
 
   <!-- Footer -->
@@ -164,7 +224,7 @@
         <ul class="footer-links">
           <li><a href="#">About</a></li>
           <li><a href="#">Safety & Trust</a></li>
-          <li><a href="#">For Dealers</a></li>
+          <li><a href="dealers.html">For Dealers</a></li>
         </ul>
       </nav>
       <form class="newsletter" aria-label="Newsletter">
@@ -179,71 +239,72 @@
     </div>
   </footer>
 
-  <!-- Core scripts -->
+  <!-- Core -->
   <script src="app.js"></script>
   <script src="data.js"></script>
 
   <!-- Page script -->
   <script>
-    // Header behavior
+    // Header basics
     const header = document.getElementById('siteHeader');
     addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Mobile nav
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
+    const navToggle=document.getElementById('navToggle');
+    const navMenu=document.getElementById('navMenu');
     navToggle?.addEventListener('click', ()=>{
       const exp = navToggle.getAttribute('aria-expanded')==='true';
       navToggle.setAttribute('aria-expanded', String(!exp));
       navMenu.classList.toggle('open');
     });
 
-    // Populate taxonomy-driven Make/Model selects
+    // Tabs
+    const tabs = document.querySelectorAll('.tab');
+    const sellPanel = document.querySelector('.sell-panel');
+    const buyForm = document.getElementById('homeSearch');
+    tabs.forEach(t=>{
+      t.addEventListener('click', ()=>{
+        tabs.forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        const k = t.dataset.tab;
+        const isBuy = k==='buy';
+        buyForm.style.display = isBuy ? '' : 'none';
+        sellPanel.hidden = isBuy;
+      });
+    });
+
+    // Taxonomy -> make/model
     (function hydrateTaxonomy(){
       const MD = window.MotoriaData || {};
       const makeSel = document.getElementById('makeSelect');
       const modelSel = document.getElementById('modelSelect');
-
-      const params = new URLSearchParams(location.search);
-      const selectedMake  = params.get('make')  || '';
-      const selectedModel = params.get('model') || '';
-
-      if (MD.getTaxonomy && MD.modelsForMake) {
+      if (MD.getTaxonomy && MD.modelsForMake){
         const taxo = MD.getTaxonomy();
-        makeSel.innerHTML = `<option value="">Any</option>` + taxo.makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
-        if (selectedMake) makeSel.value = selectedMake;
-
-        function refreshModels(){
+        makeSel.innerHTML = '<option value="">Any</option>' + taxo.makes.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+        function refresh(){
           const make = makeSel.value;
           const models = make ? MD.modelsForMake(make) : [];
           modelSel.disabled = !make;
-          modelSel.innerHTML = `<option value="">Any</option>` + models.map(x=>`<option value="${x}">${x}</option>`).join('');
-          if (selectedModel && models.includes(selectedModel)) modelSel.value = selectedModel;
+          modelSel.innerHTML = '<option value="">Any</option>' + models.map(x=>`<option value="${x}">${x}</option>`).join('');
         }
-        refreshModels();
-        makeSel.addEventListener('change', refreshModels);
-      } else {
-        const STATIC_MAKES = ['Volkswagen','BMW','Audi','Ford','Toyota','Kia'];
-        makeSel.innerHTML = `<option value="">Any</option>` + STATIC_MAKES.map(m=>`<option>${m}</option>`).join('');
+        refresh();
+        makeSel.addEventListener('change', refresh);
       }
     })();
 
-    // Search handling -> results.html
-    const form = document.getElementById('homeSearch');
-    form.addEventListener('submit', (e)=>{
+    // Search -> results
+    buyForm.addEventListener('submit', (e)=>{
       e.preventDefault();
-      const p = new URLSearchParams(new FormData(form));
+      const p = new URLSearchParams(new FormData(buyForm));
       location.href = `results.html?${p.toString()}`;
     });
 
-    // ===== Featured carousel demo =====
+    // Featured (clean, minimalist)
     const featured = [
-      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol',  img:'assets/cars/sportage.jpg' },
-      { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel',  img:'assets/cars/octavia.jpg'  },
-      { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric', img:'assets/cars/leaf.jpg'     },
-      { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',   img:'assets/cars/a180.jpg'     },
-      { id:10, title:'Hyundai Ioniq Hybrid',  price:15800, year:2018, km:62000, fuel:'Hybrid',   img:'assets/cars/ioniq.jpg'    }
+      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol', img:'assets/cars/sportage.jpg' },
+      { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel', img:'assets/cars/octavia.jpg'  },
+      { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric',img:'assets/cars/leaf.jpg'     },
+      { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',  img:'assets/cars/a180.jpg'     },
+      { id:10, title:'Hyundai Ioniq Hybrid',  price:15800, year:2018, km:62000, fuel:'Hybrid',  img:'assets/cars/ioniq.jpg'    }
     ];
     const GBP = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
     const KM  = n => `${(+n||0).toLocaleString('en-GB')} km`;
@@ -262,10 +323,6 @@
             <div class="price">${GBP(c.price)}</div>
             <div class="meta">${c.title}</div>
             <div class="meta">${c.year} • ${KM(c.km)} • ${c.fuel}</div>
-            <div class="badges">
-              <span class="badge">Verified</span>
-              <span class="badge">Instant message</span>
-            </div>
           </div>
         </article>
       `).join('');
@@ -280,14 +337,17 @@
       if (e.key === 'ArrowLeft')  prevBtn.click();
     });
 
-    // Brand strip from taxonomy (fallback to static already in DOM)
-    (function hydrateBrandStrip(){
-      const MD = window.MotoriaData || {};
-      const wrap = document.getElementById('brandStrip');
-      if (!wrap || !MD.getTaxonomy) return;
-      const makes = MD.getTaxonomy().makes.slice(0,6);
-      if (!makes.length) return;
-      wrap.innerHTML = makes.map(m => `<a href="results.html?make=${encodeURIComponent(m.name)}" class="brand-pro-tile">${m.name}</a>`).join('');
+    // Cute rolling stat count (pure cosmetic)
+    (function statCounter(){
+      const el = document.getElementById('statListings');
+      if (!el) return;
+      const target = 2480;
+      let cur = 2110;
+      const t = setInterval(()=>{
+        cur += Math.round(Math.random()*7);
+        if (cur >= target){ cur = target; clearInterval(t); }
+        el.textContent = cur.toLocaleString('en-GB');
+      }, 40);
     })();
   </script>
 </body>
