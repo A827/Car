@@ -28,7 +28,7 @@
           <li><a href="results.html">Buy</a></li>
           <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <!-- Auth buttons are injected by app.js -->
+          <!-- Auth buttons injected by app.js -->
         </ul>
       </nav>
     </div>
@@ -37,22 +37,22 @@
   <!-- Mast -->
   <section class="dash-mast">
     <div class="container mast-grid">
-      <div class="mast-left">
-        <h1 class="mast-title">Dealer dashboard</h1>
-        <p class="muted">Create listings, manage inventory, and respond to buyers.</p>
+      <div>
+        <h1 style="margin:0">Dealer dashboard</h1>
+        <p class="muted" style="margin:6px 0 0">Create listings, manage inventory, and respond to buyer messages.</p>
       </div>
       <div class="mast-kpis">
         <div class="kpi">
           <div class="kpi-num" id="kpiActive">0</div>
-          <div class="kpi-label">Active</div>
+          <div class="muted small">Active</div>
         </div>
         <div class="kpi">
           <div class="kpi-num" id="kpiViews">0</div>
-          <div class="kpi-label">Views</div>
+          <div class="muted small">Views</div>
         </div>
         <div class="kpi">
           <div class="kpi-num" id="kpiLeads">0</div>
-          <div class="kpi-label">Leads</div>
+          <div class="muted small">Leads</div>
         </div>
       </div>
     </div>
@@ -70,16 +70,16 @@
       </div>
 
       <nav class="dash-nav" role="tablist" aria-label="Dashboard sections">
-        <button class="tablink active" data-view="overview"  role="tab" aria-selected="true">Overview</button>
-        <button class="tablink"        data-view="inventory" role="tab" aria-selected="false">Inventory</button>
-        <button class="tablink"        data-view="add"       role="tab" aria-selected="false">Add listing</button>
-        <button class="tablink"        data-view="messages"  role="tab" aria-selected="false">Messages</button>
-        <button class="tablink"        data-view="settings"  role="tab" aria-selected="false">Settings</button>
+        <button class="tablink active" data-view="overview" role="tab" aria-selected="true">Overview</button>
+        <button class="tablink" data-view="inventory" role="tab" aria-selected="false">Inventory</button>
+        <button class="tablink" data-view="add" role="tab" aria-selected="false">Add listing</button>
+        <button class="tablink" data-view="messages" role="tab" aria-selected="false">Messages</button>
+        <button class="tablink" data-view="settings" role="tab" aria-selected="false">Settings</button>
       </nav>
 
       <div class="aside-help">
         <div class="help-title">Tips</div>
-        <ul>
+        <ul class="muted" style="margin:8px 0 0">
           <li>Use clear daylight photos</li>
           <li>Include service history</li>
           <li>Price competitively</li>
@@ -105,7 +105,7 @@
         <div class="card">
           <div class="section-head">
             <h2>Inventory</h2>
-            <div class="row gap8">
+            <div class="row" style="gap:8px">
               <label class="btn btn-ghost">
                 Import CSV
                 <input id="importCsv" type="file" accept=".csv" hidden />
@@ -136,7 +136,7 @@
           <!-- Form -->
           <form id="listingForm" class="card stack" autocomplete="off">
             <header class="form-head">
-              <h2 id="addTitle">Add listing</h2>
+              <h2 id="addTitle" style="margin:0">Add listing</h2>
               <div class="muted small">Fields marked * are required.</div>
             </header>
 
@@ -187,10 +187,10 @@
               </label>
               <label>Photos (URL) *
                 <input name="img" id="imgUrl" placeholder="https://…" required />
-                <div class="muted small">Tip: paste a direct image URL. You can add a gallery later.</div>
+                <div class="muted small">Tip: paste a direct image URL (jpg/png/webp). You can add a gallery later.</div>
               </label>
               <label>Description
-                <textarea name="desc" id="descInp" rows="5" placeholder="Condition, history, spec…"></textarea>
+                <textarea name="desc" id="descInp" rows="5" placeholder="Tell buyers about condition, service history and spec."></textarea>
               </label>
             </fieldset>
 
@@ -214,21 +214,21 @@
             </fieldset>
 
             <input type="hidden" name="id" id="idHidden" />
-            <div class="form-actions">
+            <div class="row" style="gap:8px; align-items:center">
               <button class="btn btn-primary" type="submit">Save listing</button>
               <button class="btn btn-ghost" type="button" id="cancelEdit" hidden>Cancel edit</button>
-              <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
+              <div id="formMsg" class="muted small" role="alert" aria-live="polite"></div>
             </div>
           </form>
 
           <!-- Preview -->
           <aside class="card preview-card">
-            <div class="preview-head">
-              <h2>Preview</h2>
+            <div class="section-head" style="margin-bottom:8px">
+              <h2 style="margin:0">Preview</h2>
               <span class="muted small">Auto‑updates as you type</span>
             </div>
             <article class="preview">
-              <img id="prevImg" class="thumb" alt="">
+              <img id="prevImg" class="thumb" alt="Preview image">
               <div class="info">
                 <div class="title" id="prevTitle">Title appears here</div>
                 <div class="meta" id="prevMeta">Year • Mileage • Fuel • Gearbox</div>
@@ -268,9 +268,9 @@
               <input name="dealerPhone" />
             </label>
           </div>
-          <div class="row">
+          <div class="row" style="gap:8px">
             <button class="btn btn-primary" type="submit">Save</button>
-            <span id="settingsSaved" class="muted" style="margin-left:8px"></span>
+            <span id="settingsSaved" class="muted"></span>
           </div>
         </form>
       </div>

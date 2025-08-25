@@ -1,11 +1,10 @@
-/* Dealer dashboard visuals (refined, tidy add-listing) */
+/* Dealer dashboard visuals (refined) */
 :root{
   --ink:#0e1726;
   --muted:#64748b;
   --line:#e5e7eb;
   --brand:#2160ff;
   --card:#fff;
-  --bg:#f8fafc;
   --shadow:0 14px 36px rgba(2,6,23,.06);
 }
 
@@ -28,18 +27,32 @@
   padding:14px;
 }
 
+/* Mast */
+.dash-mast{
+  background:linear-gradient(180deg,#f8fbff,#f3f7ff00);
+  border-bottom:1px solid #eef2f7;
+  margin-bottom:10px;
+}
+.mast-grid{display:grid; grid-template-columns:1fr auto; gap:14px; align-items:center}
+.mast-kpis{display:flex; gap:12px}
+.kpi{display:grid; gap:2px; place-items:start}
+.kpi-num{font-size:28px; font-weight:900}
+
 /* Sidebar */
 .dash-aside{position:sticky; top:76px; align-self:start}
 .dealer-card{display:flex; gap:10px; align-items:center; margin-bottom:10px}
 .avatar{width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background:#eef2ff}
 .dealer-name{font-weight:800}
 
-.dash-nav{display:grid; gap:8px}
+.dash-nav{display:grid; gap:8px; margin-bottom:12px}
 .dash-nav .tablink{
   height:40px; border-radius:10px; border:1px solid var(--line);
   background:#fff; cursor:pointer; text-align:left; padding:0 12px; font-weight:700;
 }
 .dash-nav .tablink.active{background:#f5f8ff; border-color:#dbe4ff}
+
+.aside-help{border:1px solid var(--line); border-radius:12px; padding:10px; background:#fbfdff}
+.help-title{font-weight:800; margin-bottom:6px}
 
 /* Content panels */
 .dash-content{display:grid; gap:16px}
@@ -47,8 +60,8 @@
 .panel.active{display:block}
 
 /* Grids */
-.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 
 /* Toolbar & tables */
 .toolbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
@@ -62,81 +75,52 @@
   gap:10px; padding:10px; border-bottom:1px solid var(--line);
 }
 .table .row.head{font-weight:800; color:#0b1220; background:#f8fafc; border-top-left-radius:10px; border-top-right-radius:10px}
+.table .row:hover{background:#f9fbff}
 .table .row .actions{display:flex; gap:6px; justify-content:flex-end}
 .col-img{width:64px; height:48px; object-fit:cover; border-radius:8px; background:#eef2ff; border:1px solid var(--line)}
 
 /* Forms – unified look */
 .stack{display:grid; gap:12px}
-.stack .row{display:flex; gap:8px; align-items:center}
-
 label{display:grid; gap:6px; font-weight:600; color:#0b1220}
 .small{font-size:12px}
 .muted{color:var(--muted)}
-
 input, select, textarea{
   height:44px; padding:0 12px; border:1px solid var(--line); border-radius:12px;
   background:#fff; outline:0; font:inherit;
 }
 textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 
-/* Disabled selects (clear state) */
-#panel-add select:disabled{
-  opacity:.75;
-  background:#f8fafc;
-  color:#94a3b8;
-  cursor:not-allowed;
-}
+/* ===== Add Listing layout polish ===== */
 
-/* Buttons */
-.btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer; transition:transform .15s ease}
-.btn-ghost{background:#fff}
-.btn-primary{background:var(--brand); color:#fff; border-color:transparent}
-.btn:hover{transform:translateY(-1px)}
-
-/* KPI */
-.kpi{display:grid; gap:4px; place-items:start}
-.kpi-num{font-size:28px; font-weight:900}
-
-/* ---------- ADD LISTING POLISH ---------- */
-
-/* Two-panels: form + preview (balanced) */
+/* Two-panels: form + preview */
 #panel-add > .grid-2{
-  grid-template-columns: minmax(0, 760px) 400px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 720px) 420px;
+  gap: 20px;
 }
 
-/* Tighter visual rhythm inside the form */
-#panel-add .card{padding:20px}
-#panel-add h2{margin:0 0 8px}
-#panel-add .muted.small{margin-top:-2px}
+/* Grouped sections */
+#panel-add .fieldset{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:#fff;
+}
+#panel-add .fieldset + .fieldset{margin-top:12px}
+#panel-add .fieldset legend{font-weight:800; padding:0 6px}
 
-/* Even inline rows */
-#panel-add .grid-3{grid-template-columns:repeat(3, 1fr); gap:12px}
-
-/* Form controls */
-#panel-add input,
-#panel-add select,
-#panel-add textarea{
-  height:46px;
-  border:1px solid #d1d5db;
-  border-radius:12px;
-  padding:0 12px;
+/* Controls rhythm */
+#panel-add label{font-weight:700; color:#0b1220}
+#panel-add input,#panel-add select,#panel-add textarea{
+  height:46px; border:1px solid #d1d5db; border-radius:12px; padding:0 12px; width:100%;
 }
 #panel-add textarea{min-height:110px; padding:12px}
-#panel-add input::placeholder,
-#panel-add textarea::placeholder{color:#94a3b8}
+#panel-add input::placeholder,#panel-add textarea::placeholder{color:#94a3b8}
 
-/* Preview card (sticky on desktop) */
-#panel-add .grid-2 > .card:last-child{
-  position:sticky; top:86px; align-self:start; min-width:340px;
-}
-
-/* Preview layout */
-.preview{
-  display:grid; grid-template-columns:160px 1fr; gap:14px; align-items:center;
-}
+/* Preview */
+.preview-card{ position:sticky; top:86px; align-self:start; }
+.preview{display:grid; grid-template-columns:200px 1fr; gap:12px; align-items:center}
 .preview .thumb{
-  width:160px; height:120px; object-fit:cover; border-radius:14px;
+  width:200px; height:150px; object-fit:cover; border-radius:12px;
   border:1px solid #e2e8f0; background:#f3f6ff;
 }
 .preview .title{font-weight:800; font-size:16px; margin-bottom:2px}
@@ -160,49 +144,8 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 @media (max-width: 1200px){
   .dash{grid-template-columns:1fr}
   #panel-add > .grid-2{ grid-template-columns: 1fr; }
-  #panel-add .grid-2 > .card:last-child{ position:static; min-width:auto; }
+  .preview-card{ position:static; }
   .grid-3{grid-template-columns:1fr}
   .grid-messages{grid-template-columns:1fr}
   .table .row{grid-template-columns:1.6fr .8fr .5fr .8fr .8fr .5fr 1fr}
-}
-
-/* ====== Masthead & polish (add-on) ====== */
-.dash-mast{
-  background: linear-gradient(180deg,#f7faff, #f3f6ff);
-  border-bottom:1px solid #e9eef6;
-  padding: 18px 0;
-}
-.mast-grid{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  align-items:center;
-  gap:14px;
-}
-.mast-title{ margin:0 }
-.mast-kpis{ display:flex; gap:14px; align-items:center }
-.kpi{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; box-shadow:var(--shadow) }
-.kpi-num{ font-size:22px; font-weight:900 }
-.kpi-label{ font-size:12px; color:var(--muted) }
-
-.aside-help{ margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:12px; background:#fbfdff }
-.aside-help .help-title{ font-weight:800; margin-bottom:6px }
-
-.form-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px }
-.fieldset{ border:1px solid var(--line); border-radius:14px; padding:12px; }
-.fieldset legend{ font-weight:800; padding:0 6px }
-
-.preview-card{ position:sticky; top:86px; align-self:start }
-.preview-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px }
-
-/* Tighter table look */
-.table .row{ background:#fff }
-.table .row:hover{ background:#f9fbff }
-
-/* Tiny gaps utility */
-.row.gap8{ display:flex; gap:8px; align-items:center }
-
-/* Mobile mast stack */
-@media (max-width: 720px){
-  .mast-grid{ grid-template-columns: 1fr }
-  .mast-kpis{ justify-content:flex-start }
 }
