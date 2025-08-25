@@ -93,7 +93,7 @@
         <div id="tableInventory" class="table"></div>
       </div>
 
-      <!-- ADD LISTING (new tidy layout) -->
+      <!-- ADD LISTING -->
       <div id="panel-add" class="panel">
         <div class="grid-2">
           <form id="listingForm" class="card stack">
@@ -102,14 +102,16 @@
               <p class="muted small" style="margin:4px 0 0">Fields marked * are required.</p>
             </div>
 
+            <!-- Make / Model (clean side-by-side fields) -->
             <div class="grid-2">
-              <label>Make *</label>
-              <div class="grid-2">
+              <label>Make *
                 <select name="make" id="makeSel" required></select>
+              </label>
+              <label>Model *
                 <select name="model" id="modelSel" required disabled>
                   <option value="">Model</option>
                 </select>
-              </div>
+              </label>
             </div>
 
             <div class="grid-3">
@@ -177,7 +179,7 @@
             <div id="formMsg" class="form-msg" role="alert" aria-live="polite"></div>
           </form>
 
-          <!-- Live preview -->
+          <!-- Preview -->
           <div class="card">
             <h2 style="margin-top:0">Preview</h2>
             <article class="preview">
