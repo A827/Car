@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Car Detail</title>
+  <title>Motoria • Car details</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="detail.css" />
 </head>
 <body>
   <!-- Header -->
@@ -20,7 +19,7 @@
         </svg>
         <span class="brand-name">Motoria</span>
       </a>
-      <nav class="nav">
+      <nav class="nav" aria-label="Primary">
         <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
           <span></span><span></span><span></span>
         </button>
@@ -29,143 +28,316 @@
           <li><a href="#">Sell</a></li>
           <li><a href="#">Finance</a></li>
           <li><a href="#">Dealers</a></li>
-          <li class="divider"></li>
-          <li><a class="btn btn-ghost" href="auth.html">Sign in</a></li>
-          <li><a class="btn btn-primary" href="#">List your car</a></li>
+          <li class="divider" aria-hidden="true"></li>
+          <li id="authSlot"></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <!-- Breadcrumbs -->
-  <nav class="container crumbs" aria-label="Breadcrumb">
-    <a href="index.html">Home</a> › <a href="results.html">Search</a> › <span id="crumbTitle">Car</span>
+  <!-- Breadcrumb -->
+  <nav class="container" aria-label="Breadcrumb" style="padding:12px 0">
+    <a class="muted" href="index.html">Home</a> /
+    <a class="muted" href="results.html">Results</a> /
+    <span id="crumbTitle" class="muted">Loading…</span>
   </nav>
 
-  <main class="container detail-layout">
-    <!-- Gallery -->
-    <section class="gallery">
-      <div class="hero-img">
-        <img id="heroImg" src="assets/cars/sportage.jpg" alt="Car photo" />
+  <!-- Main content -->
+  <main class="container section" style="padding-top:0">
+    <div class="section-head" style="align-items:flex-start">
+      <div>
+        <h1 id="title" style="margin:0 0 6px">Loading…</h1>
+        <div class="muted" id="specs">—</div>
+        <ul class="badges" style="margin-top:8px">
+          <li class="badge" id="locBadge">—</li>
+          <li class="badge" id="yearBadge">—</li>
+          <li class="badge" id="verifiedBadge" style="display:none">Verified Dealer</li>
+          <li class="badge" id="promotedBadge" style="display:none">Promoted</li>
+        </ul>
       </div>
-      <div class="thumbs" id="thumbs"></div>
+      <div style="text-align:right">
+        <div class="price" id="price" style="font-size:28px">—</div>
+        <div class="row" style="justify-content:flex-end;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost" id="saveBtn" type="button">Save</button>
+          <button class="btn btn-ghost" id="shareBtn" type="button">Share</button>
+          <button class="btn btn-primary" id="printBtn" type="button">Print</button>
+        </div>
+      </div>
+    </div>
 
-      <!-- Similar cars -->
-      <section class="section">
-        <div class="section-head">
-          <h2>Similar cars</h2>
-          <div class="actions">
-            <button class="carousel-btn" id="simPrev" aria-label="Previous">&#10094;</button>
-            <button class="carousel-btn" id="simNext" aria-label="Next">&#10095;</button>
+    <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:18px">
+      <!-- Left: gallery + details -->
+      <section>
+        <!-- Gallery -->
+        <div class="card" style="overflow:hidden">
+          <img id="heroImg" src="" alt="Car photo" class="card-img" style="max-height:460px;object-fit:cover" onerror="this.style.background='#eff3ff';this.removeAttribute('src')" />
+          <div id="thumbs" style="display:grid;grid-auto-flow:column;gap:8px;overflow:auto;padding:10px;background:#fff;border-top:1px solid var(--line)">
+            <!-- thumbs -->
           </div>
         </div>
-        <div class="carousel" id="similar" tabindex="0" aria-label="Similar listings"></div>
+
+        <!-- Key facts -->
+        <div class="card" style="margin-top:12px;padding:12px">
+          <h3 style="margin:0 0 10px">Key facts</h3>
+          <div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div class="muted small">Make</div><div id="makeVal">—</div></div>
+            <div><div class="muted small">Model</div><div id="modelVal">—</div></div>
+            <div><div class="muted small">Year</div><div id="yearVal">—</div></div>
+            <div><div class="muted small">Mileage</div><div id="kmVal">—</div></div>
+            <div><div class="muted small">Fuel</div><div id="fuelVal">—</div></div>
+            <div><div class="muted small">Gearbox</div><div id="boxVal">—</div></div>
+            <div><div class="muted small">Colour</div><div id="colourVal">—</div></div>
+            <div><div class="muted small">Owners</div><div id="ownersVal">—</div></div>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="card" style="margin-top:12px;padding:12px">
+          <h3 style="margin:0 0 10px">Features</h3>
+          <ul id="featureList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding-left:18px">
+            <!-- features -->
+          </ul>
+        </div>
       </section>
-    </section>
 
-    <!-- Sticky summary -->
-    <aside class="summary glass" id="summary">
-      <div class="summary-top">
-        <h1 id="title">Kia Sportage 1.6 T‑GDi</h1>
-        <div class="btn-row">
-          <button class="icon-btn" id="saveBtn" title="Save">♡</button>
-          <button class="icon-btn" id="shareBtn" title="Share">⤴︎</button>
-          <button class="icon-btn" id="printBtn" title="Print">🖨</button>
+      <!-- Right: dealer + finance + contact -->
+      <aside>
+        <div class="card" style="padding:12px">
+          <h3 style="margin:0 0 6px">Seller</h3>
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <strong id="dealerName">—</strong>
+              <div class="muted small" id="dealerStars">—</div>
+            </div>
+            <div id="dealerBadges" class="badges" style="display:flex;gap:6px">
+              <!-- Verified/Promoted duplicates here too -->
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px;margin-top:12px">
+          <h3 style="margin:0 0 8px">Finance estimate</h3>
+          <form id="finForm" class="form-col">
+            <label>Deposit (£)
+              <input type="number" name="deposit" min="0" step="100" placeholder="2000" />
+            </label>
+            <label>APR (%)
+              <input type="number" name="apr" min="0" step="0.1" placeholder="7.9" />
+            </label>
+            <label>Months
+              <input type="number" name="months" min="12" step="12" value="48" />
+            </label>
+            <button class="btn btn-primary" type="submit">Calculate</button>
+          </form>
+          <div class="muted" id="finOut" style="margin-top:8px"></div>
+        </div>
+
+        <div class="card" id="contact" style="padding:12px;margin-top:12px">
+          <h3 style="margin:0 0 8px">Contact seller</h3>
+          <form id="contactForm" class="form-col">
+            <label>Your name
+              <input name="name" placeholder="Name" required />
+            </label>
+            <label>Email
+              <input name="email" type="email" placeholder="you@example.com" required />
+            </label>
+            <label>Message
+              <textarea name="msg" rows="4" placeholder="I’m interested in this car…"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Send</button>
+          </form>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Similar -->
+    <section class="section" style="padding-top:22px">
+      <div class="section-head">
+        <h2>Similar cars</h2>
+        <div class="actions">
+          <button class="carousel-btn" id="simPrev" aria-label="Prev">‹</button>
+          <button class="carousel-btn" id="simNext" aria-label="Next">›</button>
         </div>
       </div>
-
-      <div class="badges-row">
-        <span class="badge badge-verify">Verified</span>
-        <span class="badge" id="locBadge">London</span>
-        <span class="badge" id="yearBadge">2021</span>
+      <div class="carousel" id="similar" tabindex="0" aria-label="Similar cars">
+        <!-- similar cards -->
       </div>
-
-      <div class="price" id="price">£19,900</div>
-      <div class="specs" id="specs">2021 • 29,000 km • Petrol • Manual • London</div>
-
-      <div class="seller glass-min">
-        <div class="seller-top">
-          <div class="seller-name" id="dealerName">City Cars</div>
-          <div class="stars" id="dealerStars" aria-label="Dealer rating">★★★★★</div>
-        </div>
-        <div class="seller-meta muted">Dealer • ID‑verified • Responsive</div>
-      </div>
-
-      <div class="cta-col">
-        <a class="btn btn-primary" href="#contact">Contact seller</a>
-        <a class="btn btn-ghost" href="#finance">Finance options</a>
-      </div>
-
-      <ul class="chip-list" id="featureChips"></ul>
-    </aside>
-
-    <!-- Details + contact + finance -->
-    <section class="glass details">
-      <h2>Vehicle overview</h2>
-      <div class="grid2">
-        <ul class="kv">
-          <li><span>Make</span><strong id="makeVal">Kia</strong></li>
-          <li><span>Model</span><strong id="modelVal">Sportage</strong></li>
-          <li><span>Year</span><strong id="yearVal">2021</strong></li>
-          <li><span>Mileage</span><strong id="kmVal">29,000 km</strong></li>
-        </ul>
-        <ul class="kv">
-          <li><span>Fuel</span><strong id="fuelVal">Petrol</strong></li>
-          <li><span>Gearbox</span><strong id="boxVal">Manual</strong></li>
-          <li><span>Colour</span><strong id="colourVal">White</strong></li>
-          <li><span>Owners</span><strong id="ownersVal">1</strong></li>
-        </ul>
-      </div>
-
-      <h3>Description</h3>
-      <p id="desc">Well‑maintained Sportage with full service history, Apple CarPlay, rear camera and lane assist.</p>
-
-      <h3>Key features</h3>
-      <ul class="pill-list" id="featureList">
-        <li>Apple CarPlay</li><li>Android Auto</li><li>Rear Camera</li><li>Heated Seats</li><li>Lane Assist</li>
-      </ul>
-
-      <h3 id="finance">Finance estimator</h3>
-      <form class="finance" id="finForm">
-        <label>Deposit (£)<input type="number" name="deposit" value="3000" min="0"></label>
-        <label>APR (%)<input type="number" step="0.1" name="apr" value="8.9" min="0"></label>
-        <label>Term (months)<input type="number" name="months" value="48" min="12"></label>
-        <button class="btn btn-ghost" type="submit">Calculate</button>
-        <div class="muted small" id="finOut"></div>
-      </form>
-    </section>
-
-    <section class="glass contact" id="contact">
-      <h2>Contact seller</h2>
-      <form id="contactForm" class="contact-form">
-        <div class="row">
-          <input name="name" placeholder="Your name" required />
-          <input name="email" type="email" placeholder="Email address" required />
-        </div>
-        <textarea name="msg" rows="4" placeholder="Your message (auto-includes the listing link)"></textarea>
-        <button class="btn btn-primary" type="submit">Send message</button>
-      </form>
-      <div class="small muted">By sending a message you agree to our safety and privacy policy.</div>
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
         <div class="brand-footer">
-          <svg class="logo" viewBox="0 0 64 64"><rect x="4" y="20" width="56" height="24" rx="6"/><circle cx="20" cy="48" r="6"/><circle cx="48" cy="48" r="6"/></svg>
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <rect x="4" y="20" width="56" height="24" rx="6"></rect>
+            <circle cx="20" cy="48" r="6"></circle>
+            <circle cx="48" cy="48" r="6"></circle>
+          </svg>
           <span>Motoria</span>
         </div>
         <p class="muted">© <span id="year"></span> Motoria Ltd.</p>
       </div>
-      <nav>
-        <ul class="footer-links">
-          <li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
-        </ul>
-      </nav>
     </div>
   </footer>
 
-  <script src="detail.js"></script>
+  <!-- Core scripts -->
+  <script src="app.js"></script>
+  <script src="data.js"></script>
+
+  <!-- Page controller -->
+  <script>
+  // Header/footer basics
+  const header = document.getElementById('siteHeader');
+  addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+  document.getElementById('year') && (document.getElementById('year').textContent = new Date().getFullYear());
+  const navToggle=document.getElementById('navToggle');
+  const navMenu=document.getElementById('navMenu');
+  navToggle?.addEventListener('click',()=>{
+    const exp = navToggle.getAttribute('aria-expanded')==='true';
+    navToggle.setAttribute('aria-expanded', String(!exp));
+    navMenu.classList.toggle('open');
+  });
+
+  // Helpers
+  const MD = window.MotoriaData;
+  const GBP = MD.GBP, KM = MD.KM;
+  function stars(r){ const full=Math.round(r||0); return '★'.repeat(full)+'☆'.repeat(5-full) }
+
+  // Get car by id (from query), fallback to first car if missing
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  let CAR = id ? MD.getCarById(id) : null;
+  if (!CAR) {
+    const all = MD.getCars();
+    CAR = all[0] || {
+      id: 9, title: 'Kia Sportage 1.6 T‑GDi', price: 19900, year: 2021, km: 29000,
+      fuel: 'Petrol', gearbox: 'Manual', colour: 'White', owners: 1, loc: 'London',
+      dealer: 'City Cars', rating: 4.6, dealerEmail: '',
+      features: ['Apple CarPlay','Android Auto','Rear Camera','Heated Seats','Lane Assist','Bluetooth','Cruise Control'],
+      images: ['assets/cars/sportage.jpg','assets/cars/octavia.jpg','assets/cars/leaf.jpg','assets/cars/a180.jpg','assets/cars/ioniq.jpg']
+    };
+  }
+
+  // Ensure optional fields exist
+  CAR.features = Array.isArray(CAR.features) && CAR.features.length ? CAR.features : ['Bluetooth','Cruise Control','Air Conditioning','Alloy Wheels'];
+  CAR.images = Array.isArray(CAR.images) && CAR.images.length ? CAR.images : [CAR.img].filter(Boolean);
+
+  // Derive make/model from title if not provided
+  const [mk, mdl] = (CAR.title||'').split(' ');
+  const MAKE = CAR.make || mk || '—';
+  const MODEL = CAR.model || (mdl ? mdl.replace(/[^a-z0-9\-]/ig,'') : '—');
+
+  // Annotate with dealer flags using CMS dealers
+  const annotated = MD.annotateCars([CAR])[0] || CAR;
+  const dealerVerified = !!annotated.dealerVerified;
+  const dealerPromoted = !!annotated.dealerPromoted;
+
+  // Populate UI
+  document.getElementById('crumbTitle').textContent = CAR.title || 'Car';
+  document.getElementById('title').textContent = CAR.title || 'Car';
+  document.getElementById('price').textContent = GBP(+CAR.price||0);
+  document.getElementById('specs').textContent = `${CAR.year||''} • ${KM(+CAR.km||0)} • ${CAR.fuel||''} • ${CAR.gearbox||''} • ${CAR.loc||''}`;
+  document.getElementById('locBadge').textContent = CAR.loc || '—';
+  document.getElementById('yearBadge').textContent = CAR.year || '—';
+
+  const vBadge = document.getElementById('verifiedBadge');
+  const pBadge = document.getElementById('promotedBadge');
+  vBadge.style.display = dealerVerified ? '' : 'none';
+  pBadge.style.display = dealerPromoted ? '' : 'none';
+
+  document.getElementById('dealerName').textContent = CAR.dealer || 'Seller';
+  document.getElementById('dealerStars').textContent = stars(CAR.rating||4);
+
+  // Also show small badges in the sidebar
+  const dealerBadges = document.getElementById('dealerBadges');
+  dealerBadges.innerHTML = `
+    ${dealerPromoted ? '<span class="badge">Promoted</span>' : ''}
+    ${dealerVerified ? '<span class="badge">Verified</span>' : ''}
+  `;
+
+  // KV values
+  document.getElementById('makeVal').textContent = MAKE;
+  document.getElementById('modelVal').textContent = MODEL;
+  document.getElementById('yearVal').textContent = CAR.year || '—';
+  document.getElementById('kmVal').textContent = KM(+CAR.km||0);
+  document.getElementById('fuelVal').textContent = CAR.fuel || '—';
+  document.getElementById('boxVal').textContent = CAR.gearbox || '—';
+  document.getElementById('colourVal').textContent = CAR.colour || '—';
+  document.getElementById('ownersVal').textContent = (CAR.owners==null?'—':CAR.owners);
+
+  // Features
+  const featuresEl = document.getElementById('featureList');
+  featuresEl.innerHTML = CAR.features.map(f=>`<li>${f}</li>`).join('');
+
+  // Gallery
+  const heroImg = document.getElementById('heroImg');
+  const thumbs = document.getElementById('thumbs');
+  const imgs = (CAR.images && CAR.images.length) ? CAR.images : [CAR.img].filter(Boolean);
+  if (imgs.length) heroImg.src = imgs[0];
+  thumbs.innerHTML = imgs.map(src=>`<img src="${src}" alt="Photo thumbnail" style="height:72px;border-radius:8px;cursor:pointer" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">`).join('');
+  thumbs.addEventListener('click', e=>{
+    const t = e.target.closest('img'); if(!t) return;
+    heroImg.src = t.src;
+  });
+
+  // Similar cars — pick from same make if possible
+  function similarCars(){
+    const all = MD.annotateCars(MD.getCars());
+    const sameMake = all.filter(x=>{
+      const first = (x.title||'').split(' ')[0];
+      return String(first).toLowerCase() === String(MAKE).toLowerCase() && +x.id !== +CAR.id;
+    });
+    const pool = sameMake.length ? sameMake : all.filter(x => +x.id !== +CAR.id);
+    return pool.slice(0,8);
+  }
+  const SIM = similarCars();
+  const simEl = document.getElementById('similar');
+  simEl.innerHTML = SIM.map(s=>`
+    <article class="card">
+      <img class="card-img" src="${s.img||s.images?.[0]||''}" alt="${s.title}" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+      <div class="card-body">
+        <div class="price">${GBP(+s.price||0)}</div>
+        <div class="meta">${s.title||''}</div>
+        <div class="badges">
+          ${s.dealerPromoted ? `<span class="badge">Promoted</span>` : ``}
+          ${s.dealerVerified ? `<span class="badge">Verified</span>` : ``}
+        </div>
+        <a class="btn btn-ghost" href="detail.html?id=${s.id}">View</a>
+      </div>
+    </article>
+  `).join('');
+  document.getElementById('simPrev').onclick=()=>simEl.scrollBy({left:-360,behavior:'smooth'});
+  document.getElementById('simNext').onclick=()=>simEl.scrollBy({left: 360,behavior:'smooth'});
+
+  // Finance estimator
+  document.getElementById('finForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const deposit = +fd.get('deposit')||0;
+    const apr = (+fd.get('apr')||0)/100/12;
+    const months = +fd.get('months')||48;
+    const principal = Math.max(0, (+CAR.price||0) - deposit);
+    const m = apr>0 ? (principal * (apr * Math.pow(1+apr, months))) / (Math.pow(1+apr, months) - 1) : (months ? principal / months : 0);
+    document.getElementById('finOut').textContent = `Approx. monthly £${Math.round(m).toLocaleString('en-GB')} for ${months} months (est.).`;
+  });
+
+  // Actions
+  document.getElementById('contactForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    alert('Message sent to seller. (Demo)');
+  });
+  document.getElementById('saveBtn').addEventListener('click', ()=>{
+    MD.saveCar(CAR);
+    alert('Saved! (local demo)');
+  });
+  document.getElementById('shareBtn').addEventListener('click', ()=>{
+    const url = location.href;
+    if (navigator.share) navigator.share({title:CAR.title, url}).catch(()=>{});
+    else { navigator.clipboard?.writeText(url); alert('Link copied!'); }
+  });
+  document.getElementById('printBtn').addEventListener('click', ()=>print());
+  </script>
 </body>
 </html>
