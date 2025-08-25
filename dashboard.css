@@ -78,6 +78,14 @@ input, select, textarea{
 }
 textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 
+/* Disabled selects look clear */
+#panel-add select:disabled{
+  opacity:.7;
+  background:#f8fafc;
+  color:#94a3b8;
+  cursor:not-allowed;
+}
+
 /* Buttons */
 .btn{display:inline-flex; align-items:center; justify-content:center; height:42px; padding:0 16px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer}
 .btn-ghost{background:#fff}
@@ -88,18 +96,18 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 .kpi{display:grid; gap:4px; place-items:start}
 .kpi-num{font-size:28px; font-weight:900}
 
-/* ---- ADD LISTING POLISH ---- */
+/* ---- ADD LISTING ---- */
 
 /* Two-panels: form + preview (balanced) */
 #panel-add > .grid-2{
-  grid-template-columns: minmax(0, 760px) 380px;
+  grid-template-columns: minmax(0, 760px) 420px;
   gap: 24px;
 }
 
-/* Make/Model are standard fields */
+/* Full-width selects inside label */
 #panel-add .grid-2 > label select{ width:100%; }
 
-/* Inline rows look even */
+/* Even inline rows */
 #panel-add .grid-3{grid-template-columns:repeat(3, 1fr); gap:12px}
 
 /* Controls rhythm */
@@ -119,7 +127,7 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 #panel-add input::placeholder,
 #panel-add textarea::placeholder{color:#94a3b8}
 
-/* Preview: sticky + larger image */
+/* Preview card */
 #panel-add .grid-2 > .card:last-child{
   position:sticky; top:86px; align-self:start; min-width:360px;
 }
@@ -141,7 +149,7 @@ textarea{height:auto; min-height:96px; padding:10px 12px; resize:vertical}
 .msg{margin:10px 0}
 .msg .text{padding:10px 12px; border-radius:12px; background:#f1f5ff; display:inline-block}
 .msg.me .text{background:#e7f0ff}
-.msg .meta{font-size:12px; color: var(--muted); margin-top:4px} /* <-- fixed */
+.msg .meta{font-size:12px; color: var(--muted); margin-top:4px}
 .msg-form{display:flex; gap:8px; margin-top:8px}
 .msg-form input{flex:1}
 
