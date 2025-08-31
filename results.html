@@ -174,24 +174,17 @@
     navMenu.classList.toggle('open');
   });
 
-  /* ===== Shorthands ===== */
+  /* ===== Shorthands / data API ===== */
   const qs  = (s,el=document)=>el.querySelector(s);
   const qsa = (s,el=document)=>Array.from(el.querySelectorAll(s));
   const GBP = window.MotoriaData.GBP;
   const KM  = window.MotoriaData.KM;
-  const getCars = window.MotoriaData.getCars;
-  let annotateCars = window.MotoriaData.annotateCars;
 
-  // Fallback: if MotoriaData.annotateCars isn't provided, create a harmless one
-  if (typeof annotateCars !== 'function') {
-    annotateCars = function(arr){
-      return (arr||[]).map(c=>Object.assign({
-        dealerVerified: !!c.dealerVerified,
-        dealerPromoted: !!c.dealerPromoted,
-        ts: c.ts || 0
-      }, c));
-    };
-  }
+  // Prefer pre-annotated cars if available
+  const getCarsAnnotated = window.MotoriaData.getCarsAnnotated
+    || (() => (window.MotoriaData.annotateCars
+          ? window.MotoriaData.annotateCars(window.MotoriaData.getCars())
+          : window.MotoriaData.getCars()));
 
   /* ===== DOM refs ===== */
   const cardsEl      = qs('#cards');
@@ -206,8 +199,6 @@
 
   const PAGE_SIZE = 6;
   let state = { page:1, sort:'relevance', view:'list' };
-
-  function stars(r){ const full=Math.round(r||0); return '★'.repeat(full)+'☆'.repeat(5-full) }
 
   function readParams(){
     const p = new URLSearchParams(location.search);
@@ -237,7 +228,6 @@
     if (p.get('km_max')) chips.push(['km_max', `≤ ${(+p.get('km_max')).toLocaleString('en-GB')} km`]);
     p.getAll('fuel').forEach(v=>chips.push(['fuel', v]));
     p.getAll('gearbox').forEach(v=>chips.push(['gearbox', v]));
-    // dealer filters (if any)
     if (p.get('dealer_email')) chips.push(['dealer_email', p.get('dealer_email')]);
     if (p.get('dealer')) chips.push(['dealer', p.get('dealer')]);
 
@@ -258,7 +248,7 @@
 
   function baseFiltered(){
     const p = new URLSearchParams(location.search);
-    let data = annotateCars(getCars());
+    let data = getCarsAnnotated();
 
     const q = (p.get('q')||'').toLowerCase();
     const loc = (p.get('loc')||'').toLowerCase();
@@ -311,6 +301,35 @@
     return data;
   }
 
+  function injectResultsJsonLd(slice){
+    try {
+      // remove old
+      document.querySelectorAll('script[data-jsonld="vehicles"]').forEach(n=>n.remove());
+      const items = slice.map(c => ({
+        "@context":"https://schema.org",
+        "@type":"Vehicle",
+        "name": c.title,
+        "brand": String(c.make||''),
+        "model": String(c.model||''),
+        "vehicleModelDate": String(c.year||''),
+        "mileageFromOdometer": { "@type":"QuantitativeValue", "value": +c.km||0, "unitCode": "KMT" },
+        "image": new URL(c.img, location.href).toString(),
+        "offers": {
+          "@type":"Offer",
+          "price": String(c.price||''),
+          "priceCurrency":"GBP",
+          "availability":"https://schema.org/InStock",
+          "url": new URL(`detail.html?id=${c.id}`, location.href).toString()
+        }
+      }));
+      const s = document.createElement('script');
+      s.type = 'application/ld+json';
+      s.dataset.jsonld = 'vehicles';
+      s.textContent = JSON.stringify(items);
+      document.head.appendChild(s);
+    } catch(e){}
+  }
+
   function render(){
     const data = baseFiltered();
     const pages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
@@ -318,9 +337,14 @@
     const start = (state.page-1)*PAGE_SIZE;
     const slice = data.slice(start, start+PAGE_SIZE);
 
-    cardsEl.innerHTML = slice.map(c=>`
+    // Update title with count
+    document.title = `Motoria • ${data.length} results`;
+
+    cardsEl.innerHTML = slice.length ? slice.map(c=>`
       <article class="card${c.dealerVerified?' verified':''}${c.dealerPromoted?' promoted':''}">
-        <img class="thumb" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
+        <img class="thumb" loading="lazy" width="400" height="300"
+             src="${c.img}" alt="${c.title}"
+             onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
         <div class="info">
           <div>
             <h3 class="title">
@@ -347,12 +371,15 @@
           </div>
         </div>
       </article>
-    `).join('');
+    `).join('') : `<div class="card" style="padding:16px">No results. Try changing filters.</div>`;
 
     resultCount.textContent = `${data.length} cars found`;
     pageInfo.textContent = `Page ${state.page} of ${pages}`;
     prevPage.disabled = state.page <= 1;
     nextPage.disabled = state.page >= pages;
+
+    // JSON-LD for current page slice
+    injectResultsJsonLd(slice);
   }
   render();
 

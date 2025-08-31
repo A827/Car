@@ -75,12 +75,18 @@
             <li id="yearBadge"  class="badge">—</li>
           </ul>
         </div>
+
+        <!-- Quick contact CTAs -->
+        <div class="row" style="gap:8px;margin-top:8px">
+          <a id="waCta" class="btn btn-primary" target="_blank" rel="noopener">WhatsApp</a>
+          <a id="callCta" class="btn">Call</a>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- CONTENT -->
-  <main class="container details-grid">
+  <main class="container details-grid" id="content">
     <!-- Left -->
     <section class="stack">
       <div class="card">
@@ -199,92 +205,155 @@
 
   // Load car from URL
   const id = new URLSearchParams(location.search).get('id');
-  let CAR = window.MotoriaData?.getCarById?.(id) || {
-    id: 9, title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000,
-    fuel:'Petrol', gearbox:'Manual', colour:'White', owners:1, loc:'London',
-    dealer:'City Cars', rating:4.6, dealerVerified:true,
-    desc:'Well maintained, full service history. Great family SUV with excellent spec.',
-    images:['assets/cars/sportage.jpg','assets/cars/octavia.jpg','assets/cars/leaf.jpg','assets/cars/a180.jpg','assets/cars/ioniq.jpg'],
-    features:['Apple CarPlay','Android Auto','Rear Camera','Heated Seats','Lane Assist','Bluetooth','Cruise Control']
-  };
+  let CAR = window.MotoriaData?.getCarById?.(id) || null;
 
-  // Populate hero + meta
-  qs('#crumbTitle').textContent = CAR.title || 'Car';
-  qs('#title').textContent = CAR.title || 'Car';
-  qs('#price').textContent = GBP(+CAR.price||0);
-  qs('#specs').textContent = [CAR.year ? CAR.year : null, CAR.km!=null ? KM(+CAR.km||0) : null, CAR.fuel, CAR.gearbox, CAR.loc].filter(Boolean).join(' • ');
+  // If not found, show graceful empty state
+  if (!CAR){
+    document.title = 'Listing not found • Motoria';
+    qs('#content').innerHTML = `
+      <div class="card" style="padding:16px">
+        <h2>Listing not found</h2>
+        <p class="muted">This vehicle may have been sold or the link is incorrect.</p>
+        <p><a class="btn btn-primary" href="results.html">Back to results</a></p>
+      </div>`;
+  } else {
+    // Page title + breadcrumb
+    document.title = `${CAR.title} • Motoria`;
+    qs('#crumbTitle').textContent = CAR.title || 'Car';
+    qs('#title').textContent = CAR.title || 'Car';
 
-  qs('#dealerName').textContent = CAR.dealer || 'Seller';
-  const r = Math.round(CAR.rating||0); qs('#dealerStars').textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
-  qs('#locBadge').textContent = CAR.loc || '—';
-  qs('#yearBadge').textContent = CAR.year || '—';
+    // Price/spec strip
+    qs('#price').textContent = GBP(+CAR.price||0);
+    qs('#specs').textContent = [CAR.year ? CAR.year : null, CAR.km!=null ? KM(+CAR.km||0) : null, CAR.fuel, CAR.gearbox, CAR.loc].filter(Boolean).join(' • ');
 
-  // KV values (basic inference from title remains as-is)
-  qs('#makeVal').textContent   = (CAR.title||'').split(' ')[0] || '—';
-  qs('#modelVal').textContent  = (CAR.title||'').split(' ').slice(1,3).join(' ') || '—';
-  qs('#yearVal').textContent   = CAR.year || '—';
-  qs('#kmVal').textContent     = CAR.km!=null ? KM(+CAR.km||0) : '—';
-  qs('#fuelVal').textContent   = CAR.fuel || '—';
-  qs('#boxVal').textContent    = CAR.gearbox || '—';
-  qs('#colourVal').textContent = CAR.colour || '—';
-  qs('#ownersVal').textContent = CAR.owners!=null ? CAR.owners : '—';
-  qs('#descText').textContent  = CAR.desc || qs('#descText').textContent;
+    // Seller/meta
+    qs('#dealerName').textContent = CAR.dealer || 'Seller';
+    const r = Math.round(CAR.rating||0); qs('#dealerStars').textContent = '★'.repeat(r) + '☆'.repeat(5 - r);
+    qs('#locBadge').textContent = CAR.loc || '—';
+    qs('#yearBadge').textContent = CAR.year || '—';
 
-  // Features
-  const featEl = qs('#featureList');
-  featEl.innerHTML = (CAR.features||[]).map(f=>`<li>${f}</li>`).join('');
+    // KV values
+    const makeGuess = (CAR.make || (CAR.title||'').split(' ')[0] || '');
+    const modelGuess= (CAR.model|| (CAR.title||'').split(' ').slice(1,3).join(' ') || '');
+    qs('#makeVal').textContent   = makeGuess || '—';
+    qs('#modelVal').textContent  = modelGuess || '—';
+    qs('#yearVal').textContent   = CAR.year || '—';
+    qs('#kmVal').textContent     = CAR.km!=null ? KM(+CAR.km||0) : '—';
+    qs('#fuelVal').textContent   = CAR.fuel || '—';
+    qs('#boxVal').textContent    = CAR.gearbox || '—';
+    qs('#colourVal').textContent = CAR.colour || '—';
+    qs('#ownersVal').textContent = CAR.owners!=null ? CAR.owners : '—';
+    qs('#descText').textContent  = CAR.desc || qs('#descText').textContent;
 
-  // Gallery
-  const heroImg = qs('#heroImg');
-  const thumbs = qs('#thumbs');
-  const imgs = (CAR.images && CAR.images.length ? CAR.images : [CAR.img]).filter(Boolean);
-  heroImg.src = imgs[0] || 'assets/cars/sportage.jpg';
-  heroImg.onerror = ()=>{ heroImg.removeAttribute('src'); heroImg.style.background='#eff3ff'; heroImg.alt='Photo unavailable'; };
-  thumbs.innerHTML = imgs.map((src,i)=>`<button class="thumb ${i===0?'active':''}" type="button" aria-label="Photo ${i+1}"><img src="${src}" alt="Thumbnail ${i+1}" /></button>`).join('');
-  thumbs.addEventListener('click', e=>{
-    const b = e.target.closest('.thumb'); if(!b) return;
-    thumbs.querySelectorAll('.thumb').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active'); heroImg.src = b.querySelector('img').src;
-  });
+    // Gallery
+    const heroImg = qs('#heroImg');
+    const thumbs = qs('#thumbs');
+    const imgs = (CAR.images && CAR.images.length ? CAR.images : [CAR.img]).filter(Boolean);
+    const Fallback = 'assets/cars/sportage.jpg';
+    heroImg.loading = 'lazy'; heroImg.width = 1200; heroImg.height = 675;
+    heroImg.src = imgs[0] || Fallback;
+    heroImg.onerror = ()=>{ heroImg.removeAttribute('src'); heroImg.style.background='#eff3ff'; heroImg.alt='Photo unavailable'; };
+    thumbs.innerHTML = imgs.map((src,i)=>`
+      <button class="thumb ${i===0?'active':''}" type="button" aria-label="Photo ${i+1}">
+        <img loading="lazy" width="200" height="140" src="${src}" alt="Thumbnail ${i+1}" />
+      </button>`).join('');
+    thumbs.addEventListener('click', e=>{
+      const b = e.target.closest('.thumb'); if(!b) return;
+      thumbs.querySelectorAll('.thumb').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); heroImg.src = b.querySelector('img').src;
+    });
+    // Keyboard gallery
+    addEventListener('keydown', (e)=>{
+      const items = Array.from(thumbs.querySelectorAll('.thumb'));
+      if(!items.length) return;
+      const idx = items.findIndex(x=>x.classList.contains('active'));
+      if(e.key === 'ArrowRight'){ items[(idx+1)%items.length].click(); }
+      if(e.key === 'ArrowLeft'){  items[(idx-1+items.length)%items.length].click(); }
+    });
 
-  // Finance estimator
-  qs('#finForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const deposit = +fd.get('deposit')||0;
-    const apr = (+fd.get('apr')||0)/100/12;
-    const months = +fd.get('months')||48;
-    const principal = Math.max(0, (+CAR.price||0) - deposit);
-    const m = apr>0 ? (principal * (apr * Math.pow(1+apr, months))) / (Math.pow(1+apr, months) - 1) : (months? principal / months : 0);
-    qs('#finOut').textContent = `Approx. £${Math.round(m).toLocaleString('en-GB')} / month for ${months} months.`;
-  });
+    // Finance estimator
+    qs('#finForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const fd = new FormData(e.currentTarget);
+      const deposit = +fd.get('deposit')||0;
+      const apr = (+fd.get('apr')||0)/100/12;
+      const months = +fd.get('months')||48;
+      const principal = Math.max(0, (+CAR.price||0) - deposit);
+      const m = apr>0 ? (principal * (apr * Math.pow(1+apr, months))) / (Math.pow(1+apr, months) - 1) : (months? principal / months : 0);
+      qs('#finOut').textContent = `Approx. £${Math.round(m).toLocaleString('en-GB')} / month for ${months} months.`;
+    });
 
-  // Actions
-  qs('#contactForm').addEventListener('submit', e=>{ e.preventDefault(); alert('Message sent to seller. (Demo)'); });
-  qs('#saveBtn').addEventListener('click', ()=>{ window.MotoriaData?.saveCar?.(CAR); alert('Saved!'); });
-  qs('#shareBtn').addEventListener('click', ()=>{ navigator.clipboard?.writeText(location.href); alert('Link copied'); });
-  qs('#printBtn').addEventListener('click', ()=>print());
+    // Actions
+    qs('#contactForm').addEventListener('submit', e=>{ e.preventDefault(); alert('Message sent to seller. (Demo)'); });
+    qs('#saveBtn').addEventListener('click', ()=>{ window.MotoriaData?.saveCar?.(CAR); alert('Saved!'); });
+    qs('#shareBtn').addEventListener('click', ()=>{ navigator.clipboard?.writeText(location.href); alert('Link copied'); });
+    qs('#printBtn').addEventListener('click', ()=>print());
 
-  // Similar cars (quick demo using MotoriaData)
-  (function renderSimilar(){
-    const all = (window.MotoriaData?.getCars?.()||[]).filter(x=>+x.id !== +CAR.id);
-    const pick = all.slice(0,8);
-    const el = qs('#similar');
-    const GBPf = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
-    el.innerHTML = pick.map(s=>`
-      <article class="card">
-        <a href="detail.html?id=${s.id}">
-          <img class="card-img" src="${s.img||''}" alt="${s.title||'Car'}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')">
-        </a>
-        <div class="card-body">
-          <div class="price">${GBPf(s.price)}</div>
-          <div class="meta">${s.title||''}</div>
-        </div>
-      </article>
-    `).join('');
-    qs('#simPrev').onclick=()=>el.scrollBy({left:-360,behavior:'smooth'});
-    qs('#simNext').onclick=()=>el.scrollBy({left: 360,behavior:'smooth'});
-  })();
+    // Quick contact links (replace numbers!)
+    const phone = CAR.phone || '+90533XXXXXXX';
+    const waMsg = encodeURIComponent(`Interested in ${CAR.title}`);
+    qs('#waCta').href   = `https://wa.me/${phone.replace(/\D/g,'')}?text=${waMsg}`;
+    qs('#callCta').href = `tel:${phone}`;
+
+    // Features
+    const featEl = qs('#featureList');
+    featEl.innerHTML = (CAR.features||[]).map(f=>`<li>${f}</li>`).join('');
+
+    // Similar cars (use helper)
+    (function renderSimilar(){
+      const pick = (window.MotoriaData?.getSimilarCars?.(CAR, 8)) || [];
+      const el = qs('#similar');
+      const GBPf = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
+      el.innerHTML = pick.map(s=>`
+        <article class="card">
+          <a href="detail.html?id=${s.id}">
+            <img class="card-img" loading="lazy" width="400" height="300"
+                 src="${s.img||''}" alt="${s.title||'Car'}"
+                 onerror="this.style.background='#eff3ff'; this.removeAttribute('src')">
+          </a>
+          <div class="card-body">
+            <div class="price">${GBPf(s.price)}</div>
+            <div class="meta">${s.title||''}</div>
+          </div>
+        </article>
+      `).join('');
+      qs('#simPrev').onclick=()=>el.scrollBy({left:-360,behavior:'smooth'});
+      qs('#simNext').onclick=()=>el.scrollBy({left: 360,behavior:'smooth'});
+    })();
+
+    // ---- Vehicle JSON-LD (SEO) ----
+    (function injectVehicleJsonLd(){
+      try {
+        const v = {
+          "@context":"https://schema.org",
+          "@type":"Vehicle",
+          "name": CAR.title,
+          "brand": CAR.make || (CAR.title||'').split(' ')[0] || "",
+          "model": CAR.model || (CAR.title||'').split(' ').slice(1,3).join(' ') || "",
+          "vehicleModelDate": String(CAR.year||''),
+          "mileageFromOdometer": { "@type":"QuantitativeValue", "value": +CAR.km||0, "unitCode": "KMT" },
+          "color": CAR.colour || "",
+          "image": (CAR.images && CAR.images[0]) ? new URL(CAR.images[0], location.href).toString() : (CAR.img ? new URL(CAR.img, location.href).toString() : ""),
+          "offers": {
+            "@type":"Offer",
+            "price": String(CAR.price||''),
+            "priceCurrency":"GBP",
+            "availability":"https://schema.org/InStock",
+            "url": location.href
+          },
+          "seller": {
+            "@type":"Organization",
+            "name": CAR.dealer || "Seller",
+            "url": location.origin + "/dealers.html"
+          }
+        };
+        const s = document.createElement('script');
+        s.type = 'application/ld+json';
+        s.textContent = JSON.stringify(v);
+        document.head.appendChild(s);
+      } catch(e){}
+    })();
+  }
   </script>
 </body>
 </html>

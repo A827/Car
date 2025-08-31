@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Motoria • Dealers</title>
+  <title>Motoria • Dealer dashboard</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dealer.css" />
 </head>
 <body>
   <!-- Header -->
@@ -35,22 +36,106 @@
     </div>
   </header>
 
-  <main class="section">
-    <div class="container">
-      <div class="section-head">
-        <h1 style="margin:0">Verified dealers</h1>
-        <div class="row" style="gap:8px">
-          <input id="dealerSearch" placeholder="Search dealers or city…" style="height:42px;border-radius:999px;border:1px solid var(--line);padding:0 12px;min-width:240px" />
-          <select id="dealerFilter" style="height:42px;border-radius:999px;border:1px solid var(--line);padding:0 12px">
-            <option value="">All dealers</option>
-            <option value="promoted">Promoted only</option>
-            <option value="verified">Verified only</option>
-          </select>
+  <main class="container dealer">
+    <!-- Left: nav -->
+    <aside class="dealer-nav">
+      <div class="dealer-head">
+        <div class="avatar" id="dlrAvatar">D</div>
+        <div>
+          <div id="dlrName" style="font-weight:800">Dealer</div>
+          <div id="dlrCity" class="muted small">—</div>
+        </div>
+      </div>
+      <button class="tablink active" data-tab="overview">Overview</button>
+      <button class="tablink" data-tab="inventory">Inventory</button>
+      <button class="tablink" data-tab="messages">Messages</button>
+      <button class="tablink" data-tab="settings">Settings</button>
+    </aside>
+
+    <!-- Right: main -->
+    <section class="dealer-main" id="tabContent">
+      <!-- Overview -->
+      <div class="panel" data-panel="overview">
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Active listings</div>
+            <div class="val" id="kpiListings">0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Average price</div>
+            <div class="val" id="kpiAvgPrice">£0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Status</div>
+            <div class="val">
+              <span id="kpiBadges">
+                <span class="badge badge-verified" style="display:none">Verified</span>
+                <span class="badge badge-promoted" style="display:none">Promoted</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-head">
+            <h2 style="margin:0">Recent inventory</h2>
+            <div class="row">
+              <a class="btn btn-ghost" id="viewAllBtn">View all</a>
+            </div>
+          </div>
+          <div class="table-inventory" id="recentTable"></div>
         </div>
       </div>
 
-      <div id="grid" class="cards" style="grid-template-columns:repeat(3,1fr);gap:16px"></div>
-    </div>
+      <!-- Inventory -->
+      <div class="panel" data-panel="inventory" hidden>
+        <div class="block-head">
+          <h2 style="margin:0">Inventory</h2>
+          <div class="row">
+            <input id="invSearch" class="filter" placeholder="Search title, fuel…" />
+            <select id="invFuel" class="filter">
+              <option value="">Fuel: Any</option>
+              <option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+            </select>
+            <select id="invBox" class="filter">
+              <option value="">Gearbox: Any</option>
+              <option>Manual</option><option>Automatic</option>
+            </select>
+            <a class="btn btn-primary" href="dealers.html">Dealer directory</a>
+          </div>
+        </div>
+        <div class="table-inventory" id="invTable"></div>
+      </div>
+
+      <!-- Messages (demo UI) -->
+      <div class="panel" data-panel="messages" hidden>
+        <div class="messages">
+          <div class="threads" id="threads"></div>
+          <div class="thread-view">
+            <div class="muted small" id="threadHeader">Select a conversation</div>
+            <div class="thread" id="thread"></div>
+            <form class="msg-form" id="msgForm">
+              <input id="msgInput" placeholder="Type a message…" />
+              <button class="btn btn-primary" type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings (basic) -->
+      <div class="panel" data-panel="settings" hidden>
+        <h2 style="margin:0 0 8px">Dealer settings</h2>
+        <form class="settings-form" id="setForm">
+          <input id="setCompany" placeholder="Company name" />
+          <input id="setCity" placeholder="City" />
+          <input id="setEmail" placeholder="Public email" />
+          <div class="row">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-ghost" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -69,71 +154,197 @@
     </div>
   </footer>
 
+  <!-- Core -->
   <script src="app.js"></script>
   <script src="data.js"></script>
+
+  <!-- Page controller -->
   <script>
-    // Header basics
-    const header = document.getElementById('siteHeader');
-    addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
-    const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
-    const navToggle=document.getElementById('navToggle');
-    const navMenu=document.getElementById('navMenu');
-    navToggle?.addEventListener('click',()=>{
-      const exp = navToggle.getAttribute('aria-expanded')==='true';
-      navToggle.setAttribute('aria-expanded', String(!exp));
-      navMenu.classList.toggle('open');
+  // Header basics
+  const header = document.getElementById('siteHeader');
+  addEventListener('scroll',()=>header.classList.toggle('elevated', scrollY>6));
+  const y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+  const navToggle=document.getElementById('navToggle');
+  const navMenu=document.getElementById('navMenu');
+  navToggle?.addEventListener('click',()=>{
+    const exp = navToggle.getAttribute('aria-expanded')==='true';
+    navToggle.setAttribute('aria-expanded', String(!exp));
+    navMenu.classList.toggle('open');
+  });
+
+  // Data API
+  const MD = window.MotoriaData || {};
+  const GBP = MD.GBP || (n=>`£${(+n||0).toLocaleString('en-GB')}`);
+  const KM  = MD.KM  || (n=>`${(+n||0).toLocaleString('en-GB')} km`);
+
+  // Pick dealer by ?email= or first one
+  const params = new URLSearchParams(location.search);
+  const emailParam = (params.get('email')||'').toLowerCase();
+  const dealers = (MD.getDealers?.() || []);
+  let DEALER = dealers.find(d => String(d.email||'').toLowerCase()===emailParam) || dealers[0] || {company:'Dealer',city:'',email:''};
+
+  // UI header
+  document.getElementById('dlrName').textContent = DEALER.company || DEALER.name || 'Dealer';
+  document.getElementById('dlrCity').textContent = [DEALER.city, DEALER.country].filter(Boolean).join(', ');
+  document.getElementById('dlrAvatar').textContent = (DEALER.company||DEALER.name||'D').trim().charAt(0).toUpperCase();
+
+  // Pull all cars and filter to this dealer
+  function isThisDealer(car){
+    const ce = String(car.dealerEmail||car.sellerEmail||'').toLowerCase();
+    const oursByEmail = ce && DEALER.email && ce === String(DEALER.email).toLowerCase();
+    const oursByName  = (car.dealer||car.company||'').trim().toLowerCase() === (DEALER.company||DEALER.name||'').trim().toLowerCase();
+    return oursByEmail || oursByName;
+  }
+  const ALL = (MD.getCars?.() || []).filter(isThisDealer);
+
+  // KPIs
+  const kpiListings = document.getElementById('kpiListings');
+  const kpiAvgPrice = document.getElementById('kpiAvgPrice');
+  const kpiBadges   = document.getElementById('kpiBadges');
+  kpiListings.textContent = ALL.length;
+  const avg = ALL.length ? Math.round(ALL.reduce((s,c)=>s+(+c.price||0),0)/ALL.length) : 0;
+  kpiAvgPrice.textContent = GBP(avg);
+  if (DEALER.verified) kpiBadges.querySelector('.badge-verified').style.display = '';
+  if (DEALER.promoted)  kpiBadges.querySelector('.badge-promoted').style.display = '';
+
+  // Tables
+  const recentTable = document.getElementById('recentTable');
+  const invTable    = document.getElementById('invTable');
+
+  function renderTable(container, rows){
+    const head = `
+      <div class="row head" role="row">
+        <div>Title</div>
+        <div>Price</div>
+        <div>Year</div>
+        <div>Mileage</div>
+        <div>Fuel</div>
+        <div>Gearbox</div>
+        <div class="actions">Actions</div>
+      </div>`;
+    const body = rows.map(c=>`
+      <div class="row" role="row">
+        <div style="display:flex;gap:10px;align-items:center">
+          <img class="col-img" src="${c.img||''}" alt="" onerror="this.style.background='#eef2ff';this.removeAttribute('src')">
+          <a href="detail.html?id=${c.id}"><strong>${c.title||'Car'}</strong></a>
+        </div>
+        <div>${GBP(+c.price||0)}</div>
+        <div>${c.year||''}</div>
+        <div>${c.km!=null ? KM(+c.km||0) : ''}</div>
+        <div>${c.fuel||''}</div>
+        <div>${c.gearbox||''}</div>
+        <div class="actions">
+          <a class="btn btn-ghost" href="detail.html?id=${c.id}">View</a>
+          <a class="btn btn-primary" href="results.html?dealer_email=${encodeURIComponent(DEALER.email||'')}">More</a>
+        </div>
+      </div>
+    `).join('');
+    container.innerHTML = head + body;
+  }
+
+  renderTable(recentTable, ALL.slice(0,5));
+  renderTable(invTable, ALL);
+
+  // Inventory filters
+  const invSearch = document.getElementById('invSearch');
+  const invFuel   = document.getElementById('invFuel');
+  const invBox    = document.getElementById('invBox');
+  function reRenderInv(){
+    const q = (invSearch.value||'').toLowerCase();
+    const fuel = invFuel.value;
+    const box  = invBox.value;
+    let rows = ALL.slice();
+    if (q) rows = rows.filter(c => String(c.title||'').toLowerCase().includes(q) || String(c.fuel||'').toLowerCase().includes(q));
+    if (fuel) rows = rows.filter(c => String(c.fuel||'') === fuel);
+    if (box)  rows = rows.filter(c => String(c.gearbox||'') === box);
+    renderTable(invTable, rows);
+  }
+  [invSearch, invFuel, invBox].forEach(el => el.addEventListener('input', reRenderInv));
+
+  // Tabs
+  const tabBtns = Array.from(document.querySelectorAll('.tablink'));
+  const panels  = Array.from(document.querySelectorAll('.panel'));
+  function setTab(name){
+    tabBtns.forEach(b=>{
+      const act = b.dataset.tab===name;
+      b.classList.toggle('active', act);
+      b.setAttribute('aria-pressed', String(act));
     });
+    panels.forEach(p=>p.hidden = p.dataset.panel!==name);
+  }
+  tabBtns.forEach(b=>b.addEventListener('click', ()=>setTab(b.dataset.tab)));
+  document.getElementById('viewAllBtn').addEventListener('click', ()=>setTab('inventory'));
 
-    // Dealer list
-    const MD = window.MotoriaData;
-    const grid = document.getElementById('grid');
-    const qInput = document.getElementById('dealerSearch');
-    const filter = document.getElementById('dealerFilter');
+  // Messages (demo thread data in-memory)
+  const threadsEl = document.getElementById('threads');
+  const threadEl  = document.getElementById('thread');
+  const threadHeader = document.getElementById('threadHeader');
+  const msgForm  = document.getElementById('msgForm');
+  const msgInput = document.getElementById('msgInput');
 
-    function render(){
-      const q = (qInput.value||'').toLowerCase().trim();
-      const mode = filter.value;
-      let dealers = MD.getDealers();
+  const DEMO_THREADS = [
+    { id:1, from:'Alex',  car: ALL[0]?.title || 'Listing', msgs:[
+      { me:false, text:'Hi, is this still available?', at:'09:14' },
+      { me:true,  text:'Yes, available. Would you like to view?', at:'09:16' }
+    ]},
+    { id:2, from:'Maya',  car: ALL[1]?.title || 'Listing', msgs:[
+      { me:false, text:'Could you share service history?', at:'10:02' }
+    ]},
+  ];
 
-      // optional filters
-      if (mode === 'promoted') dealers = dealers.filter(d=>d.promoted);
-      if (mode === 'verified') dealers = dealers.filter(d=>d.verified);
+  function renderThreads(){
+    threadsEl.innerHTML = DEMO_THREADS.map(t=>`
+      <div class="thread-item" data-id="${t.id}">
+        <div class="from">${t.from}</div>
+        <div class="muted small">${t.car}</div>
+      </div>
+    `).join('');
+  }
+  function renderThread(id){
+    const t = DEMO_THREADS.find(x=>x.id===id);
+    if(!t){ threadEl.innerHTML = '<div class="thread-empty muted">No conversation</div>'; return; }
+    threadHeader.textContent = `${t.from} • ${t.car}`;
+    threadEl.innerHTML = t.msgs.map(m=>`
+      <div class="msg ${m.me?'me':''}">
+        <div>${m.text}</div>
+        <div class="meta">${m.at}</div>
+      </div>
+    `).join('');
+    threadsEl.querySelectorAll('.thread-item').forEach(el=>el.classList.toggle('active', +el.dataset.id===id));
+    threadEl.scrollTop = threadEl.scrollHeight;
+  }
+  threadsEl.addEventListener('click', e=>{
+    const item = e.target.closest('.thread-item'); if(!item) return;
+    renderThread(+item.dataset.id);
+  });
+  msgForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const active = threadsEl.querySelector('.thread-item.active');
+    if(!active) return;
+    const t = DEMO_THREADS.find(x=>x.id===+active.dataset.id);
+    const text = msgInput.value.trim(); if(!text) return;
+    t.msgs.push({me:true, text, at:new Date().toTimeString().slice(0,5)});
+    msgInput.value=''; renderThread(t.id);
+  });
 
-      if (q){
-        dealers = dealers.filter(d=>{
-          const hay = [d.company,d.name,d.city,d.email].map(x=>String(x||'').toLowerCase()).join(' ');
-          return hay.includes(q);
-        });
-      }
+  renderThreads();
+  renderThread(DEMO_THREADS[0]?.id);
 
-      // promoted first, then verified
-      dealers.sort((a,b)=> (b.promoted - a.promoted) || (b.verified - a.verified) || (String(a.company||a.name).localeCompare(String(b.company||b.name))));
+  // Settings (demo)
+  const setForm = document.getElementById('setForm');
+  const setCompany = document.getElementById('setCompany');
+  const setCity    = document.getElementById('setCity');
+  const setEmail   = document.getElementById('setEmail');
+  setCompany.value = DEALER.company || DEALER.name || '';
+  setCity.value    = DEALER.city || '';
+  setEmail.value   = DEALER.email || '';
+  setForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    alert('Saved (demo only).');
+  });
 
-      grid.innerHTML = dealers.map(d=>`
-        <article class="card ${d.verified?'verified':''} ${d.promoted?'promoted':''}">
-          <div class="card-body">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-              <h3 style="margin:0;font-size:18px">${d.company||d.name||'Dealer'}</h3>
-              <div class="badges">
-                ${d.promoted?'<span class="badge badge-promoted">Promoted</span>':''}
-                ${d.verified?'<span class="badge badge-verified">Verified</span>':''}
-              </div>
-            </div>
-            <div class="muted small" style="margin-top:6px">${d.city||''}${d.city&&d.country?', ':''}${d.country||''}</div>
-            <div class="muted small">${d.email||''}</div>
-
-            <div class="row" style="gap:8px;margin-top:10px">
-              <a class="btn btn-primary" href="results.html?dealer_email=${encodeURIComponent(d.email||'')}">View listings</a>
-              <a class="btn btn-ghost" href="results.html?dealer=${encodeURIComponent(d.company||d.name||'')}">Search by name</a>
-            </div>
-          </div>
-        </article>
-      `).join('') || '<div class="muted">No dealers found.</div>';
-    }
-
-    qInput.addEventListener('input', render);
-    filter.addEventListener('change', render);
-    render();
+  // Accessibility: default tab
+  setTab('overview');
   </script>
 </body>
 </html>
