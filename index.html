@@ -3,15 +3,62 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Motoria • Buy & Sell Cars</title>
   <meta name="description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options." />
+
+  <!-- Canonical + Social -->
+  <link rel="canonical" href="https://car-psi-brown.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Motoria — Buy & Sell Cars">
+  <meta property="og:description" content="Find your next car from verified dealers. Powerful search, trusted sellers, finance options.">
+  <meta property="og:url" content="https://car-psi-brown.vercel.app/">
+  <meta property="og:image" content="https://car-psi-brown.vercel.app/og-cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#1e88e5" />
+
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="home.css" />
+
+  <!-- Minimal inline helpers (you can move to CSS files later) -->
+  <style>
+    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{left:12px;top:12px;width:auto;height:auto;padding:.5rem 1rem;background:#111;color:#fff;border-radius:8px;z-index:1000}
+    /* Make the search card sticky for faster refinement */
+    .search-card{position:sticky;top:0.5rem;z-index:20;backdrop-filter: blur(8px)}
+  </style>
+
+  <!-- Organization + WebSite JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Motoria",
+    "url": "https://car-psi-brown.vercel.app/",
+    "logo": "https://car-psi-brown.vercel.app/favicon.svg"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Motoria",
+    "url":"https://car-psi-brown.vercel.app/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://car-psi-brown.vercel.app/results.html?{search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
+  </script>
 </head>
 <body>
+  <!-- Skip link for keyboard users -->
+  <a class="skip-link" href="#content">Skip to content</a>
+
   <!-- Header -->
-  <header class="site-header" id="siteHeader">
+  <header class="site-header" id="siteHeader" role="banner">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Motoria home">
         <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
@@ -28,11 +75,10 @@
         <ul id="navMenu" class="nav-menu">
           <li><a class="active" href="index.html">Home</a></li>
           <li><a href="results.html">Buy</a></li>
-          <li><a href="#">Sell</a></li>
-          <li><a href="#">Finance</a></li>
+          <li><a href="sell.html">Sell</a></li>
+          <li><a href="finance.html">Finance</a></li>
           <li><a href="dealers.html">Dealers</a></li>
           <li class="divider" aria-hidden="true"></li>
-          <!-- This placeholder is fine; app.js will replace items after the divider -->
           <li id="authSlot"></li>
         </ul>
       </nav>
@@ -53,14 +99,15 @@
         <p class="lede">Powerful search. Verified dealers. Clear history and finance options.</p>
 
         <!-- Search card with tabs -->
-        <div class="search-card">
+        <div class="search-card" role="region" aria-label="Search cars">
           <div class="tabs" role="tablist" aria-label="Search mode">
-            <button class="tab active" data-tab="buy" role="tab" aria-selected="true" aria-controls="tab-buy">Buy</button>
-            <button class="tab" data-tab="sell" role="tab" aria-selected="false" aria-controls="tab-sell">Sell</button>
+            <button class="tab active" data-tab="buy" role="tab" aria-selected="true" aria-controls="tabpanel-buy" id="tab-buy">Buy</button>
+            <button class="tab" data-tab="sell" role="tab" aria-selected="false" aria-controls="tabpanel-sell" id="tab-sell">Sell</button>
           </div>
 
           <!-- BUY form -->
-          <form id="homeSearch" class="buy-form" role="search" aria-label="Car search" tabindex="0" data-tabpanel="buy" aria-labelledby="tab-buy">
+          <form id="homeSearch" class="buy-form" role="search" aria-label="Car search" tabindex="0" data-tabpanel="buy" aria-labelledby="tab-buy" aria-describedby="searchHelp" >
+            <p id="searchHelp" class="visually-hidden">Choose make and model or use quick picks below</p>
             <div class="row">
               <label class="field">
                 <span>Make</span>
@@ -76,7 +123,7 @@
               </label>
               <label class="field">
                 <span>City / Postcode</span>
-                <input name="loc" placeholder="e.g. SW1A or London" />
+                <input name="loc" inputmode="text" autocomplete="postal-code" placeholder="e.g. SW1A or London" />
               </label>
             </div>
             <div class="row">
@@ -105,7 +152,7 @@
           </form>
 
           <!-- SELL panel -->
-          <div class="sell-panel" id="tab-sell" role="tabpanel" hidden aria-labelledby="tab-sell">
+          <div class="sell-panel" id="tabpanel-sell" role="tabpanel" hidden aria-labelledby="tab-sell">
             <h3>Sell your car with confidence</h3>
             <ul class="list">
               <li>Instant listing builder</li>
@@ -117,43 +164,43 @@
         </div>
 
         <!-- Social proof -->
-        <div class="trust-row">
-          <div class="trust-item"><span class="dot"></span> 1000+ verified dealers</div>
-          <div class="trust-item"><span class="dot"></span> Free history checks</div>
-          <div class="trust-item"><span class="dot"></span> Finance-friendly</div>
+        <div class="trust-row" role="list" aria-label="Marketplace advantages">
+          <div class="trust-item" role="listitem"><span class="dot"></span> 1000+ verified dealers</div>
+          <div class="trust-item" role="listitem"><span class="dot"></span> Free history checks</div>
+          <div class="trust-item" role="listitem"><span class="dot"></span> Finance-friendly</div>
         </div>
       </div>
 
       <!-- Right column visual -->
-      <div class="hero-right">
-        <div class="stat-card">
+      <div class="hero-right" aria-label="Popular picks">
+        <div class="stat-card" aria-live="polite">
           <div class="stat"><span id="statListings">2,480</span><small>cars</small></div>
           <div class="muted">Live nationwide</div>
         </div>
         <div class="grid-cards">
           <div class="mini-card">
-            <img src="assets/cars/sportage.jpg" alt="Kia Sportage" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <img loading="lazy" width="180" height="120" src="assets/cars/sportage.jpg" alt="Kia Sportage" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Kia Sportage</strong>
               <span>£19,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/leaf.jpg" alt="Nissan Leaf" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <img loading="lazy" width="180" height="120" src="assets/cars/leaf.jpg" alt="Nissan Leaf" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Nissan Leaf</strong>
               <span>£12,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/octavia.jpg" alt="Skoda Octavia" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <img loading="lazy" width="180" height="120" src="assets/cars/octavia.jpg" alt="Skoda Octavia" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Skoda Octavia</strong>
               <span>£9,900</span>
             </div>
           </div>
           <div class="mini-card">
-            <img src="assets/cars/ioniq.jpg" alt="Hyundai Ioniq" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
+            <img loading="lazy" width="180" height="120" src="assets/cars/ioniq.jpg" alt="Hyundai Ioniq" onerror="this.style.background='#eff3ff';this.removeAttribute('src')">
             <div class="mini-meta">
               <strong>Hyundai Ioniq</strong>
               <span>£15,800</span>
@@ -166,49 +213,51 @@
   </section>
 
   <!-- Explore tiles -->
-  <section class="container section explore">
-    <div class="section-head">
-      <h2>Explore Motoria</h2>
-    </div>
-    <div class="explore-grid">
-      <a class="explore-tile" href="results.html?fuel=Electric">
-        <div class="tone electric"></div>
-        <div class="tile-body">
-          <h3>Go Electric</h3>
-          <p>City-friendly EVs and long‑range options.</p>
-        </div>
-      </a>
-      <a class="explore-tile" href="results.html?max=10000">
-        <div class="tone budget"></div>
-        <div class="tile-body">
-          <h3>Best under £10k</h3>
-          <p>Value picks that won’t break the bank.</p>
-        </div>
-      </a>
-      <a class="explore-tile" href="dealers.html">
-        <div class="tone dealers"></div>
-        <div class="tile-body">
-          <h3>Verified Dealers</h3>
-          <p>Browse trusted partners near you.</p>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <!-- Featured -->
-  <section class="container section">
-    <div class="section-head">
-      <h2>Featured today</h2>
-      <div class="actions">
-        <button class="carousel-btn" id="prevBtn" aria-label="Previous listings">&#10094;</button>
-        <button class="carousel-btn" id="nextBtn" aria-label="Next listings">&#10095;</button>
+  <main id="content">
+    <section class="container section explore" aria-labelledby="exploreHeading">
+      <div class="section-head">
+        <h2 id="exploreHeading">Explore Motoria</h2>
       </div>
-    </div>
-    <div class="carousel" id="carousel" tabindex="0" aria-label="Featured listings"></div>
-  </section>
+      <div class="explore-grid">
+        <a class="explore-tile" href="results.html?fuel=Electric">
+          <div class="tone electric" aria-hidden="true"></div>
+          <div class="tile-body">
+            <h3>Go Electric</h3>
+            <p>City-friendly EVs and long-range options.</p>
+          </div>
+        </a>
+        <a class="explore-tile" href="results.html?max=10000">
+          <div class="tone budget" aria-hidden="true"></div>
+          <div class="tile-body">
+            <h3>Best under £10k</h3>
+            <p>Value picks that won’t break the bank.</p>
+          </div>
+        </a>
+        <a class="explore-tile" href="dealers.html">
+          <div class="tone dealers" aria-hidden="true"></div>
+          <div class="tile-body">
+            <h3>Verified Dealers</h3>
+            <p>Browse trusted partners near you.</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Featured -->
+    <section class="container section" aria-labelledby="featuredHeading">
+      <div class="section-head">
+        <h2 id="featuredHeading">Featured today</h2>
+        <div class="actions">
+          <button class="carousel-btn" id="prevBtn" aria-label="Previous listings">&#10094;</button>
+          <button class="carousel-btn" id="nextBtn" aria-label="Next listings">&#10095;</button>
+        </div>
+      </div>
+      <div class="carousel" id="carousel" tabindex="0" aria-label="Featured listings" aria-roledescription="carousel"></div>
+    </section>
+  </main>
 
   <!-- Footer -->
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="container footer-grid">
       <div>
         <div class="brand-footer">
@@ -223,8 +272,8 @@
       </div>
       <nav aria-label="Footer">
         <ul class="footer-links">
-          <li><a href="#">About</a></li>
-          <li><a href="#">Safety & Trust</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="trust.html">Safety & Trust</a></li>
           <li><a href="dealers.html">For Dealers</a></li>
         </ul>
       </nav>
@@ -260,7 +309,7 @@
 
     // Tabs + keyboard a11y
     const tabs = [...document.querySelectorAll('.tab')];
-    const sellPanel = document.querySelector('.sell-panel');
+    const sellPanel = document.querySelector('#tabpanel-sell');
     const buyForm = document.getElementById('homeSearch');
 
     function setTab(key){
@@ -311,14 +360,14 @@
       const hasTaxo = !!(MD.getTaxonomy && MD.modelsForMake);
       const makes = hasTaxo ? MD.getTaxonomy().makes.map(m=>m.name) : Object.keys(fallback);
 
-      makeSel.innerHTML = '<option value="">Any</option>' + makes.map(m=>`<option value="${m}">${m}</option>`).join('');
+      makeSel.innerHTML = '<option value=\"\">Any</option>' + makes.map(m=>`<option value=\"${m}\">${m}</option>`).join('');
       if (selectedMake && makes.includes(selectedMake)) makeSel.value = selectedMake;
 
       function refreshModels(){
         const mk = makeSel.value;
         const models = mk ? (hasTaxo ? MD.modelsForMake(mk) : (fallback[mk]||[])) : [];
         modelSel.disabled = !mk;
-        modelSel.innerHTML = '<option value="">Any</option>' + models.map(x=>`<option value="${x}">${x}</option>`).join('');
+        modelSel.innerHTML = '<option value=\"\">Any</option>' + models.map(x=>`<option value=\"${x}\">${x}</option>`).join('');
         if (selectedModel && models.includes(selectedModel)) modelSel.value = selectedModel;
       }
       refreshModels();
@@ -334,7 +383,7 @@
 
     // Featured (clean, minimalist)
     const featured = [
-      { id:9,  title:'Kia Sportage 1.6 T‑GDi', price:19900, year:2021, km:29000, fuel:'Petrol', img:'assets/cars/sportage.jpg' },
+      { id:9,  title:'Kia Sportage 1.6 T-GDi', price:19900, year:2021, km:29000, fuel:'Petrol', img:'assets/cars/sportage.jpg' },
       { id:8,  title:'Skoda Octavia 1.6 TDI',  price: 9900, year:2016, km:99000, fuel:'Diesel', img:'assets/cars/octavia.jpg'  },
       { id:6,  title:'Nissan Leaf 40kWh',     price:12900, year:2019, km:47000, fuel:'Electric',img:'assets/cars/leaf.jpg'     },
       { id:7,  title:'Mercedes A180d AMG',    price:21400, year:2019, km:38000, fuel:'Diesel',  img:'assets/cars/a180.jpg'     },
@@ -349,13 +398,16 @@
 
     function renderFeatured(){
       carouselEl.innerHTML = featured.map(c => `
-        <article class="card" tabindex="0" role="group" aria-label="${c.title}">
+        <article class="card" tabindex="0" role="group" aria-label="${c.title}" itemscope itemtype="https://schema.org/Vehicle">
           <a href="detail.html?id=${c.id}" aria-label="${c.title}">
-            <img class="card-img" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
+            <img class="card-img" loading="lazy" width="400" height="260" src="${c.img}" alt="${c.title}" onerror="this.style.background='#eff3ff'; this.removeAttribute('src')" />
           </a>
           <div class="card-body">
-            <div class="price">${GBP(c.price)}</div>
-            <div class="meta">${c.title}</div>
+            <div class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+              <span itemprop="priceCurrency" content="GBP">£</span>
+              <span itemprop="price" content="${c.price}">${GBP(c.price)}</span>
+            </div>
+            <div class="meta" itemprop="name">${c.title}</div>
             <div class="meta">${c.year} • ${KM(c.km)} • ${c.fuel}</div>
           </div>
         </article>
@@ -382,6 +434,33 @@
         if (cur >= target){ cur = target; clearInterval(t); }
         el.textContent = cur.toLocaleString('en-GB');
       }, 40);
+    })();
+
+    // ---- DYNAMIC Vehicle JSON-LD from 'featured' ----
+    (function injectVehicleJsonLd(){
+      try {
+        const items = featured.slice(0,5).map(c => ({
+          "@context":"https://schema.org",
+          "@type":"Vehicle",
+          "name": c.title,
+          "brand": c.title.split(' ')[0],
+          "model": c.title.split(' ').slice(1).join(' '),
+          "vehicleModelDate": String(c.year),
+          "mileageFromOdometer": { "@type":"QuantitativeValue", "value": c.km, "unitCode": "KMT" },
+          "image": new URL(c.img, location.href).toString(),
+          "offers": {
+            "@type": "Offer",
+            "price": String(c.price),
+            "priceCurrency": "GBP",
+            "availability": "https://schema.org/InStock",
+            "url": new URL(`detail.html?id=${c.id}`, location.href).toString()
+          }
+        }));
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.textContent = JSON.stringify(items.length === 1 ? items[0] : items);
+        document.head.appendChild(script);
+      } catch(e) { /* no-op */ }
     })();
   </script>
 </body>
