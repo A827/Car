@@ -1,4 +1,4 @@
-// data.js — shared data layer for Motoria (merge demo + dealer inventory)
+// data.js — shared data layer for Motoria (inventory + optional demo + taxonomy + dealers)
 (function(){
   'use strict';
 
@@ -8,36 +8,34 @@
     SEARCHES: 'saved_searches'
   };
 
+  // ----- formatters -----
   const GBP = n => new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(+n||0);
   const KM  = n => `${(+n||0).toLocaleString('en-GB')} km`;
 
-  function load(k, d){ try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d)) }catch(_){ return d } }
+  // ----- storage helpers -----
+  function load(k, d){ try { return JSON.parse(localStorage.getItem(k) || JSON.stringify(d)); } catch(_) { return d; } }
   function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 
-  // Read dealer inventory (already shaped correctly by dealer.js)
+  // ----- sources -----
   function readInventory(){ return load(KEYS.INV, []); }
+  function readDemo(){ return Array.isArray(window.DEMO_CARS) ? window.DEMO_CARS : []; }
 
-  // Optional demo set (if a page defined window.DEMO_CARS, we’ll use it)
-  function readDemo(){
-    return Array.isArray(window.DEMO_CARS) ? window.DEMO_CARS : [];
-  }
-
-  // Merge both sources; inventory IDs are large (6‑7 digits) so no collision
+  // merge inventory (from CMS/dealer.js) + optional demo (window.DEMO_CARS)
   function getCars(){
-    const inv = readInventory();
+    const inv  = readInventory();
     const demo = readDemo();
     return [...inv, ...demo];
   }
 
   function getCarById(id){
-    id = +id;
-    return getCars().find(c => +c.id === id) || null;
+    const needle = String(id);
+    return getCars().find(c => String(c.id) === needle) || null;
   }
 
   function saveCar(car){
     if (!car) return;
     const list = load(KEYS.SAVED, []);
-    if (!list.some(x => +x.id === +car.id)){
+    if (!list.some(x => String(x.id) === String(car.id))){
       list.unshift({
         id:car.id, title:car.title, price:car.price, year:car.year, km:car.km,
         fuel:car.fuel, gearbox:car.gearbox, img:car.img, loc:car.loc
@@ -53,10 +51,13 @@
     save(KEYS.SEARCHES, saved.slice(0,50));
   }
 
-  window.MotoriaData = { KEYS, GBP, KM, getCars, getCarById, saveCar, saveSearchFromParams };
+  // expose base API
+  window.MotoriaData = Object.assign({}, window.MotoriaData || {}, {
+    KEYS, GBP, KM, getCars, getCarById, saveCar, saveSearchFromParams
+  });
 })();
 
-// data.js — add taxonomy helpers
+// data.js — taxonomy helpers
 (function(){
   'use strict';
   const KEY_LIVE = 'motoria_taxonomy_v1';
@@ -64,33 +65,27 @@
 
   const DEFAULT_TAXO = {
     makes: [
-      { name:'Kia', models:['Sportage','Ceed','Rio','Stonic'] },
-      { name:'Skoda', models:['Octavia','Fabia','Superb','Karoq'] },
-      { name:'Hyundai', models:['Ioniq','i10','i20','Tucson'] },
+      { name:'Kia',        models:['Sportage','Ceed','Rio','Stonic'] },
+      { name:'Skoda',      models:['Octavia','Fabia','Superb','Karoq'] },
+      { name:'Hyundai',    models:['Ioniq','i10','i20','Tucson'] },
       { name:'Volkswagen', models:['Golf','Polo','Passat','T-Roc'] },
-      { name:'BMW', models:['1 Series','3 Series','X1','X3'] },
-      { name:'Audi', models:['A3','A4','Q2','Q3'] },
-      { name:'Ford', models:['Fiesta','Focus','Puma','Kuga'] },
-      { name:'Toyota', models:['Corolla','Yaris','C-HR','RAV4'] }
+      { name:'BMW',        models:['1 Series','3 Series','X1','X3'] },
+      { name:'Audi',       models:['A3','A4','Q2','Q3'] },
+      { name:'Ford',       models:['Fiesta','Focus','Puma','Kuga'] },
+      { name:'Toyota',     models:['Corolla','Yaris','C-HR','RAV4'] }
     ]
   };
 
-  function getTaxonomy(){
-    return load(KEY_LIVE, DEFAULT_TAXO);
-  }
+  function getTaxonomy(){ return load(KEY_LIVE, DEFAULT_TAXO); }
   function modelsForMake(makeName){
-    const taxo = getTaxonomy();
-    const m = taxo.makes.find(x => x.name.toLowerCase() === String(makeName||'').toLowerCase());
+    const m = getTaxonomy().makes.find(x => x.name.toLowerCase() === String(makeName||'').toLowerCase());
     return m ? m.models.slice() : [];
   }
 
-  // Attach to existing MotoriaData if present
-  window.MotoriaData = Object.assign({}, window.MotoriaData||{}, {
-    getTaxonomy, modelsForMake
-  });
+  window.MotoriaData = Object.assign({}, window.MotoriaData || {}, { getTaxonomy, modelsForMake });
 })();
 
-// data.js — dealers helpers (reads CMS dealers; annotate cars with dealer flags)
+// data.js — dealers + annotations (+ convenience helpers)
 (function(){
   'use strict';
 
@@ -112,31 +107,15 @@
     const e = String(email).toLowerCase();
     return getDealers().find(d => String(d.email||'').toLowerCase()===e) || null;
   }
+  const isDealerVerified = (email)=> !!(dealerByEmail(email)?.verified);
+  const isDealerPromoted = (email)=> !!(dealerByEmail(email)?.promoted);
 
-  function isDealerVerified(email){
-    const d = dealerByEmail(email);
-    return !!(d && d.verified);
-  }
-
-  function isDealerPromoted(email){
-    const d = dealerByEmail(email);
-    return !!(d && d.promoted);
-  }
-
-  /**
-   * annotateCars(cars[])
-   * Returns a new array where each car is tagged:
-   * - dealerVerified: boolean
-   * - dealerPromoted: boolean
-   * Lookup priority: dealerEmail -> (fallback) dealer/company/name string match.
-   */
+  // annotateCars: tag each car with dealer flags
   function annotateCars(cars){
     const list = Array.isArray(cars) ? cars.slice() : [];
     const dealers = getDealers();
     const byEmail = new Map(dealers.map(d => [String(d.email||'').toLowerCase(), d]));
-    const byName  = new Map(
-      dealers.map(d => [String(d.company||d.name||'').trim().toLowerCase(), d])
-    );
+    const byName  = new Map(dealers.map(d => [String(d.company||d.name||'').trim().toLowerCase(), d]));
 
     return list.map(c => {
       const email = String(c.dealerEmail||c.sellerEmail||'').toLowerCase();
@@ -152,12 +131,29 @@
     });
   }
 
-  // Extend MotoriaData without removing prior methods
-  window.MotoriaData = Object.assign({}, window.MotoriaData||{}, {
-    getDealers,
-    dealerByEmail,
-    isDealerVerified,
-    isDealerPromoted,
-    annotateCars
+  // convenience helpers used by pages
+  function getCarsAnnotated(){ return annotateCars((window.MotoriaData?.getCars()||[])); }
+
+  function getSimilarCars(carOrId, n=8){
+    const car = typeof carOrId === 'object' ? carOrId : (window.MotoriaData?.getCarById?.(carOrId));
+    if(!car) return [];
+    const all = getCarsAnnotated().filter(x => String(x.id) !== String(car.id));
+    // simple similarity: same make/model first, then same fuel, then promoted/verified
+    all.sort((a,b)=>{
+      const smA = +(a.make===car.make) + +(a.model===car.model);
+      const smB = +(b.make===car.make) + +(b.model===car.model);
+      if (smB - smA) return smB - smA;
+      const fu = +(b.fuel===car.fuel) - +(a.fuel===car.fuel);
+      if (fu) return fu;
+      const pv = (+b.dealerPromoted - +a.dealerPromoted) || (+b.dealerVerified - +a.dealerVerified);
+      if (pv) return pv;
+      return (b.ts||0) - (a.ts||0);
+    });
+    return all.slice(0,n);
+  }
+
+  window.MotoriaData = Object.assign({}, window.MotoriaData || {}, {
+    getDealers, dealerByEmail, isDealerVerified, isDealerPromoted,
+    annotateCars, getCarsAnnotated, getSimilarCars
   });
 })();
