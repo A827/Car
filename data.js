@@ -2,6 +2,67 @@
 (function(){
   'use strict';
 
+  // ===== DEMO INVENTORY (for testing UI) =====
+  window.DEMO_CARS = [
+    {
+      id: 1,
+      title: "BMW 330D",
+      make: "BMW",
+      model: "330D",
+      year: 2019,
+      km: 42000,
+      price: 20000,
+      fuel: "Diesel",
+      gearbox: "Automatic",
+      colour: "Black",
+      owners: 1,
+      loc: "London",
+      img: "https://cdn.pixabay.com/photo/2017/01/06/19/15/bmw-1957037_1280.jpg",
+      dealer: "City Motors",
+      dealerEmail: "sales@citymotors.co.uk",
+      desc: "Excellent condition, full service history.",
+      ts: Date.now()
+    },
+    {
+      id: 2,
+      title: "Kia Sportage 1.6 GDi",
+      make: "Kia",
+      model: "Sportage",
+      year: 2021,
+      km: 18000,
+      price: 17500,
+      fuel: "Petrol",
+      gearbox: "Manual",
+      colour: "White",
+      owners: 1,
+      loc: "Manchester",
+      img: "https://cdn.pixabay.com/photo/2018/05/22/08/59/kia-3422822_1280.jpg",
+      dealer: "Northern Cars",
+      dealerEmail: "contact@northerncars.co.uk",
+      desc: "Low mileage, great family SUV.",
+      ts: Date.now()-10000
+    },
+    {
+      id: 3,
+      title: "Hyundai Ioniq Hybrid",
+      make: "Hyundai",
+      model: "Ioniq",
+      year: 2020,
+      km: 31000,
+      price: 15800,
+      fuel: "Hybrid",
+      gearbox: "Automatic",
+      colour: "Silver",
+      owners: 2,
+      loc: "Cardiff",
+      img: "https://cdn.pixabay.com/photo/2019/06/17/18/31/hyundai-4279142_1280.jpg",
+      dealer: "Eco Cars",
+      dealerEmail: "eco@cars.uk",
+      desc: "Efficient and stylish hybrid hatchback.",
+      ts: Date.now()-20000
+    }
+  ];
+
   const KEYS = {
     INV: 'motoria_listings',
     SAVED: 'motoria_saved_cars',
